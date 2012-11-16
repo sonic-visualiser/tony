@@ -21,49 +21,22 @@
 #include "view/Pane.h"
 #include "view/PaneStack.h"
 #include "data/model/WaveFileModel.h"
-#include "data/model/SparseOneDimensionalModel.h"
-#include "data/model/FFTModel.h"
 #include "view/ViewManager.h"
 #include "base/Preferences.h"
 #include "layer/WaveformLayer.h"
-#include "layer/TimeRulerLayer.h"
 #include "layer/TimeInstantLayer.h"
 #include "layer/TimeValueLayer.h"
-#include "layer/Colour3DPlotLayer.h"
-#include "layer/SliceLayer.h"
-#include "layer/SliceableLayer.h"
 #include "widgets/Fader.h"
 #include "view/Overview.h"
-#include "widgets/PropertyBox.h"
-#include "widgets/PropertyStack.h"
 #include "widgets/AudioDial.h"
 #include "widgets/IconLoader.h"
-#include "widgets/ListInputDialog.h"
-#include "widgets/SubdividingMenu.h"
-#include "widgets/NotifyingPushButton.h"
 #include "widgets/KeyReference.h"
 #include "audioio/AudioCallbackPlaySource.h"
 #include "audioio/AudioCallbackPlayTarget.h"
-#include "audioio/AudioTargetFactory.h"
 #include "audioio/PlaySpeedRangeMapper.h"
-#include "data/fileio/DataFileReaderFactory.h"
-#include "data/fileio/PlaylistFileReader.h"
-#include "data/fileio/WavFileWriter.h"
-#include "data/fileio/CSVFileWriter.h"
-#include "data/fileio/BZipFileDevice.h"
-#include "data/fileio/FileSource.h"
-#include "data/fft/FFTDataServer.h"
-#include "base/RecentFiles.h"
-#include "transform/TransformFactory.h"
-#include "transform/ModelTransformerFactory.h"
-#include "base/PlayParameterRepository.h"
-#include "base/XmlExportable.h"
-#include "widgets/CommandHistory.h"
 #include "base/Profiler.h"
-#include "base/Clipboard.h"
 #include "base/UnitDatabase.h"
 #include "layer/ColourDatabase.h"
-#include "data/osc/OSCQueue.h"
 
 // For version information
 #include "vamp/vamp.h"
@@ -75,24 +48,16 @@
 #include <QMessageBox>
 #include <QGridLayout>
 #include <QLabel>
-#include <QAction>
 #include <QMenuBar>
 #include <QToolBar>
 #include <QToolButton>
-#include <QButtonGroup>
 #include <QInputDialog>
 #include <QStatusBar>
-#include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include <QTextStream>
 #include <QProcess>
-#include <QShortcut>
+#include <QPushButton>
 #include <QSettings>
-#include <QDateTime>
-#include <QProcess>
-#include <QCheckBox>
-#include <QRegExp>
 #include <QScrollArea>
 
 #include <iostream>
@@ -103,8 +68,6 @@ using std::cerr;
 using std::endl;
 
 using std::vector;
-using std::map;
-using std::set;
 
 
 MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :

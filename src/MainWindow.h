@@ -16,45 +16,7 @@
 #ifndef _MAIN_WINDOW_H_
 #define _MAIN_WINDOW_H_
 
-#include <QFrame>
-#include <QString>
-#include <QUrl>
-#include <QMainWindow>
-#include <QPointer>
-
 #include "framework/MainWindowBase.h"
-#include "base/Command.h"
-#include "view/ViewManager.h"
-#include "base/PropertyContainer.h"
-#include "base/RecentFiles.h"
-#include "layer/LayerFactory.h"
-#include "transform/Transform.h"
-#include "framework/SVFileReader.h"
-#include "widgets/InteractiveFileFinder.h"
-#include <map>
-
-class Document;
-class PaneStack;
-class Pane;
-class View;
-class Fader;
-class Overview;
-class Layer;
-class WaveformLayer;
-class WaveFileModel;
-class AudioCallbackPlaySource;
-class AudioCallbackPlayTarget;
-class CommandHistory;
-class QMenu;
-class AudioDial;
-class QLabel;
-class QCheckBox;
-class QTreeView;
-class QPushButton;
-class OSCQueue;
-class OSCMessage;
-class KeyReference;
-
 
 class MainWindow : public MainWindowBase
 {
