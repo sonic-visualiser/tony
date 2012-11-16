@@ -773,14 +773,12 @@ MainWindow::updateDescriptionLabel()
 void
 MainWindow::documentModified()
 {
-    //!!!
     MainWindowBase::documentModified();
 }
 
 void
 MainWindow::documentRestored()
 {
-    //!!!
     MainWindowBase::documentRestored();
 }
 
@@ -960,7 +958,7 @@ MainWindow::paneAboutToBeDeleted(Pane *pane)
 void
 MainWindow::paneDropAccepted(Pane *pane, QStringList uriList)
 {
-//    if (pane) m_paneStack->setCurrentPane(pane);
+    if (pane) m_paneStack->setCurrentPane(pane);
 
     for (QStringList::iterator i = uriList.begin(); i != uriList.end(); ++i) {
 
@@ -1326,14 +1324,6 @@ void
 MainWindow::sampleRateMismatch(size_t requested, size_t actual,
                                bool willResample)
 {
-    if (!willResample) {
-        //!!! more helpful message needed
-        QMessageBox::information
-            (this, tr("Sample rate mismatch"),
-             tr("The sample rate of this audio file (%1 Hz) does not match\nthe current playback rate (%2 Hz).\n\nThe file will play at the wrong speed and pitch.")
-             .arg(requested).arg(actual));
-    }        
-
     updateDescriptionLabel();
 }
 
@@ -1513,13 +1503,15 @@ MainWindow::mouseLeftWidget()
 void
 MainWindow::website()
 {
-    openHelpUrl(tr("http://www.sonicvisualiser.org/"));
+    //!!! todo: URL!
+    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/"));
 }
 
 void
 MainWindow::help()
 {
-    openHelpUrl(tr("http://www.sonicvisualiser.org/doc/reference/1.0/en/"));
+    //!!! todo: help URL!
+    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/"));
 }
 
 void
