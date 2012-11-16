@@ -110,26 +110,6 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     QSettings settings;
 
-    settings.beginGroup("LayerDefaults");
-
-    settings.setValue("waveform",
-                      QString("<layer scale=\"%1\" channelMode=\"%2\"/>")
-                      .arg(int(WaveformLayer::MeterScale))
-//                      .arg(int(WaveformLayer::LinearScale))
-                      .arg(int(WaveformLayer::MergeChannels)));
-
-    settings.setValue("timevalues",
-                      QString("<layer plotStyle=\"%1\"/>")
-                      .arg(int(TimeValueLayer::PlotStems)));
-
-    settings.setValue("spectrogram",
-                      QString("<layer channel=\"-1\" windowSize=\"2048\" windowHopLevel=\"2\"/>"));
-
-    settings.setValue("melodicrange",
-                      QString("<layer channel=\"-1\" gain=\"10\" normalizeVisibleArea=\"false\" normalizeColumns=\"false\" minFrequency=\"100\" maxFrequency=\"1200\" windowSize=\"4096\" windowOverlap=\"75\" binDisplay=\"0\" />"));
-
-    settings.endGroup();
-
     settings.beginGroup("MainWindow");
     settings.setValue("showstatusbar", false);
     settings.endGroup();

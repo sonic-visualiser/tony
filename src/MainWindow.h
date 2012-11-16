@@ -114,6 +114,8 @@ protected:
     QAction                 *m_ffwdAction;
     QAction                 *m_rwdAction;
 
+    QLabel                  *m_descriptionLabel;
+
     KeyReference            *m_keyReference;
 
     virtual void setupMenus();
