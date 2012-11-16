@@ -712,10 +712,10 @@ MainWindow::updateMenuStates()
 	 currentLayer->isLayerEditable());
     bool haveCurrentTimeInstantsLayer = 
 	(haveCurrentLayer &&
-	 dynamic_cast<TimeInstantLayer *>(currentLayer));
+	 qobject_cast<TimeInstantLayer *>(currentLayer));
     bool haveCurrentTimeValueLayer = 
 	(haveCurrentLayer &&
-	 dynamic_cast<TimeValueLayer *>(currentLayer));
+	 qobject_cast<TimeValueLayer *>(currentLayer));
 
     emit canChangePlaybackSpeed(true);
     int v = m_playSpeed->value();
@@ -913,7 +913,7 @@ void
 MainWindow::openRecentFile()
 {
     QObject *obj = sender();
-    QAction *action = dynamic_cast<QAction *>(obj);
+    QAction *action = qobject_cast<QAction *>(obj);
     
     if (!action) {
 	std::cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
@@ -1009,8 +1009,8 @@ MainWindow::configureNewPane(Pane *pane)
     for (int i = 0; i < pane->getLayerCount(); ++i) {
         Layer *layer = pane->getLayer(i);
         if (!layer) continue;
-        if (dynamic_cast<WaveformLayer *>(layer)) waveformLayer = layer;
-        if (dynamic_cast<TimeValueLayer *>(layer)) return;
+        if (qobject_cast<WaveformLayer *>(layer)) waveformLayer = layer;
+        if (qobject_cast<TimeValueLayer *>(layer)) return;
     }
     if (!waveformLayer) return;
 
@@ -1372,7 +1372,7 @@ void
 MainWindow::modelAdded(Model *model)
 {
     MainWindowBase::modelAdded(model);
-    DenseTimeValueModel *dtvm = dynamic_cast<DenseTimeValueModel *>(model);
+    DenseTimeValueModel *dtvm = qobject_cast<DenseTimeValueModel *>(model);
     if (dtvm) {
         std::cerr << "A dense time-value model (such as an audio file) has been loaded" << std::endl;
     }
@@ -1490,7 +1490,7 @@ MainWindow::handleOSCMessage(const OSCMessage &message)
 void
 MainWindow::mouseEnteredWidget()
 {
-    QWidget *w = dynamic_cast<QWidget *>(sender());
+    QWidget *w = qobject_cast<QWidget *>(sender());
     if (!w) return;
 
     if (w == m_fader) {
