@@ -1,0 +1,24 @@
+syntax: glob
+Makefile
+Makefile.tonyapp
+*/Makefile
+o/*
+*/o/*
+*/tmp_obj/*
+*/tmp_moc/*
+doc/html/
+*.o
+*.so
+*.so.*
+*.a
+*.wav
+*~
+*.orig
+*.rej
+re:^autom4te\.cache/
+re:^qrc_tony\.cpp$
+re:^tony$
+re:^aclocal\.m4$
+re:^config\.log$
+re:^config\.pri$
+re:^config\.status$
