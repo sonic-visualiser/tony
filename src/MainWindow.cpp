@@ -16,6 +16,8 @@
 #include "../version.h"
 
 #include "MainWindow.h"
+#include "Analyser.h"
+
 #include "framework/Document.h"
 
 #include "view/Pane.h"
@@ -114,28 +116,31 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     settings.setValue("showstatusbar", false);
     settings.endGroup();
 
-    m_viewManager->setAlignMode(true);
-    m_viewManager->setPlaySoloMode(true);
+    m_viewManager->setAlignMode(false);
+    m_viewManager->setPlaySoloMode(false);
     m_viewManager->setToolMode(ViewManager::NavigateMode);
     m_viewManager->setZoomWheelsEnabled(false);
-    m_viewManager->setIlluminateLocalFeatures(false);
+    m_viewManager->setIlluminateLocalFeatures(true);
     m_viewManager->setShowWorkTitle(true);
+    m_viewManager->setShowCentreLine(false);
+    m_viewManager->setOverlayMode(ViewManager::NoOverlays);
 
     QFrame *frame = new QFrame;
     setCentralWidget(frame);
 
     QGridLayout *layout = new QGridLayout;
     
-    m_descriptionLabel = new QLabel;
-
     QScrollArea *scroll = new QScrollArea(frame);
     scroll->setWidgetResizable(true);
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setFrameShape(QFrame::NoFrame);
 
+    // We have a pane stack: it comes with the territory. However, we
+    // have a fixed and known number of panes in it (e.g. 1) -- it
+    // isn't variable
     m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
     scroll->setWidget(m_paneStack);
-    
+
     m_overview = new Overview(frame);
     m_overview->setViewManager(m_viewManager);
     m_overview->setFixedHeight(40);
@@ -147,7 +152,6 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 #endif
     connect(m_overview, SIGNAL(contextHelpChanged(const QString &)),
             this, SLOT(contextHelpChanged(const QString &)));
-    m_overview->hide();
 
     m_panLayer = new WaveformLayer;
     m_panLayer->setChannelMode(WaveformLayer::MergeChannels);
@@ -184,14 +188,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     layout->setSpacing(4);
-    layout->addWidget(scroll, 0, 0, 1, 6);
-    layout->addWidget(m_overview, 1, 1);
-    layout->addWidget(m_fader, 1, 2);
-    layout->addWidget(m_playSpeed, 1, 3);
-
-    m_paneStack->setPropertyStackMinWidth
-        (m_fader->width() + m_playSpeed->width() +
-         layout->spacing() * 4);
+    layout->addWidget(m_overview, 0, 1);
+    layout->addWidget(scroll, 1, 1);
 
     layout->setColumnStretch(1, 10);
 
@@ -203,11 +201,14 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     statusBar();
 
+    m_analyser = new Analyser();
+
     newSession();
 }
 
 MainWindow::~MainWindow()
 {
+    delete m_analyser;
     delete m_keyReference;
     Profiles::getInstance()->dump();
 }
@@ -369,88 +370,6 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canZoom(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
-
-    menu->addSeparator();
-
-    m_keyReference->setCategory(tr("Display Features"));
-
-    QActionGroup *overlayGroup = new QActionGroup(this);
-        
-    action = new QAction(tr("Show &No Overlays"), this);
-    action->setShortcut(tr("0"));
-    action->setStatusTip(tr("Hide centre indicator, frame times, layer names and scale"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showNoOverlays()));
-    action->setCheckable(true);
-    action->setChecked(false);
-    overlayGroup->addAction(action);
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-        
-    action = new QAction(tr("Show &Minimal Overlays"), this);
-    action->setShortcut(tr("9"));
-    action->setStatusTip(tr("Show centre indicator only"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showMinimalOverlays()));
-    action->setCheckable(true);
-    action->setChecked(false);
-    overlayGroup->addAction(action);
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-        
-    action = new QAction(tr("Show &Standard Overlays"), this);
-    action->setShortcut(tr("8"));
-    action->setStatusTip(tr("Show centre indicator, frame times and scale"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showStandardOverlays()));
-    action->setCheckable(true);
-    action->setChecked(true);
-    overlayGroup->addAction(action);
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-        
-    action = new QAction(tr("Show &All Overlays"), this);
-    action->setShortcut(tr("7"));
-    action->setStatusTip(tr("Show all texts and scale"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showAllOverlays()));
-    action->setCheckable(true);
-    action->setChecked(false);
-    overlayGroup->addAction(action);
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-        
-    menu->addSeparator();
-
-    action = new QAction(tr("Show &Zoom Wheels"), this);
-    action->setShortcut(tr("Z"));
-    action->setStatusTip(tr("Show thumbwheels for zooming horizontally and vertically"));
-    connect(action, SIGNAL(triggered()), this, SLOT(toggleZoomWheels()));
-    action->setCheckable(true);
-    action->setChecked(m_viewManager->getZoomWheelsEnabled());
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-        
-    action = new QAction(tr("Show Property Bo&xes"), this);
-    action->setShortcut(tr("X"));
-    action->setStatusTip(tr("Show the layer property boxes at the side of the main window"));
-    connect(action, SIGNAL(triggered()), this, SLOT(togglePropertyBoxes()));
-    action->setCheckable(true);
-    action->setChecked(false); //!!!
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-
-    action = new QAction(tr("Show Status &Bar"), this);
-    action->setStatusTip(tr("Show context help information in the status bar at the bottom of the window"));
-    connect(action, SIGNAL(triggered()), this, SLOT(toggleStatusBar()));
-    action->setCheckable(true);
-    action->setChecked(true);
-    menu->addAction(action);
-
-    QSettings settings;
-    settings.beginGroup("MainWindow");
-    bool sb = settings.value("showstatusbar", true).toBool();
-    if (!sb) {
-        action->setChecked(false);
-        statusBar()->hide();
-    }
-    settings.endGroup();
 }
 
 void
@@ -561,7 +480,7 @@ MainWindow::setupToolbars()
     ffwdEndAction->setStatusTip(tr("Fast-forward to the end"));
     connect(ffwdEndAction, SIGNAL(triggered()), this, SLOT(ffwdEnd()));
     connect(this, SIGNAL(canPlay(bool)), ffwdEndAction, SLOT(setEnabled(bool)));
-/*
+
     toolbar = addToolBar(tr("Play Mode Toolbar"));
 
     QAction *psAction = toolbar->addAction(il.load("playselection"),
@@ -586,33 +505,17 @@ MainWindow::setupToolbars()
     connect(plAction, SIGNAL(triggered()), this, SLOT(playLoopToggled()));
     connect(this, SIGNAL(canPlay(bool)), plAction, SLOT(setEnabled(bool)));
 
-    QAction *soAction = toolbar->addAction(il.load("solo"),
-                                           tr("Solo Current Pane"));
-    soAction->setCheckable(true);
-    soAction->setChecked(m_viewManager->getPlaySoloMode());
-    soAction->setShortcut(tr("o"));
-    soAction->setStatusTip(tr("Solo the current pane during playback"));
-    connect(m_viewManager, SIGNAL(playSoloModeChanged(bool)),
-            soAction, SLOT(setChecked(bool)));
-    connect(soAction, SIGNAL(triggered()), this, SLOT(playSoloToggled()));
-    connect(this, SIGNAL(canPlay(bool)), soAction, SLOT(setEnabled(bool)));
-
     m_keyReference->registerShortcut(psAction);
     m_keyReference->registerShortcut(plAction);
-    m_keyReference->registerShortcut(soAction);
-*/
     m_keyReference->registerShortcut(playAction);
     m_keyReference->registerShortcut(m_rwdAction);
     m_keyReference->registerShortcut(m_ffwdAction);
     m_keyReference->registerShortcut(rwdStartAction);
     m_keyReference->registerShortcut(ffwdEndAction);
 
-/*
+    menu->addAction(playAction);
     menu->addAction(psAction);
     menu->addAction(plAction);
-    menu->addAction(soAction);
-*/
-    menu->addAction(playAction);
     menu->addSeparator();
     menu->addAction(m_rwdAction);
     menu->addAction(m_ffwdAction);
@@ -622,11 +525,8 @@ MainWindow::setupToolbars()
     menu->addSeparator();
 
     m_rightButtonPlaybackMenu->addAction(playAction);
-/*
     m_rightButtonPlaybackMenu->addAction(psAction);
     m_rightButtonPlaybackMenu->addAction(plAction);
-    m_rightButtonPlaybackMenu->addAction(soAction);
-*/
     m_rightButtonPlaybackMenu->addSeparator();
     m_rightButtonPlaybackMenu->addAction(m_rwdAction);
     m_rightButtonPlaybackMenu->addAction(m_ffwdAction);
@@ -660,10 +560,10 @@ MainWindow::setupToolbars()
     m_rightButtonPlaybackMenu->addAction(fastAction);
     m_rightButtonPlaybackMenu->addAction(slowAction);
     m_rightButtonPlaybackMenu->addAction(normalAction);
-/*
-    toolbar = addToolBar(tr("Edit Toolbar"));
-    CommandHistory::getInstance()->registerToolbar(toolbar);
-*/
+
+    toolbar = addToolBar(tr("Playback Controls"));
+    toolbar->addWidget(m_playSpeed);
+    toolbar->addWidget(m_fader);
 
     Pane::registerShortcuts(*m_keyReference);
 }
@@ -725,29 +625,7 @@ MainWindow::updateMenuStates()
 void
 MainWindow::updateDescriptionLabel()
 {
-    if (!getMainModel()) {
-	m_descriptionLabel->setText(tr("No audio file loaded."));
-	return;
-    }
-
-    QString description;
-
-    size_t ssr = getMainModel()->getSampleRate();
-    size_t tsr = ssr;
-    if (m_playSource) tsr = m_playSource->getTargetSampleRate();
-
-    if (ssr != tsr) {
-	description = tr("%1Hz (resampling to %2Hz)").arg(ssr).arg(tsr);
-    } else {
-	description = QString("%1Hz").arg(ssr);
-    }
-
-    description = QString("%1 - %2")
-	.arg(RealTime::frame2RealTime(getMainModel()->getEndFrame(), ssr)
-	     .toText(false).c_str())
-	.arg(description);
-
-    m_descriptionLabel->setText(description);
+    // Nothing, we don't have one
 }
 
 void
@@ -776,8 +654,8 @@ MainWindow::newSession()
     connect(pane, SIGNAL(contextHelpChanged(const QString &)),
             this, SLOT(contextHelpChanged(const QString &)));
 
-    Layer *waveform = m_document->createMainModelLayer(LayerFactory::Waveform);
-    m_document->addLayerToView(pane, waveform);
+//    Layer *waveform = m_document->createMainModelLayer(LayerFactory::Waveform);
+//    m_document->addLayerToView(pane, waveform);
 
     m_overview->registerView(pane);
 
@@ -918,7 +796,7 @@ MainWindow::openRecentFile()
 void
 MainWindow::paneAdded(Pane *pane)
 {
-    pane->setPlaybackFollow(PlaybackScrollContinuous);
+    pane->setPlaybackFollow(PlaybackScrollPage);
     m_paneStack->sizePanesEqually();
     if (m_overview) m_overview->registerView(pane);
 }    
@@ -980,21 +858,11 @@ MainWindow::configureNewPane(Pane *pane)
 {
     std::cerr << "MainWindow::configureNewPane(" << pane << ")" << std::endl;
 
-    if (!pane) return;
-
-    Layer *waveformLayer = 0;
-
-    for (int i = 0; i < pane->getLayerCount(); ++i) {
-        Layer *layer = pane->getLayer(i);
-        if (!layer) continue;
-        if (qobject_cast<WaveformLayer *>(layer)) waveformLayer = layer;
-        if (qobject_cast<TimeValueLayer *>(layer)) return;
+    if (!pane) {
+        pane = m_paneStack->addPane();
     }
-    if (!waveformLayer) return;
 
-    waveformLayer->setObjectName(tr("Waveform"));
-
-    zoomToFit();
+    m_analyser->newFileLoaded(m_document, getMainModel(), m_paneStack, pane);
 }
 
 void
@@ -1347,13 +1215,6 @@ MainWindow::modelAdded(Model *model)
         std::cerr << "A dense time-value model (such as an audio file) has been loaded" << std::endl;
     }
 }
-
-void
-MainWindow::modelReady()
-{
-    QObject *s = sender();
-    std::cerr << "MainWindow::modelReady(" << s << ")" << std::endl;
-}            
 
 void
 MainWindow::modelAboutToBeDeleted(Model *model)

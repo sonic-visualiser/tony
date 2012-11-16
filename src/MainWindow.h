@@ -18,6 +18,8 @@
 
 #include "framework/MainWindowBase.h"
 
+class Analyser;
+
 class MainWindow : public MainWindowBase
 {
     Q_OBJECT
@@ -73,7 +75,6 @@ protected slots:
 
     virtual void mainModelChanged(WaveFileModel *);
     virtual void modelAdded(Model *);
-    virtual void modelReady();
     virtual void modelAboutToBeDeleted(Model *);
 
     virtual void modelGenerationFailed(QString, QString);
@@ -97,26 +98,26 @@ protected slots:
     virtual void keyReference();
 
 protected:
-    Overview                *m_overview;
-    Fader                   *m_fader;
-    AudioDial               *m_playSpeed;
-    QPushButton             *m_playSharpen;
-    QPushButton             *m_playMono;
-    WaveformLayer           *m_panLayer;
+    Analyser      *m_analyser;
 
-    bool                     m_mainMenusCreated;
-    QMenu                   *m_playbackMenu;
-    QMenu                   *m_recentFilesMenu;
-    QMenu                   *m_rightButtonMenu;
-    QMenu                   *m_rightButtonPlaybackMenu;
+    Overview      *m_overview;
+    Fader         *m_fader;
+    AudioDial     *m_playSpeed;
+    QPushButton   *m_playSharpen;
+    QPushButton   *m_playMono;
+    WaveformLayer *m_panLayer;
 
-    QAction                 *m_deleteSelectedAction;
-    QAction                 *m_ffwdAction;
-    QAction                 *m_rwdAction;
+    bool           m_mainMenusCreated;
+    QMenu         *m_playbackMenu;
+    QMenu         *m_recentFilesMenu;
+    QMenu         *m_rightButtonMenu;
+    QMenu         *m_rightButtonPlaybackMenu;
 
-    QLabel                  *m_descriptionLabel;
+    QAction       *m_deleteSelectedAction;
+    QAction       *m_ffwdAction;
+    QAction       *m_rwdAction;
 
-    KeyReference            *m_keyReference;
+    KeyReference  *m_keyReference;
 
     virtual void setupMenus();
     virtual void setupFileMenu();
