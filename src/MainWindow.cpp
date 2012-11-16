@@ -38,7 +38,6 @@
 #include "widgets/PropertyStack.h"
 #include "widgets/AudioDial.h"
 #include "widgets/IconLoader.h"
-#include "widgets/LayerTree.h"
 #include "widgets/ListInputDialog.h"
 #include "widgets/SubdividingMenu.h"
 #include "widgets/NotifyingPushButton.h"
@@ -83,7 +82,6 @@
 #include <QButtonGroup>
 #include <QInputDialog>
 #include <QStatusBar>
-#include <QTreeView>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -120,7 +118,6 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_deleteSelectedAction(0),
     m_ffwdAction(0),
     m_rwdAction(0),
-    m_layerTreeView(0),
     m_keyReference(new KeyReference())
 {
     setWindowTitle(QApplication::applicationName());
@@ -269,7 +266,6 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 MainWindow::~MainWindow()
 {
     delete m_keyReference;
-    delete m_layerTreeView;
     Profiles::getInstance()->dump();
 }
 
@@ -304,37 +300,27 @@ MainWindow::setupFileMenu()
     m_keyReference->setCategory(tr("File and Session Management"));
 
     IconLoader il;
-
-    QIcon icon = il.load("filenew");
-    icon.addPixmap(il.loadPixmap("filenew-22"));
-    QAction *action = new QAction(icon, tr("&Clear Session"), this);
-    action->setShortcut(tr("Ctrl+N"));
-    action->setStatusTip(tr("Abandon the current session and start a new one"));
-    connect(action, SIGNAL(triggered()), this, SLOT(newSession()));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-    toolbar->addAction(action);
+    QIcon icon;
+    QAction *action;
 
     icon = il.load("fileopen");
     icon.addPixmap(il.loadPixmap("fileopen-22"));
-    action = new QAction(icon, tr("&Add File..."), this);
+    action = new QAction(icon, tr("&Open..."), this);
     action->setShortcut(tr("Ctrl+O"));
-    action->setStatusTip(tr("Add a file"));
+    action->setStatusTip(tr("Open a file"));
     connect(action, SIGNAL(triggered()), this, SLOT(openFile()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
     toolbar->addAction(action);
 
-    action = new QAction(tr("Add Lo&cation..."), this);
+    action = new QAction(tr("Open Lo&cation..."), this);
     action->setShortcut(tr("Ctrl+Shift+O"));
-    action->setStatusTip(tr("Add a file from a remote URL"));
+    action->setStatusTip(tr("Open a file from a remote URL"));
     connect(action, SIGNAL(triggered()), this, SLOT(openLocation()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
 
-    menu->addSeparator();
-
-    m_recentFilesMenu = menu->addMenu(tr("&Recent Locations"));
+    m_recentFilesMenu = menu->addMenu(tr("Open &Recent"));
     m_recentFilesMenu->setTearOffEnabled(true);
     setupRecentFilesMenu();
     connect(&m_recentFiles, SIGNAL(recentChanged()),
@@ -522,15 +508,6 @@ MainWindow::setupViewMenu()
         statusBar()->hide();
     }
     settings.endGroup();
-
-    menu->addSeparator();
-
-    action = new QAction(tr("Show La&yer Hierarchy"), this);
-    action->setShortcut(tr("H"));
-    action->setStatusTip(tr("Open a window displaying the hierarchy of panes and layers in this session"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showLayerTree()));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
 }
 
 void
@@ -543,28 +520,30 @@ MainWindow::setupHelpMenu()
 
     IconLoader il;
 
+    QString name = QApplication::applicationName();
+
     QAction *action = new QAction(il.load("help"),
                                   tr("&Help Reference"), this); 
     action->setShortcut(tr("F1"));
-    action->setStatusTip(tr("Open the reference manual")); 
+    action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
     connect(action, SIGNAL(triggered()), this, SLOT(help()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
 
     action = new QAction(tr("&Key and Mouse Reference"), this);
     action->setShortcut(tr("F2"));
-    action->setStatusTip(tr("Open a window showing the keystrokes you can use"));
+    action->setStatusTip(tr("Open a window showing the keystrokes you can use in %1").arg(name));
     connect(action, SIGNAL(triggered()), this, SLOT(keyReference()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
     
-    action = new QAction(tr("Sonic Visualiser on the &Web"), this); 
-    action->setStatusTip(tr("Open the Sonic Visualiser website")); 
+    action = new QAction(tr("%1 on the &Web").arg(name), this); 
+    action->setStatusTip(tr("Open the %1 website").arg(name)); 
     connect(action, SIGNAL(triggered()), this, SLOT(website()));
     menu->addAction(action);
     
-    action = new QAction(tr("&About Sonic Visualiser"), this); 
-    action->setStatusTip(tr("Show information about Sonic Visualiser")); 
+    action = new QAction(tr("&About %1").arg(name), this); 
+    action->setStatusTip(tr("Show information about %1").arg(name)); 
     connect(action, SIGNAL(triggered()), this, SLOT(about()));
     menu->addAction(action);
 }
@@ -922,7 +901,7 @@ MainWindow::openFile()
 
     if (path.isEmpty()) return;
 
-    FileOpenStatus status = open(path, CreateAdditionalModel);
+    FileOpenStatus status = open(path, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open file"),
@@ -954,7 +933,7 @@ MainWindow::openLocation()
 
     if (text.isEmpty()) return;
 
-    FileOpenStatus status = open(text, CreateAdditionalModel);
+    FileOpenStatus status = open(text, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open location"),
@@ -982,7 +961,7 @@ MainWindow::openRecentFile()
     QString path = action->text();
     if (path == "") return;
 
-    FileOpenStatus status = open(path, CreateAdditionalModel);
+    FileOpenStatus status = open(path, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open location"),
@@ -1022,7 +1001,7 @@ MainWindow::paneDropAccepted(Pane *pane, QStringList uriList)
 
     for (QStringList::iterator i = uriList.begin(); i != uriList.end(); ++i) {
 
-        FileOpenStatus status = open(*i, CreateAdditionalModel);
+        FileOpenStatus status = open(*i, ReplaceSession);
 
         if (status == FileOpenFailed) {
             QMessageBox::critical(this, tr("Failed to open dropped URL"),
@@ -1102,11 +1081,6 @@ MainWindow::closeEvent(QCloseEvent *e)
 
     delete m_keyReference;
     m_keyReference = 0;
-
-    if (m_layerTreeView &&
-        m_layerTreeView->isVisible()) {
-        delete m_layerTreeView;
-    }
 
     closeSession();
 
@@ -1542,25 +1516,6 @@ MainWindow::rightButtonMenuRequested(Pane *pane, QPoint position)
 //    std::cerr << "MainWindow::rightButtonMenuRequested(" << pane << ", " << position.x() << ", " << position.y() << ")" << std::endl;
     m_paneStack->setCurrentPane(pane);
     m_rightButtonMenu->popup(position);
-}
-
-void
-MainWindow::showLayerTree()
-{
-    if (!m_layerTreeView.isNull()) {
-        m_layerTreeView->show();
-        m_layerTreeView->raise();
-        return;
-    }
-
-    //!!! should use an actual dialog class
-        
-    m_layerTreeView = new QTreeView();
-    LayerTreeModel *tree = new LayerTreeModel(m_paneStack);
-    m_layerTreeView->resize(500, 300); //!!!
-    m_layerTreeView->setModel(tree);
-    m_layerTreeView->expandAll();
-    m_layerTreeView->show();
 }
 
 void

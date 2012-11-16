@@ -124,8 +124,6 @@ protected slots:
 
     virtual void setupRecentFilesMenu();
 
-    virtual void showLayerTree();
-
     virtual void handleOSCMessage(const OSCMessage &);
 
     virtual void mouseEnteredWidget();
@@ -154,13 +152,7 @@ protected:
     QAction                 *m_ffwdAction;
     QAction                 *m_rwdAction;
 
-    QPointer<QTreeView>      m_layerTreeView;
-
     KeyReference            *m_keyReference;
-
-    typedef std::set<Layer *> LayerSet;
-    typedef std::map<Pane *, LayerSet> PaneLayerMap;
-    PaneLayerMap             m_hiddenLayers;
 
     virtual void setupMenus();
     virtual void setupFileMenu();
