@@ -1,1 +1,1 @@
-#define VECT_VERSION "[tony] @PACKAGE_VERSION@"
+#define TONY_VERSION "[tony] @PACKAGE_VERSION@"
