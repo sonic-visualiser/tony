@@ -23,7 +23,7 @@
 #include "view/PaneStack.h"
 #include "layer/Layer.h"
 #include "layer/TimeValueLayer.h"
-#include "layer/NoteLayer.h"
+#include "layer/FlexiNoteLayer.h"
 #include "layer/ColourDatabase.h"
 
 Analyser::Analyser() :
@@ -73,7 +73,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     layer = addLayerFor(notes);
 
     if (layer) {
-	NoteLayer *nl = qobject_cast<NoteLayer *>(layer);
+	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
 	if (nl) {
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
@@ -96,7 +96,7 @@ Analyser::addLayerFor(TransformId id)
     Transform transform = tf->getDefaultTransformFor
 	(id, m_fileModel->getSampleRate());
 	
-    transform.setStepSize(1024);
+    transform.setStepSize(512);
     transform.setBlockSize(2048);
 	
     ModelTransformer::Input input(m_fileModel, -1);
