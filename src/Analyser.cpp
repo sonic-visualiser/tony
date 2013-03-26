@@ -45,7 +45,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_fileModel = model;
     m_pane = pane;
 
-    TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
+    TransformId f0 = "vamp:yintony:yintony:f0";
     TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
 
     // We don't want a waveform in the main pane. We must have a
