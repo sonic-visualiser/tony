@@ -163,7 +163,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
             (ColourDatabase::getInstance()->getColourIndex(tr("Bright Green")));
     } else {
         m_panLayer->setBaseColour
-            (ColourDatabase::getInstance()->getColourIndex(tr("Green")));
+            (ColourDatabase::getInstance()->getColourIndex(tr("Blue")));
     }        
 
     m_fader = new Fader(frame, false);

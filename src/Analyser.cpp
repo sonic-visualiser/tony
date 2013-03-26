@@ -23,6 +23,7 @@
 #include "view/PaneStack.h"
 #include "layer/Layer.h"
 #include "layer/TimeValueLayer.h"
+#include "layer/NoteLayer.h"
 #include "layer/FlexiNoteLayer.h"
 #include "layer/ColourDatabase.h"
 
@@ -73,7 +74,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     layer = addLayerFor(notes);
 
     if (layer) {
-	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
+	NoteLayer *nl = qobject_cast<NoteLayer *>(layer);
 	if (nl) {
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
