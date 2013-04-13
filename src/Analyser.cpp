@@ -27,7 +27,7 @@
 #include "layer/NoteLayer.h"
 #include "layer/FlexiNoteLayer.h"
 #include "layer/ColourDatabase.h"
-#include "layer/LayerFactory.h" // GF: added so we can access the FlexiNotes enum value.
+#include "layer/LayerFactory.h"
 
 Analyser::Analyser() :
     m_document(0),
@@ -79,8 +79,6 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     if (layer) {
 	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
 	if (nl) {
-		// GF: delete this later !
-		std::cerr << "NOTE: layer type cast successful...." << std::endl;
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
 	}
@@ -113,7 +111,7 @@ Analyser::addLayerFor(TransformId id)
     if (layer) {
 		m_document->addLayerToView(m_pane, layer);
     } else {
-		std::cerr << "ERROR: Cound not create layer. " << std::endl;
+		std::cerr << "ERROR: Analyser::addLayerFor: Cound not create layer. " << std::endl;
 	}
 
     return layer;
@@ -144,15 +142,15 @@ Analyser::addLayerForNotes(TransformId id)
 
 	// preferredLayer = LayerFactory::Notes ;
 	preferredLayer = LayerFactory::FlexiNotes ;
-	std::cerr << "NOTE: Trying to create layer type(" << preferredLayer << ")" << std::endl;
-    
+	
+	// std::cerr << "NOTE: Trying to create layer type(" << preferredLayer << ")" << std::endl;
     Layer *layer;
     layer = m_document->createDerivedLayer(transform, m_fileModel, preferredLayer, preferredModel);
 
     if (layer) {
 		m_document->addLayerToView(m_pane, layer);
     } else {
-		std::cerr << "ERROR: Cound not create layer type(" << preferredLayer << ")" << std::endl;
+		std::cerr << "ERROR: Analyser::addLayerForNotes: Cound not create layer type(" << preferredLayer << ")" << std::endl;
 	}
 
     return layer;
