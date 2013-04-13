@@ -46,6 +46,7 @@ protected:
     Pane *m_pane;
 
     Layer *addLayerFor(TransformId);
+    Layer *addLayerForNotes(TransformId);
 	LayerFactory::LayerType preferredLayer;
 
 };

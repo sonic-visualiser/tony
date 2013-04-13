@@ -74,7 +74,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 	}
     }
 
-    layer = addLayerFor(notes);
+    layer = addLayerForNotes(notes);
 
     if (layer) {
 	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
@@ -91,6 +91,36 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 
 Layer *
 Analyser::addLayerFor(TransformId id)
+{
+    TransformFactory *tf = TransformFactory::getInstance();
+
+    if (!tf->haveTransform(id)) {
+	std::cerr << "ERROR: Analyser::addLayerFor(" << id << "): Transform unknown" << std::endl;
+	return 0;
+    }
+    
+    Transform transform = tf->getDefaultTransformFor
+	(id, m_fileModel->getSampleRate());
+	
+    transform.setStepSize(512);
+    transform.setBlockSize(2048);
+	
+    ModelTransformer::Input input(m_fileModel, -1);
+    
+    Layer *layer;
+    layer = m_document->createDerivedLayer(transform, m_fileModel);
+
+    if (layer) {
+		m_document->addLayerToView(m_pane, layer);
+    } else {
+		std::cerr << "ERROR: Cound not create layer. " << std::endl;
+	}
+
+    return layer;
+}
+
+Layer *
+Analyser::addLayerForNotes(TransformId id)
 {
     TransformFactory *tf = TransformFactory::getInstance();
 
