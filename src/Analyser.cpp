@@ -17,6 +17,7 @@
 
 #include "transform/TransformFactory.h"
 #include "transform/ModelTransformer.h"
+#include "transform/FeatureExtractionModelTransformer.h"
 #include "framework/Document.h"
 #include "data/model/WaveFileModel.h"
 #include "view/Pane.h"
@@ -26,6 +27,7 @@
 #include "layer/NoteLayer.h"
 #include "layer/FlexiNoteLayer.h"
 #include "layer/ColourDatabase.h"
+#include "layer/LayerFactory.h" // GF: added so we can access the FlexiNotes enum value.
 
 Analyser::Analyser() :
     m_document(0),
@@ -46,7 +48,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_fileModel = model;
     m_pane = pane;
 
-    TransformId f0 = "vamp:yintony:yintony:f0";
+    // TransformId f0 = "vamp:yintony:yintony:f0";
+    TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
     TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
 
     // We don't want a waveform in the main pane. We must have a
@@ -74,8 +77,10 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     layer = addLayerFor(notes);
 
     if (layer) {
-	NoteLayer *nl = qobject_cast<NoteLayer *>(layer);
+	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
 	if (nl) {
+		// GF: delete this later !
+		std::cerr << "NOTE: layer type cast successful...." << std::endl;
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
 	}
@@ -101,12 +106,24 @@ Analyser::addLayerFor(TransformId id)
     transform.setBlockSize(2048);
 	
     ModelTransformer::Input input(m_fileModel, -1);
+
+	FeatureExtractionModelTransformer::PreferredOutputModel preferredModel;
+	
+	// preferredModel = FeatureExtractionModelTransformer::NoteOutputModel;
+	preferredModel = FeatureExtractionModelTransformer::FlexiNoteOutputModel;
+
+	// preferredLayer = LayerFactory::Notes ;
+	preferredLayer = LayerFactory::FlexiNotes ;
+	std::cerr << "NOTE: Trying to create layer type(" << preferredLayer << ")" << std::endl;
     
     Layer *layer;
-    layer = m_document->createDerivedLayer(transform, m_fileModel);
+    layer = m_document->createDerivedLayer(transform, m_fileModel, preferredLayer, preferredModel);
+
     if (layer) {
-	m_document->addLayerToView(m_pane, layer);
-    }
+		m_document->addLayerToView(m_pane, layer);
+    } else {
+		std::cerr << "ERROR: Cound not create layer type(" << preferredLayer << ")" << std::endl;
+	}
 
     return layer;
 }

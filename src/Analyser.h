@@ -19,12 +19,15 @@
 #include <QObject>
 
 #include "transform/Transform.h"
+#include "layer/LayerFactory.h" // GF: added so we can access the FlexiNotes enum value.
+
 
 class WaveFileModel;
 class Pane;
 class PaneStack;
 class Document;
 class Layer;
+class LayerFactory;
 
 class Analyser : public QObject
 {
@@ -43,6 +46,8 @@ protected:
     Pane *m_pane;
 
     Layer *addLayerFor(TransformId);
+	LayerFactory::LayerType preferredLayer;
+
 };
 
 #endif
