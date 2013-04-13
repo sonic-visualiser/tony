@@ -17,6 +17,7 @@
 
 #include "transform/TransformFactory.h"
 #include "transform/ModelTransformer.h"
+#include "transform/FeatureExtractionModelTransformer.h"
 #include "framework/Document.h"
 #include "data/model/WaveFileModel.h"
 #include "view/Pane.h"
@@ -26,6 +27,7 @@
 #include "layer/NoteLayer.h"
 #include "layer/FlexiNoteLayer.h"
 #include "layer/ColourDatabase.h"
+#include "layer/LayerFactory.h"
 
 Analyser::Analyser() :
     m_document(0),
@@ -47,7 +49,10 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_pane = pane;
 
     TransformId f0 = "vamp:yintony:yintony:f0";
-    TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
+    TransformId notes = "vamp:yintony:yintony:notes";
+
+    // TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
+    // TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
 
     // We don't want a waveform in the main pane. We must have a
     // main-model layer of some sort, but the layers created by
@@ -65,16 +70,16 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     if (layer) {
 	TimeValueLayer *tvl = qobject_cast<TimeValueLayer *>(layer);
 	if (tvl) {
-	    tvl->setPlotStyle(TimeValueLayer::PlotDiscreteCurves);
+	    tvl->setPlotStyle(TimeValueLayer::PlotPoints);
 	    tvl->setBaseColour(ColourDatabase::getInstance()->
 			       getColourIndex(QString("Black")));
 	}
     }
 
-    layer = addLayerFor(notes);
+    layer = addLayerForNotes(notes);
 
     if (layer) {
-	NoteLayer *nl = qobject_cast<NoteLayer *>(layer);
+	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
 	if (nl) {
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
@@ -104,9 +109,51 @@ Analyser::addLayerFor(TransformId id)
     
     Layer *layer;
     layer = m_document->createDerivedLayer(transform, m_fileModel);
+
     if (layer) {
-	m_document->addLayerToView(m_pane, layer);
+		m_document->addLayerToView(m_pane, layer);
+    } else {
+		std::cerr << "ERROR: Analyser::addLayerFor: Cound not create layer. " << std::endl;
+	}
+
+    return layer;
+}
+
+Layer *
+Analyser::addLayerForNotes(TransformId id)
+{
+    TransformFactory *tf = TransformFactory::getInstance();
+
+    if (!tf->haveTransform(id)) {
+	std::cerr << "ERROR: Analyser::addLayerFor(" << id << "): Transform unknown" << std::endl;
+	return 0;
     }
+    
+    Transform transform = tf->getDefaultTransformFor
+	(id, m_fileModel->getSampleRate());
+	
+    transform.setStepSize(512);
+    transform.setBlockSize(2048);
+	
+    ModelTransformer::Input input(m_fileModel, -1);
+
+	FeatureExtractionModelTransformer::PreferredOutputModel preferredModel;
+	
+	// preferredModel = FeatureExtractionModelTransformer::NoteOutputModel;
+	preferredModel = FeatureExtractionModelTransformer::FlexiNoteOutputModel;
+
+	// preferredLayer = LayerFactory::Notes ;
+	preferredLayer = LayerFactory::FlexiNotes ;
+	
+	// std::cerr << "NOTE: Trying to create layer type(" << preferredLayer << ")" << std::endl;
+    Layer *layer;
+    layer = m_document->createDerivedLayer(transform, m_fileModel, preferredLayer, preferredModel);
+
+    if (layer) {
+		m_document->addLayerToView(m_pane, layer);
+    } else {
+		std::cerr << "ERROR: Analyser::addLayerForNotes: Cound not create layer type(" << preferredLayer << ")" << std::endl;
+	}
 
     return layer;
 }
