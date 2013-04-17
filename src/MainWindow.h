@@ -97,6 +97,10 @@ protected slots:
     virtual void about();
     virtual void keyReference();
 
+   // GF: temporary function for switching to edit mode
+   virtual void selectEditMode();
+
+
 protected:
     Analyser      *m_analyser;
 

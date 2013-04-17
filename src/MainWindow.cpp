@@ -195,13 +195,15 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     frame->setLayout(layout);
 
+    m_analyser = new Analyser();
+
     setupMenus();
     setupToolbars();
     setupHelpMenu();
 
     statusBar();
 
-    m_analyser = new Analyser();
+    // m_analyser = new Analyser();
 
     newSession();
 }
@@ -565,7 +567,27 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_playSpeed);
     toolbar->addWidget(m_fader);
 
+	toolbar = addToolBar(tr("Test actions toolbar")); // GF: temporary toolbar for triggering actions manually
+	
+	// GF: TEMP : this created a menu item
+    QAction *test = toolbar->addAction(il.load("new"), tr("Test"));
+    test->setShortcut(tr("Home"));
+    test->setStatusTip(tr("Test"));
+	test->setEnabled(true);
+    // connect(test, SIGNAL(triggered()), this, SLOT(about()));
+    // connect(test, SIGNAL(triggered()), m_analyser, SLOT(resizeLayer()));
+    connect(test, SIGNAL(triggered()), this, SLOT(selectEditMode())); 
+    // connect(this, SIGNAL(canPlay(bool)), test, SLOT(setEnabled(bool)));
+	menu->addAction(test);
+
     Pane::registerShortcuts(*m_keyReference);
+}
+
+void
+MainWindow::selectEditMode()	
+{
+	std::cerr << "Edit mode selected" << std::endl;
+	m_viewManager->setToolMode(ViewManager::EditMode);
 }
 
 void
