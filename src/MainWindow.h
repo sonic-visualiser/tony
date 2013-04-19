@@ -120,6 +120,7 @@ protected:
     QAction       *m_deleteSelectedAction;
     QAction       *m_ffwdAction;
     QAction       *m_rwdAction;
+    QAction       *m_editSelectAction;
 
     KeyReference  *m_keyReference;
 

@@ -570,15 +570,15 @@ MainWindow::setupToolbars()
 	toolbar = addToolBar(tr("Test actions toolbar")); // GF: temporary toolbar for triggering actions manually
 	
 	// GF: TEMP : this created a menu item
-    QAction *test = toolbar->addAction(il.load("new"), tr("Test"));
-    test->setShortcut(tr("Home"));
-    test->setStatusTip(tr("Test"));
-	test->setEnabled(true);
+    m_editSelectAction = toolbar->addAction(il.load("move"), tr("Edit"));
+    m_editSelectAction->setShortcut(tr("Home"));
+    m_editSelectAction->setStatusTip(tr("Edit Notes"));
+	m_editSelectAction->setEnabled(true);
     // connect(test, SIGNAL(triggered()), this, SLOT(about()));
     // connect(test, SIGNAL(triggered()), m_analyser, SLOT(resizeLayer()));
-    connect(test, SIGNAL(triggered()), this, SLOT(selectEditMode())); 
+    connect(m_editSelectAction, SIGNAL(triggered()), this, SLOT(selectEditMode())); 
     // connect(this, SIGNAL(canPlay(bool)), test, SLOT(setEnabled(bool)));
-	menu->addAction(test);
+	menu->addAction(m_editSelectAction);
 
     Pane::registerShortcuts(*m_keyReference);
 }
@@ -586,8 +586,15 @@ MainWindow::setupToolbars()
 void
 MainWindow::selectEditMode()	
 {
-	std::cerr << "Edit mode selected" << std::endl;
-	m_viewManager->setToolMode(ViewManager::EditMode);
+	IconLoader il;
+	if (m_viewManager->getToolMode() == ViewManager::EditMode) {
+		m_viewManager->setToolMode(ViewManager::NavigateMode);
+		m_editSelectAction->setIcon(il.load("move"));
+	} else {
+		std::cerr << "Edit mode selected" << std::endl;
+		m_viewManager->setToolMode(ViewManager::EditMode);
+		m_editSelectAction->setIcon(il.load("navigate"));
+	}
 }
 
 void
