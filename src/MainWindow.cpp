@@ -594,6 +594,7 @@ MainWindow::selectEditMode()
 		std::cerr << "Edit mode selected" << std::endl;
 		m_viewManager->setToolMode(ViewManager::EditMode);
 		m_editSelectAction->setIcon(il.load("navigate"));
+		m_editSelectAction->setStatusTip(tr("Navigate"));
 	}
 }
 
