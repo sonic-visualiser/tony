@@ -97,8 +97,8 @@ protected slots:
     virtual void about();
     virtual void keyReference();
 
-   // GF: temporary function for switching to edit mode
-   virtual void selectEditMode();
+   // GF: function for switching to NoteEditMode (perhaps temporary, as we may want this to be triggered in some other way...)
+   virtual void selectNoteEditMode();
 
 
 protected:

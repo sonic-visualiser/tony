@@ -183,7 +183,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_playSpeed->setRangeMapper(new PlaySpeedRangeMapper(0, 200));
     m_playSpeed->setShowToolTip(true);
     connect(m_playSpeed, SIGNAL(valueChanged(int)),
-	    this, SLOT(playSpeedChanged(int)));
+        this, SLOT(playSpeedChanged(int)));
     connect(m_playSpeed, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
@@ -311,7 +311,7 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
-	
+    
     action = new QAction(tr("Scroll &Right"), this);
     action->setShortcut(tr("Right"));
     action->setStatusTip(tr("Scroll the current pane to the right"));
@@ -319,7 +319,7 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
-	
+    
     action = new QAction(tr("&Jump Left"), this);
     action->setShortcut(tr("Ctrl+Left"));
     action->setStatusTip(tr("Scroll the current pane a big step to the left"));
@@ -327,7 +327,7 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
-	
+    
     action = new QAction(tr("J&ump Right"), this);
     action->setShortcut(tr("Ctrl+Right"));
     action->setStatusTip(tr("Scroll the current pane a big step to the right"));
@@ -348,7 +348,7 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canZoom(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
-	
+    
     action = new QAction(il.load("zoom-out"),
                          tr("Zoom &Out"), this);
     action->setShortcut(tr("Down"));
@@ -357,7 +357,7 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canZoom(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
-	
+    
     action = new QAction(tr("Restore &Default Zoom"), this);
     action->setStatusTip(tr("Restore the zoom level to the default"));
     connect(action, SIGNAL(triggered()), this, SLOT(zoomDefault()));
@@ -418,8 +418,8 @@ MainWindow::setupRecentFilesMenu()
     m_recentFilesMenu->clear();
     vector<QString> files = m_recentFiles.getRecent();
     for (size_t i = 0; i < files.size(); ++i) {
-	QAction *action = new QAction(files[i], this);
-	connect(action, SIGNAL(triggered()), this, SLOT(openRecentFile()));
+    QAction *action = new QAction(files[i], this);
+    connect(action, SIGNAL(triggered()), this, SLOT(openRecentFile()));
         if (i == 0) {
             action->setShortcut(tr("Ctrl+R"));
             m_keyReference->registerShortcut
@@ -427,7 +427,7 @@ MainWindow::setupRecentFilesMenu()
                  action->shortcut(),
                  tr("Re-open the current or most recently opened file"));
         }
-	m_recentFilesMenu->addAction(action);
+    m_recentFilesMenu->addAction(action);
     }
 }
 
@@ -466,7 +466,7 @@ MainWindow::setupToolbars()
     playAction->setStatusTip(tr("Start or stop playback from the current position"));
     connect(playAction, SIGNAL(triggered()), this, SLOT(play()));
     connect(m_playSource, SIGNAL(playStatusChanged(bool)),
-	    playAction, SLOT(setChecked(bool)));
+        playAction, SLOT(setChecked(bool)));
     connect(this, SIGNAL(canPlay(bool)), playAction, SLOT(setEnabled(bool)));
 
     m_ffwdAction = toolbar->addAction(il.load("ffwd"),
@@ -567,35 +567,35 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_playSpeed);
     toolbar->addWidget(m_fader);
 
-	toolbar = addToolBar(tr("Test actions toolbar")); // GF: temporary toolbar for triggering actions manually
-	
-	// GF: TEMP : this created a menu item
+    toolbar = addToolBar(tr("Test actions toolbar")); // GF: temporary toolbar for triggering actions manually
+    
+    // GF: TEMP : this created a menu item
     m_editSelectAction = toolbar->addAction(il.load("move"), tr("Edit"));
     m_editSelectAction->setShortcut(tr("Home"));
     m_editSelectAction->setStatusTip(tr("Edit Notes"));
-	m_editSelectAction->setEnabled(true);
+    m_editSelectAction->setEnabled(true);
     // connect(test, SIGNAL(triggered()), this, SLOT(about()));
     // connect(test, SIGNAL(triggered()), m_analyser, SLOT(resizeLayer()));
-    connect(m_editSelectAction, SIGNAL(triggered()), this, SLOT(selectEditMode())); 
+    connect(m_editSelectAction, SIGNAL(triggered()), this, SLOT(selectNoteEditMode())); 
     // connect(this, SIGNAL(canPlay(bool)), test, SLOT(setEnabled(bool)));
-	menu->addAction(m_editSelectAction);
+    menu->addAction(m_editSelectAction);
 
     Pane::registerShortcuts(*m_keyReference);
 }
 
 void
-MainWindow::selectEditMode()	
+MainWindow::selectNoteEditMode()   
 {
-	IconLoader il;
-	if (m_viewManager->getToolMode() == ViewManager::EditMode) {
-		m_viewManager->setToolMode(ViewManager::NavigateMode);
-		m_editSelectAction->setIcon(il.load("move"));
-	} else {
-		std::cerr << "Edit mode selected" << std::endl;
-		m_viewManager->setToolMode(ViewManager::EditMode);
-		m_editSelectAction->setIcon(il.load("navigate"));
-		m_editSelectAction->setStatusTip(tr("Navigate"));
-	}
+    IconLoader il;
+    if (m_viewManager->getToolMode() == ViewManager::NoteEditMode) {
+        m_viewManager->setToolMode(ViewManager::NavigateMode);
+        m_editSelectAction->setIcon(il.load("move"));
+    } else {
+        std::cerr << "NoteEdit mode selected" << std::endl;
+        m_viewManager->setToolMode(ViewManager::NoteEditMode);
+        m_editSelectAction->setIcon(il.load("navigate"));
+        m_editSelectAction->setStatusTip(tr("Navigate"));
+    }
 }
 
 void
@@ -615,17 +615,17 @@ MainWindow::updateMenuStates()
         (haveCurrentPane &&
          (currentLayer != 0));
     bool haveSelection = 
-	(m_viewManager &&
-	 !m_viewManager->getSelections().empty());
+    (m_viewManager &&
+     !m_viewManager->getSelections().empty());
     bool haveCurrentEditableLayer =
-	(haveCurrentLayer &&
-	 currentLayer->isLayerEditable());
+    (haveCurrentLayer &&
+     currentLayer->isLayerEditable());
     bool haveCurrentTimeInstantsLayer = 
-	(haveCurrentLayer &&
-	 qobject_cast<TimeInstantLayer *>(currentLayer));
+    (haveCurrentLayer &&
+     qobject_cast<TimeInstantLayer *>(currentLayer));
     bool haveCurrentTimeValueLayer = 
-	(haveCurrentLayer &&
-	 qobject_cast<TimeValueLayer *>(currentLayer));
+    (haveCurrentLayer &&
+     qobject_cast<TimeValueLayer *>(currentLayer));
 
     emit canChangePlaybackSpeed(true);
     int v = m_playSpeed->value();
@@ -702,29 +702,29 @@ MainWindow::closeSession()
 
     while (m_paneStack->getPaneCount() > 0) {
 
-	Pane *pane = m_paneStack->getPane(m_paneStack->getPaneCount() - 1);
+    Pane *pane = m_paneStack->getPane(m_paneStack->getPaneCount() - 1);
 
-	while (pane->getLayerCount() > 0) {
-	    m_document->removeLayerFromView
-		(pane, pane->getLayer(pane->getLayerCount() - 1));
-	}
+    while (pane->getLayerCount() > 0) {
+        m_document->removeLayerFromView
+        (pane, pane->getLayer(pane->getLayerCount() - 1));
+    }
 
-	m_overview->unregisterView(pane);
-	m_paneStack->deletePane(pane);
+    m_overview->unregisterView(pane);
+    m_paneStack->deletePane(pane);
     }
 
     while (m_paneStack->getHiddenPaneCount() > 0) {
 
-	Pane *pane = m_paneStack->getHiddenPane
-	    (m_paneStack->getHiddenPaneCount() - 1);
+    Pane *pane = m_paneStack->getHiddenPane
+        (m_paneStack->getHiddenPaneCount() - 1);
 
-	while (pane->getLayerCount() > 0) {
-	    m_document->removeLayerFromView
-		(pane, pane->getLayer(pane->getLayerCount() - 1));
-	}
+    while (pane->getLayerCount() > 0) {
+        m_document->removeLayerFromView
+        (pane, pane->getLayer(pane->getLayerCount() - 1));
+    }
 
-	m_overview->unregisterView(pane);
-	m_paneStack->deletePane(pane);
+    m_overview->unregisterView(pane);
+    m_paneStack->deletePane(pane);
     }
 
     delete m_document;
@@ -802,9 +802,9 @@ MainWindow::openRecentFile()
     QAction *action = qobject_cast<QAction *>(obj);
     
     if (!action) {
-	std::cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
-		  << std::endl;
-	return;
+    std::cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
+          << std::endl;
+    return;
     }
 
     QString path = action->text();
@@ -902,14 +902,14 @@ MainWindow::closeEvent(QCloseEvent *e)
 
     if (m_openingAudioFile) {
 //        std::cerr << "Busy - ignoring close event" << std::endl;
-	e->ignore();
-	return;
+    e->ignore();
+    return;
     }
 
     if (!m_abandoning && !checkSaveModified()) {
 //        std::cerr << "Ignoring close event" << std::endl;
-	e->ignore();
-	return;
+    e->ignore();
+    return;
     }
 
     QSettings settings;
@@ -978,22 +978,22 @@ MainWindow::checkSaveModified()
     if (!m_documentModified) return true;
 
     int button = 
-	QMessageBox::warning(this,
-			     tr("Session modified"),
-			     tr("The current session has been modified.\nDo you want to save it?"),
-			     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+    QMessageBox::warning(this,
+                 tr("Session modified"),
+                 tr("The current session has been modified.\nDo you want to save it?"),
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                              QMessageBox::Yes);
 
     if (button == QMessageBox::Yes) {
-	saveSession();
-	if (m_documentModified) { // save failed -- don't proceed!
-	    return false;
-	} else {
+    saveSession();
+    if (m_documentModified) { // save failed -- don't proceed!
+        return false;
+    } else {
             return true; // saved, so it's safe to continue now
         }
     } else if (button == QMessageBox::No) {
-	m_documentModified = false; // so we know to abandon it
-	return true;
+    m_documentModified = false; // so we know to abandon it
+    return true;
     }
 
     // else cancel
@@ -1004,15 +1004,15 @@ void
 MainWindow::saveSession()
 {
     if (m_sessionFile != "") {
-	if (!saveSessionFile(m_sessionFile)) {
-	    QMessageBox::critical(this, tr("Failed to save file"),
-				  tr("Session file \"%1\" could not be saved.").arg(m_sessionFile));
-	} else {
-	    CommandHistory::getInstance()->documentSaved();
-	    documentRestored();
-	}
+    if (!saveSessionFile(m_sessionFile)) {
+        QMessageBox::critical(this, tr("Failed to save file"),
+                  tr("Session file \"%1\" could not be saved.").arg(m_sessionFile));
     } else {
-	saveSessionAs();
+        CommandHistory::getInstance()->documentSaved();
+        documentRestored();
+    }
+    } else {
+    saveSessionAs();
     }
 }
 
@@ -1028,15 +1028,15 @@ MainWindow::saveSessionAs()
     if (path == "") return;
 
     if (!saveSessionFile(path)) {
-	QMessageBox::critical(this, tr("Failed to save file"),
-			      tr("Session file \"%1\" could not be saved.").arg(path));
+    QMessageBox::critical(this, tr("Failed to save file"),
+                  tr("Session file \"%1\" could not be saved.").arg(path));
     } else {
-	setWindowTitle(tr("%1: %2")
+    setWindowTitle(tr("%1: %2")
                        .arg(QApplication::applicationName())
-		       .arg(QFileInfo(path).fileName()));
-	m_sessionFile = path;
-	CommandHistory::getInstance()->documentSaved();
-	documentRestored();
+               .arg(QFileInfo(path).fileName()));
+    m_sessionFile = path;
+    CommandHistory::getInstance()->documentSaved();
+    documentRestored();
         m_recentFiles.addFile(path);
     }
 }
@@ -1046,17 +1046,17 @@ MainWindow::renameCurrentLayer()
 {
     Pane *pane = m_paneStack->getCurrentPane();
     if (pane) {
-	Layer *layer = pane->getSelectedLayer();
-	if (layer) {
-	    bool ok = false;
-	    QString newName = QInputDialog::getText
-		(this, tr("Rename Layer"),
-		 tr("New name for this layer:"),
-		 QLineEdit::Normal, layer->objectName(), &ok);
-	    if (ok) {
-		layer->setObjectName(newName);
-	    }
-	}
+    Layer *layer = pane->getSelectedLayer();
+    if (layer) {
+        bool ok = false;
+        QString newName = QInputDialog::getText
+        (this, tr("Rename Layer"),
+         tr("New name for this layer:"),
+         QLineEdit::Normal, layer->objectName(), &ok);
+        if (ok) {
+        layer->setObjectName(newName);
+        }
+    }
     }
 }
 
