@@ -38,6 +38,7 @@ protected slots:
     virtual void openRecentFile();
     virtual void saveSession();
     virtual void saveSessionAs();
+    virtual void exportLayer();
     virtual void newSession();
     virtual void closeSession();
 

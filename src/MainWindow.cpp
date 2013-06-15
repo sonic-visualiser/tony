@@ -23,6 +23,9 @@
 #include "view/Pane.h"
 #include "view/PaneStack.h"
 #include "data/model/WaveFileModel.h"
+#include "data/model/NoteModel.h"
+#include "data/model/FlexiNoteModel.h"
+#include "data/model/NoteModel.h"
 #include "view/ViewManager.h"
 #include "base/Preferences.h"
 #include "layer/WaveformLayer.h"
@@ -39,6 +42,10 @@
 #include "base/Profiler.h"
 #include "base/UnitDatabase.h"
 #include "layer/ColourDatabase.h"
+
+#include "data/fileio/CSVFileWriter.h"
+#include "data/fileio/MIDIFileWriter.h"
+#include "rdf/RDFExporter.h"
 
 // For version information
 #include "vamp/vamp.h"
@@ -271,6 +278,13 @@ MainWindow::setupFileMenu()
     setupRecentFilesMenu();
     connect(&m_recentFiles, SIGNAL(recentChanged()),
             this, SLOT(setupRecentFilesMenu()));
+
+    menu->addSeparator();
+    action = new QAction(tr("Export Annotation Layer..."), this);
+    action->setStatusTip(tr("Export layer data to a file"));
+    connect(action, SIGNAL(triggered()), this, SLOT(exportLayer()));
+    connect(this, SIGNAL(canExportLayer(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
 
     menu->addSeparator();
     action = new QAction(il.load("exit"), tr("&Quit"), this);
@@ -1040,6 +1054,101 @@ MainWindow::saveSessionAs()
         m_recentFiles.addFile(path);
     }
 }
+
+void
+MainWindow::exportLayer()
+{
+    Pane *pane = m_paneStack->getCurrentPane();
+    if (!pane) return;
+
+    Layer *layer = pane->getSelectedLayer();
+    if (!layer) return;
+
+    Model *model = layer->getModel();
+    if (!model) return;
+
+    FileFinder::FileType type = FileFinder::LayerFileNoMidi;
+
+    if (dynamic_cast<FlexiNoteModel *>(model)) type = FileFinder::LayerFile;
+
+    QString path = getSaveFileName(type);
+
+    if (path == "") return;
+
+    if (QFileInfo(path).suffix() == "") path += ".svl";
+
+    QString suffix = QFileInfo(path).suffix().toLower();
+
+    QString error;
+
+    if (suffix == "xml" || suffix == "svl") {
+
+        QFile file(path);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            error = tr("Failed to open file %1 for writing").arg(path);
+        } else {
+            QTextStream out(&file);
+            out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                << "<!DOCTYPE sonic-visualiser>\n"
+                << "<sv>\n"
+                << "  <data>\n";
+
+            model->toXml(out, "    ");
+
+            out << "  </data>\n"
+                << "  <display>\n";
+
+            layer->toXml(out, "    ");
+
+            out << "  </display>\n"
+                << "</sv>\n";
+        }
+
+    // } else if (suffix == "mid" || suffix == "midi") {
+    // 
+    //     FlexiNoteModel *nm = dynamic_cast<FlexiNoteModel *>(model);
+    // 
+    //     if (!nm) {
+    //         error = tr("Can't export non-note layers to MIDI");
+    //     } else {
+    //         MIDIFileWriter writer(path, nm);
+    //         writer.write();
+    //         if (!writer.isOK()) {
+    //             error = writer.getError();
+    //         }
+    //     }
+
+    } else if (suffix == "ttl" || suffix == "n3") {
+
+        if (!RDFExporter::canExportModel(model)) {
+            error = tr("Sorry, cannot export this layer type to RDF (supported types are: region, note, text, time instants, time values)");
+        } else {
+            RDFExporter exporter(path, model);
+            exporter.write();
+            if (!exporter.isOK()) {
+                error = exporter.getError();
+            }
+        }
+
+    } else {
+
+        CSVFileWriter writer(path, model,
+                             ((suffix == "csv") ? "," : "\t"));
+        writer.write();
+
+        if (!writer.isOK()) {
+            error = writer.getError();
+        }
+    }
+
+    if (error != "") {
+        QMessageBox::critical(this, tr("Failed to write file"), error);
+    } else {
+        m_recentFiles.addFile(path);
+        emit activity(tr("Export layer to \"%1\"").arg(path));
+    }
+}
+
 
 void
 MainWindow::renameCurrentLayer()
