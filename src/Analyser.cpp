@@ -106,7 +106,7 @@ Analyser::addLayerFor(TransformId id)
     Transform transform = tf->getDefaultTransformFor
 	(id, m_fileModel->getSampleRate());
 	
-    transform.setStepSize(512);
+    transform.setStepSize(256);
     transform.setBlockSize(2048);
 	
     ModelTransformer::Input input(m_fileModel, -1);
@@ -136,7 +136,7 @@ Analyser::addLayerForNotes(TransformId id)
     Transform transform = tf->getDefaultTransformFor
 	(id, m_fileModel->getSampleRate());
 	
-    transform.setStepSize(512);
+    transform.setStepSize(256);
     transform.setBlockSize(2048);
 	
     ModelTransformer::Input input(m_fileModel, -1);
