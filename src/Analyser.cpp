@@ -48,7 +48,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_fileModel = model;
     m_pane = pane;
 
-    TransformId f0 = "vamp:yintony:yintony:f0";
+    TransformId f0 = "vamp:yintony:yintony:notepitchtrack";
     TransformId notes = "vamp:yintony:yintony:notes";
 
     // TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
