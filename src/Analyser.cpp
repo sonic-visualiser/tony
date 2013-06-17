@@ -48,11 +48,11 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_fileModel = model;
     m_pane = pane;
 
-    // TransformId f0 = "vamp:yintony:yintony:notepitchtrack";
-    // TransformId notes = "vamp:yintony:yintony:notes";
+    TransformId f0 = "vamp:yintony:yintony:notepitchtrack";
+    TransformId notes = "vamp:yintony:yintony:notes";
 
-    TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
-    TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
+    // TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
+    // TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
 
     // We don't want a waveform in the main pane. We must have a
     // main-model layer of some sort, but the layers created by
@@ -72,9 +72,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 	if (tvl) {
 	    tvl->setPlotStyle(TimeValueLayer::PlotPoints);
 	    tvl->setBaseColour(ColourDatabase::getInstance()->
-			       getColourIndex(QString("Bright Blue")));
+			       getColourIndex(QString("Black")));
 			tvl->setVerticalScale(TimeValueLayer::LogScale);
-			tvl->setDisplayExtents(80.f,450.f); // temporary values: better get the real extents of the data form the model
+			tvl->setDisplayExtents(80.f,600.f); // temporary values: better get the real extents of the data form the model
 	}
     }
 
