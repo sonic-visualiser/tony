@@ -70,7 +70,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     if (layer) {
 	TimeValueLayer *tvl = qobject_cast<TimeValueLayer *>(layer);
 	if (tvl) {
-	    tvl->setPlotStyle(TimeValueLayer::PlotPoints);
+        tvl->setPlotStyle(TimeValueLayer::PlotDiscreteCurves);
+        // tvl->setPlotStyle(TimeValueLayer::PlotPoints);
 	    tvl->setBaseColour(ColourDatabase::getInstance()->
 			       getColourIndex(QString("Black")));
 			tvl->setVerticalScale(TimeValueLayer::LogScale);
