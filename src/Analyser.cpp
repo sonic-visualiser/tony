@@ -74,7 +74,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 	    tvl->setBaseColour(ColourDatabase::getInstance()->
 			       getColourIndex(QString("Black")));
 			tvl->setVerticalScale(TimeValueLayer::LogScale);
-			tvl->setDisplayExtents(80.f,600.f); // temporary values: better get the real extents of the data form the model
+			tvl->setDisplayExtents(27.5f,880.f); // temporary values: better get the real extents of the data form the model
 	}
     }
 
@@ -85,11 +85,12 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 	if (nl) {
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
-            // nl->setVerticalScale(FlexiNoteLayer::LogScale);
-            // nl->setDisplayExtents(100.f,550.f); // temporary values: better get the real extents of the data form the model
+            nl->setVerticalScale(FlexiNoteLayer::AutoAlignScale);
+            // nl->setDisplayExtents(80.f,600.f); // temporary values: better get the real extents of the data form the model
 	}
     }
 
+    
     paneStack->setCurrentLayer(m_pane, layer);
 }
 

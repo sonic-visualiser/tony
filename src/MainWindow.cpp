@@ -25,6 +25,7 @@
 #include "data/model/WaveFileModel.h"
 #include "data/model/NoteModel.h"
 #include "data/model/FlexiNoteModel.h"
+#include "layer/FlexiNoteLayer.h"
 #include "data/model/NoteModel.h"
 #include "view/ViewManager.h"
 #include "base/Preferences.h"
@@ -1289,7 +1290,13 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
         m_myStatusMessage = tr("Visible: %1 to %2 (duration %3)")
             .arg(startStr).arg(endStr).arg(durationStr);
     }
-
+    
+    // scale Y axis
+    FlexiNoteLayer *fnl = dynamic_cast<FlexiNoteLayer *>(p->getLayer(2));
+    if (fnl) {
+        fnl->setVerticalRangeToNoteRange(p);
+    }
+    
     statusBar()->showMessage(m_myStatusMessage);
 }
 
