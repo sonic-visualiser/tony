@@ -38,6 +38,7 @@ Analyser::Analyser() :
 
 Analyser::~Analyser()
 {
+    if (m_flexiNoteLayer) delete m_flexiNoteLayer;
 }
 
 void
@@ -84,6 +85,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     if (layer) {
 	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
 	if (nl) {
+	    m_flexiNoteLayer = nl;
 	    nl->setBaseColour(ColourDatabase::getInstance()->
 			      getColourIndex(QString("Bright Blue")));
             nl->setVerticalScale(FlexiNoteLayer::AutoAlignScale);
@@ -164,3 +166,9 @@ Analyser::addLayerForNotes(TransformId id)
     return layer;
 }
 
+void
+Analyser::setIntelligentActions(bool on) 
+{
+    std::cerr << "toggle setIntelligentActions " << on << std::endl;
+    m_flexiNoteLayer->setIntelligentActions(on);
+}

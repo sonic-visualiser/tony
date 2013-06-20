@@ -20,7 +20,7 @@
 
 #include "transform/Transform.h"
 #include "layer/LayerFactory.h" // GF: added so we can access the FlexiNotes enum value.
-
+#include "layer/FlexiNoteLayer.h"
 
 class WaveFileModel;
 class Pane;
@@ -39,11 +39,14 @@ public:
 
     void newFileLoaded(Document *newDocument, WaveFileModel *model,
 		       PaneStack *paneStack, Pane *pane);
+		       
+    void setIntelligentActions(bool);
 
 protected:
     Document *m_document;
     WaveFileModel *m_fileModel;
     Pane *m_pane;
+    FlexiNoteLayer *m_flexiNoteLayer;
 
     Layer *addLayerFor(TransformId);
     Layer *addLayerForNotes(TransformId);
