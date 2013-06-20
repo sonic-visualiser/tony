@@ -84,8 +84,9 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     MainWindowBase(withAudioOutput, withOSCSupport, false),
     m_overview(0),
     m_mainMenusCreated(false),
+    m_intelligentActionOn(true), //GF: !!! temporary
     m_playbackMenu(0),
-    m_recentFilesMenu(0),
+    m_recentFilesMenu(0), 
     m_rightButtonMenu(0),
     m_rightButtonPlaybackMenu(0),
     m_deleteSelectedAction(0),
@@ -594,6 +595,12 @@ MainWindow::setupToolbars()
     connect(m_editSelectAction, SIGNAL(triggered()), this, SLOT(selectNoteEditMode())); 
     // connect(this, SIGNAL(canPlay(bool)), test, SLOT(setEnabled(bool)));
     menu->addAction(m_editSelectAction);
+    
+    m_toggleIntelligenceAction = toolbar->addAction(il.load("notes"), tr("EditMode"));
+    // m_toggleIntelligenceAction->setShortcut(tr("Home"));
+    m_toggleIntelligenceAction->setStatusTip(tr("Toggle note edit boundary constraints and automation"));
+    m_toggleIntelligenceAction->setEnabled(true);
+    connect(m_toggleIntelligenceAction, SIGNAL(triggered()), this, SLOT(toggleNoteEditIntelligence()));
 
     Pane::registerShortcuts(*m_keyReference);
 }
@@ -609,7 +616,21 @@ MainWindow::selectNoteEditMode()
         std::cerr << "NoteEdit mode selected" << std::endl;
         m_viewManager->setToolMode(ViewManager::NoteEditMode);
         m_editSelectAction->setIcon(il.load("navigate"));
-        m_editSelectAction->setStatusTip(tr("Navigate"));
+    }
+}
+
+void
+MainWindow::toggleNoteEditIntelligence()
+{
+    IconLoader il;
+    if (m_intelligentActionOn == true) {
+        m_toggleIntelligenceAction->setIcon(il.load("values"));
+        m_intelligentActionOn = false;
+        m_analyser->setIntelligentActions(false);
+    } else {
+        m_toggleIntelligenceAction->setIcon(il.load("notes"));
+        m_intelligentActionOn = true;
+        m_analyser->setIntelligentActions(true);
     }
 }
 

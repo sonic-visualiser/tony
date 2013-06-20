@@ -100,6 +100,7 @@ protected slots:
 
    // GF: function for switching to NoteEditMode (perhaps temporary, as we may want this to be triggered in some other way...)
    virtual void selectNoteEditMode();
+   virtual void toggleNoteEditIntelligence();
 
 
 protected:
@@ -122,6 +123,9 @@ protected:
     QAction       *m_ffwdAction;
     QAction       *m_rwdAction;
     QAction       *m_editSelectAction;
+    QAction       *m_toggleIntelligenceAction;
+    bool           m_intelligentActionOn; // GF: !!! temporary
+    
 
     KeyReference  *m_keyReference;
 
