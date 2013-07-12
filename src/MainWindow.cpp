@@ -434,16 +434,16 @@ MainWindow::setupRecentFilesMenu()
     m_recentFilesMenu->clear();
     vector<QString> files = m_recentFiles.getRecent();
     for (size_t i = 0; i < files.size(); ++i) {
-    QAction *action = new QAction(files[i], this);
-    connect(action, SIGNAL(triggered()), this, SLOT(openRecentFile()));
+        QAction *action = new QAction(files[i], this);
+        connect(action, SIGNAL(triggered()), this, SLOT(openRecentFile()));
         if (i == 0) {
             action->setShortcut(tr("Ctrl+R"));
             m_keyReference->registerShortcut
                 (tr("Re-open"),
-                 action->shortcut(),
+                 action->shortcut().toString(),
                  tr("Re-open the current or most recently opened file"));
         }
-    m_recentFilesMenu->addAction(action);
+        m_recentFilesMenu->addAction(action);
     }
 }
 

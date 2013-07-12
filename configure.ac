@@ -1,5 +1,5 @@
 
-AC_INIT([Tony], 0.0, cannam@all-day-breakfast.com)
+AC_INIT([Tony], 0.1, cannam@all-day-breakfast.com)
 
 AC_CONFIG_SRCDIR(src/main.cpp)
 
@@ -80,8 +80,10 @@ SV_MODULE_REQUIRED([fftw3f],[fftw3f >= 3.0.0],[fftw3.h],[fftw3f],[fftwf_execute]
 SV_MODULE_REQUIRED([sndfile],[sndfile >= 1.0.16],[sndfile.h],[sndfile],[sf_open])
 SV_MODULE_REQUIRED([samplerate],[samplerate >= 0.1.2],[samplerate.h],[samplerate],[src_new])
 SV_MODULE_REQUIRED([vamp],[vamp >= 2.1],[vamp/vamp.h],[],[])
-SV_MODULE_REQUIRED([vamphostsdk],[vamp-hostsdk >= 2.3.1],[vamp-hostsdk/PluginLoader.h],[vamp-hostsdk],[libvamphostsdk_v_2_3_1_present])
+SV_MODULE_REQUIRED([vamphostsdk],[vamp-hostsdk >= 2.5],[vamp-hostsdk/PluginLoader.h],[vamp-hostsdk],[libvamphostsdk_v_2_5_present])
 SV_MODULE_REQUIRED([rubberband],[rubberband],[rubberband/RubberBandStretcher.h],[rubberband],[rubberband_new])
+SV_MODULE_REQUIRED([sord],[sord-0 >= 0.5],[sord/sord.h],[sord-0],[sord_world_new])
+SV_MODULE_REQUIRED([serd],[serd-0 >= 0.5],[serd/serd.h],[serd-0],[serd_reader_read_file])
 SV_MODULE_REQUIRED([dataquay],[dataquay >= 0.9],[dataquay/Uri.h],[dataquay],[dataquay_v_0_9_present])
 
 SV_MODULE_OPTIONAL([liblo],[],[lo/lo.h],[lo],[lo_address_new])
@@ -106,6 +108,7 @@ AC_SUBST(CUT)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(CXXFLAGS_MINIMAL)
+AC_SUBST(LDFLAGS)
 AC_SUBST(HAVES)
 AC_SUBST(LIBS)
 
@@ -131,5 +134,5 @@ might care about, and then run "make".
 
 The file config.pri contains the configuration settings for
 qmake.  If you want to adjust these by hand, edit config.pri
-and run "qmake -r" again to regenerate the Makefile.
+and run "$QMAKE -r" again to regenerate the Makefile.
 ])
