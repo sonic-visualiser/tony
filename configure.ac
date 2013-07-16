@@ -84,7 +84,6 @@ SV_MODULE_REQUIRED([vamphostsdk],[vamp-hostsdk >= 2.5],[vamp-hostsdk/PluginLoade
 SV_MODULE_REQUIRED([rubberband],[rubberband],[rubberband/RubberBandStretcher.h],[rubberband],[rubberband_new])
 SV_MODULE_REQUIRED([sord],[sord-0 >= 0.5],[sord/sord.h],[sord-0],[sord_world_new])
 SV_MODULE_REQUIRED([serd],[serd-0 >= 0.5],[serd/serd.h],[serd-0],[serd_reader_read_file])
-SV_MODULE_REQUIRED([dataquay],[dataquay >= 0.9],[dataquay/Uri.h],[dataquay],[dataquay_v_0_9_present])
 
 SV_MODULE_OPTIONAL([liblo],[],[lo/lo.h],[lo],[lo_address_new])
 SV_MODULE_OPTIONAL([portaudio_2_0],[portaudio-2.0 >= 19],[portaudio.h],[portaudio],[Pa_IsFormatSupported])
