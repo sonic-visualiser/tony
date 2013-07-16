@@ -32,7 +32,8 @@
 Analyser::Analyser() :
     m_document(0),
     m_fileModel(0),
-    m_pane(0)
+    m_pane(0),
+    m_flexiNoteLayer(0)
 {
 }
 
