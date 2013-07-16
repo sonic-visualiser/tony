@@ -35,31 +35,27 @@
                 Guid="B0DA872A-E8B9-4C41-B0B0-7702A9EBBD51">
 
               <File
-                  Id="SV"
+                  Id="T"
                   Name="Tony.exe"
                   DiskId="1"
                   Source="release\Tony.exe"
                   KeyPath="yes">
 
                 <Shortcut
-                    Id="SVStartEntry"
+                    Id="TStartEntry"
                     Directory="ProgramMenuDir"
                     Name="Tony"
                     WorkingDirectory="INSTALLDIR"
-                    Icon="winicon.ico"
-                    IconIndex="0"
                     Advertise="yes"/>
 
                 <Shortcut
-                    Id="SVDesktop"
+                    Id="TDesktop"
                     Directory="DesktopFolder"
                     Name="Tony"
                     WorkingDirectory="INSTALLDIR"
-                    Icon="winicon.ico"
-                    IconIndex="0"
                     Advertise="yes"/>
               </File>
-
+<!--
               <File
                   Id="COPYING"
                   Name="COPYING"
@@ -75,13 +71,7 @@
                   Name="CHANGELOG"
                   DiskId="1"
                   Source="CHANGELOG"/>
-
-              <File
-                  Id="winicon.ico"
-                  Name="sv-winicon.ico"
-                  DiskId="1"
-                  Source="icons/sv-winicon.ico"/>
-            </Component>
+    -->        </Component>
 
             <Component
                 Id="Qt5"
