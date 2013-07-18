@@ -23,6 +23,23 @@ case "$version" in
     *) echo "Error: Version $version is neither two- nor three-part number" ;;
 esac
 
+if file "$source/Contents/MacOS/$app" | grep -q script; then
+    echo
+    echo "Executable is already a script, leaving it alone."
+else
+    echo
+    echo "Moving aside executable, adding script."
+
+    mv "$source/Contents/MacOS/$app" "$source/Contents/Resources/" || exit 1
+    cp "deploy/osx/$app.sh" "$source/Contents/MacOS/$app" || exit 1
+    chmod +x "$source/Contents/MacOS/$app"
+fi
+
+echo
+echo "Copying in plugin."
+
+cp ../yintony/yintony.{dylib,cat,n3} "$source/Contents/Resources/"
+
 echo
 echo "Fixing up paths."
 
