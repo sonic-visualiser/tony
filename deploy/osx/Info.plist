@@ -8,9 +8,9 @@
 	<string>Tony</string>
 	<key>CFBundleExecutable</key>
 	<string>Tony</string>
-	<key>CFBundleIconFile</key>
+<!--	<key>CFBundleIconFile</key>
 	<string>sv-macicon.icns</string>
-	<key>CFBundleIdentifier</key>
+-->	<key>CFBundleIdentifier</key>
 	<string>uk.ac.qmul.eecs.c4dm.Tony</string>
 	<key>CFBundleShortVersionString</key>
 	<string>TONY_VERSION</string>
