@@ -39,7 +39,6 @@ Analyser::Analyser() :
 
 Analyser::~Analyser()
 {
-    delete m_flexiNoteLayer;
 }
 
 void
