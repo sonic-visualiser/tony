@@ -21,6 +21,7 @@
 #include "base/PropertyContainer.h"
 #include "base/Preferences.h"
 #include "widgets/TipDialog.h"
+#include "transform/TransformFactory.h"
 
 #include <QMetaType>
 #include <QApplication>
@@ -39,16 +40,21 @@
 #include <signal.h>
 
 static QMutex cleanupMutex;
+static bool cleanedUp = false;
 
 static void
 signalHandler(int /* signal */)
 {
     // Avoid this happening more than once across threads
 
+    cerr << "signalHandler: cleaning up and exiting" << endl;
     cleanupMutex.lock();
-    std::cerr << "signalHandler: cleaning up and exiting" << std::endl;
-    TempDirectory::getInstance()->cleanup();
-    exit(0); // without releasing mutex
+    if (!cleanedUp) {
+        TempDirectory::getInstance()->cleanup();
+        cleanedUp = true;
+    }
+    cleanupMutex.unlock();
+    exit(0);
 }
 
 class TonyApplication : public QApplication
@@ -241,10 +247,18 @@ main(int argc, char **argv)
     gui->hide();
 
     cleanupMutex.lock();
-    TempDirectory::getInstance()->cleanup();
+
+    if (!cleanedUp) {
+        TransformFactory::deleteInstance();
+        TempDirectory::getInstance()->cleanup();
+        cleanedUp = true;
+    }
+
     application.releaseMainWindow();
 
     delete gui;
+
+    cleanupMutex.unlock();
 
     return rv;
 }

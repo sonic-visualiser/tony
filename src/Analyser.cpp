@@ -170,5 +170,7 @@ void
 Analyser::setIntelligentActions(bool on) 
 {
     std::cerr << "toggle setIntelligentActions " << on << std::endl;
-    m_flexiNoteLayer->setIntelligentActions(on);
+    if (m_flexiNoteLayer) {
+        m_flexiNoteLayer->setIntelligentActions(on);
+    }
 }

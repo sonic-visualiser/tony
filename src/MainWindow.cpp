@@ -74,9 +74,6 @@
 #include <cstdio>
 #include <errno.h>
 
-using std::cerr;
-using std::endl;
-
 using std::vector;
 
 
@@ -583,6 +580,47 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_playSpeed);
     toolbar->addWidget(m_fader);
 
+    toolbar = addToolBar(tr("Tools Toolbar"));
+    
+    CommandHistory::getInstance()->registerToolbar(toolbar);
+
+    m_keyReference->setCategory(tr("Tool Selection"));
+
+    toolbar = addToolBar(tr("Tools Toolbar"));
+    QActionGroup *group = new QActionGroup(this);
+
+    QAction *action = toolbar->addAction(il.load("navigate"),
+                                         tr("Navigate"));
+    action->setCheckable(true);
+    action->setChecked(true);
+    action->setShortcut(tr("1"));
+    action->setStatusTip(tr("Navigate"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolNavigateSelected()));
+    connect(this, SIGNAL(replacedDocument()), action, SLOT(trigger()));
+    group->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+    action = toolbar->addAction(il.load("move"),
+				tr("Edit"));
+    action->setCheckable(true);
+    action->setShortcut(tr("2"));
+    action->setStatusTip(tr("Edit with Note Intelligence"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolEditSelected()));
+    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
+    group->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+    action = toolbar->addAction(il.load("notes"),
+				tr("Free Edit"));
+    action->setCheckable(true);
+    action->setShortcut(tr("3"));
+    action->setStatusTip(tr("Free Edit"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolFreeEditSelected()));
+    group->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+
+    /*
     toolbar = addToolBar(tr("Test actions toolbar")); // GF: temporary toolbar for triggering actions manually
     
     // GF: TEMP : this created a menu item
@@ -601,10 +639,34 @@ MainWindow::setupToolbars()
     m_toggleIntelligenceAction->setStatusTip(tr("Toggle note edit boundary constraints and automation"));
     m_toggleIntelligenceAction->setEnabled(true);
     connect(m_toggleIntelligenceAction, SIGNAL(triggered()), this, SLOT(toggleNoteEditIntelligence()));
-
+    */
     Pane::registerShortcuts(*m_keyReference);
 }
 
+void
+MainWindow::toolNavigateSelected()
+{
+    m_viewManager->setToolMode(ViewManager::NavigateMode);
+    m_intelligentActionOn = true;
+}
+
+void
+MainWindow::toolEditSelected()
+{
+    m_viewManager->setToolMode(ViewManager::EditMode);
+    m_intelligentActionOn = true;
+    m_analyser->setIntelligentActions(m_intelligentActionOn);
+}
+
+void
+MainWindow::toolFreeEditSelected()
+{
+    m_viewManager->setToolMode(ViewManager::EditMode);
+    m_intelligentActionOn = false;
+    m_analyser->setIntelligentActions(m_intelligentActionOn);
+}
+
+/*
 void
 MainWindow::selectNoteEditMode()   
 {
@@ -613,7 +675,7 @@ MainWindow::selectNoteEditMode()
         m_viewManager->setToolMode(ViewManager::NavigateMode);
         m_editSelectAction->setIcon(il.load("move"));
     } else {
-        std::cerr << "NoteEdit mode selected" << std::endl;
+        cerr << "NoteEdit mode selected" << endl;
         m_viewManager->setToolMode(ViewManager::NoteEditMode);
         m_editSelectAction->setIcon(il.load("navigate"));
     }
@@ -633,6 +695,7 @@ MainWindow::toggleNoteEditIntelligence()
         m_analyser->setIntelligentActions(true);
     }
 }
+*/
 
 void
 MainWindow::updateMenuStates()
@@ -838,8 +901,8 @@ MainWindow::openRecentFile()
     QAction *action = qobject_cast<QAction *>(obj);
     
     if (!action) {
-    std::cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
-          << std::endl;
+    cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
+          << endl;
     return;
     }
 
@@ -922,7 +985,7 @@ MainWindow::paneDropAccepted(Pane *pane, QString text)
 void
 MainWindow::configureNewPane(Pane *pane)
 {
-    std::cerr << "MainWindow::configureNewPane(" << pane << ")" << std::endl;
+    cerr << "MainWindow::configureNewPane(" << pane << ")" << endl;
 
     if (!pane) {
         pane = m_paneStack->addPane();
@@ -934,16 +997,16 @@ MainWindow::configureNewPane(Pane *pane)
 void
 MainWindow::closeEvent(QCloseEvent *e)
 {
-//    std::cerr << "MainWindow::closeEvent" << std::endl;
+//    cerr << "MainWindow::closeEvent" << endl;
 
     if (m_openingAudioFile) {
-//        std::cerr << "Busy - ignoring close event" << std::endl;
+//        cerr << "Busy - ignoring close event" << endl;
     e->ignore();
     return;
     }
 
     if (!m_abandoning && !checkSaveModified()) {
-//        std::cerr << "Ignoring close event" << std::endl;
+//        cerr << "Ignoring close event" << endl;
     e->ignore();
     return;
     }
@@ -1199,7 +1262,7 @@ MainWindow::playSpeedChanged(int position)
     float percent = m_playSpeed->mappedValue();
     float factor = mapper.getFactorForValue(percent);
 
-    std::cerr << "speed = " << position << " percent = " << percent << " factor = " << factor << std::endl;
+    cerr << "speed = " << position << " percent = " << percent << " factor = " << factor << endl;
 
     bool something = (position != 100);
 
@@ -1379,7 +1442,7 @@ MainWindow::modelAdded(Model *model)
     MainWindowBase::modelAdded(model);
     DenseTimeValueModel *dtvm = qobject_cast<DenseTimeValueModel *>(model);
     if (dtvm) {
-        std::cerr << "A dense time-value model (such as an audio file) has been loaded" << std::endl;
+        cerr << "A dense time-value model (such as an audio file) has been loaded" << endl;
     }
 }
 
@@ -1474,7 +1537,7 @@ MainWindow::alignmentFailed(QString transformName, QString message)
 void
 MainWindow::rightButtonMenuRequested(Pane *pane, QPoint position)
 {
-//    std::cerr << "MainWindow::rightButtonMenuRequested(" << pane << ", " << position.x() << ", " << position.y() << ")" << std::endl;
+//    cerr << "MainWindow::rightButtonMenuRequested(" << pane << ", " << position.x() << ", " << position.y() << ")" << endl;
     m_paneStack->setCurrentPane(pane);
     m_rightButtonMenu->popup(position);
 }
@@ -1482,7 +1545,7 @@ MainWindow::rightButtonMenuRequested(Pane *pane, QPoint position)
 void
 MainWindow::handleOSCMessage(const OSCMessage &message)
 {
-    std::cerr << "MainWindow::handleOSCMessage: Not implemented" << std::endl;
+    cerr << "MainWindow::handleOSCMessage: Not implemented" << endl;
 }
 
 void

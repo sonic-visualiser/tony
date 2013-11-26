@@ -44,6 +44,10 @@ protected slots:
 
     virtual void renameCurrentLayer();
 
+    virtual void toolNavigateSelected();
+    virtual void toolEditSelected();
+    virtual void toolFreeEditSelected();
+
     virtual void paneAdded(Pane *);
     virtual void paneHidden(Pane *);
     virtual void paneAboutToBeDeleted(Pane *);
@@ -98,11 +102,6 @@ protected slots:
     virtual void about();
     virtual void keyReference();
 
-   // GF: function for switching to NoteEditMode (perhaps temporary, as we may want this to be triggered in some other way...)
-   virtual void selectNoteEditMode();
-   virtual void toggleNoteEditIntelligence();
-
-
 protected:
     Analyser      *m_analyser;
 
@@ -126,7 +125,6 @@ protected:
     QAction       *m_toggleIntelligenceAction;
     bool           m_intelligentActionOn; // GF: !!! temporary
     
-
     KeyReference  *m_keyReference;
 
     virtual void setupMenus();
