@@ -122,6 +122,13 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     settings.setValue("showstatusbar", false);
     settings.endGroup();
 
+    settings.beginGroup("LayerDefaults");
+    settings.setValue("waveform",
+                      QString("<layer scale=\"%1\" channelMode=\"%2\"/>")
+                      .arg(int(WaveformLayer::LinearScale))
+                      .arg(int(WaveformLayer::MixChannels)));
+    settings.endGroup();
+
     m_viewManager->setAlignMode(false);
     m_viewManager->setPlaySoloMode(false);
     m_viewManager->setToolMode(ViewManager::NavigateMode);
@@ -616,6 +623,7 @@ MainWindow::setupToolbars()
     action->setShortcut(tr("3"));
     action->setStatusTip(tr("Free Edit"));
     connect(action, SIGNAL(triggered()), this, SLOT(toolFreeEditSelected()));
+    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
     group->addAction(action);
     m_keyReference->registerShortcut(action);
 
@@ -1449,6 +1457,15 @@ MainWindow::mainModelChanged(WaveFileModel *model)
             Pane *pane = m_paneStack->getCurrentPane();
             if (!pane) {
                 pane = m_paneStack->addPane();
+/*
+                Pane *p2 = m_paneStack->addPane();
+                m_document->addLayerToView
+                    (p2,
+                     m_document->createMainModelLayer(LayerFactory::TimeRuler));
+                m_document->addLayerToView
+                    (p2,
+                     m_document->createMainModelLayer(LayerFactory::Waveform));
+*/
             }
             if (pane) {
                 m_analyser->newFileLoaded
