@@ -137,7 +137,6 @@ protected:
     virtual void closeEvent(QCloseEvent *e);
     bool checkSaveModified();
 
-    virtual void configureNewPane(Pane *p);
     virtual void updateVisibleRangeDisplay(Pane *p) const;
     virtual void updatePositionStatusDisplays() const;
 };

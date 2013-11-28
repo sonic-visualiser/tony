@@ -857,8 +857,6 @@ MainWindow::openFile()
     } else if (status == FileOpenWrongMode) {
         QMessageBox::critical(this, tr("Failed to open file"),
                               tr("<b>Audio required</b><p>Please load at least one audio file before importing annotation data"));
-    } else {
-        configureNewPane(m_paneStack->getCurrentPane());
     }
 }
 
@@ -889,8 +887,6 @@ MainWindow::openLocation()
     } else if (status == FileOpenWrongMode) {
         QMessageBox::critical(this, tr("Failed to open location"),
                               tr("<b>Audio required</b><p>Please load at least one audio file before importing annotation data"));
-    } else {
-        configureNewPane(m_paneStack->getCurrentPane());
     }
 }
 
@@ -917,8 +913,6 @@ MainWindow::openRecentFile()
     } else if (status == FileOpenWrongMode) {
         QMessageBox::critical(this, tr("Failed to open location"),
                               tr("<b>Audio required</b><p>Please load at least one audio file before importing annotation data"));
-    } else {
-        configureNewPane(m_paneStack->getCurrentPane());
     }
 }
 
@@ -957,8 +951,6 @@ MainWindow::paneDropAccepted(Pane *pane, QStringList uriList)
         } else if (status == FileOpenWrongMode) {
             QMessageBox::critical(this, tr("Failed to open dropped URL"),
                                   tr("<b>Audio required</b><p>Please load at least one audio file before importing annotation data"));
-        } else {
-            configureNewPane(m_paneStack->getCurrentPane());
         }
     }
 }
@@ -980,18 +972,6 @@ MainWindow::paneDropAccepted(Pane *pane, QString text)
 
     //!!! open as text -- but by importing as if a CSV, or just adding
     //to a text layer?
-}
-
-void
-MainWindow::configureNewPane(Pane *pane)
-{
-    cerr << "MainWindow::configureNewPane(" << pane << ")" << endl;
-
-    if (!pane) {
-        pane = m_paneStack->addPane();
-    }
-
-    m_analyser->newFileLoaded(m_document, getMainModel(), m_paneStack, pane);
 }
 
 void
@@ -1462,6 +1442,19 @@ MainWindow::mainModelChanged(WaveFileModel *model)
     if (m_playTarget) {
         connect(m_fader, SIGNAL(valueChanged(float)),
                 m_playTarget, SLOT(setOutputGain(float)));
+    }
+
+    if (model) {
+        if (m_paneStack) {
+            Pane *pane = m_paneStack->getCurrentPane();
+            if (!pane) {
+                pane = m_paneStack->addPane();
+            }
+            if (pane) {
+                m_analyser->newFileLoaded
+                    (m_document, getMainModel(), m_paneStack, pane);
+            }
+        }
     }
 }
 
