@@ -49,7 +49,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_fileModel = model;
     m_pane = pane;
 
-    TransformId f0 = "vamp:pyin:pyin:notepitchtrack";
+    TransformId f0 = "vamp:pyin:pyin:smoothedpitchtrack";
     TransformId notes = "vamp:pyin:pyin:notes";
 
     // TransformId f0 = "vamp:yintony:yintony:notepitchtrack";
@@ -96,7 +96,6 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 	}
     }
 
-    
     paneStack->setCurrentLayer(m_pane, layer);
 }
 
