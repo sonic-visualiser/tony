@@ -661,7 +661,7 @@ MainWindow::toolNavigateSelected()
 void
 MainWindow::toolEditSelected()
 {
-    m_viewManager->setToolMode(ViewManager::EditMode);
+    m_viewManager->setToolMode(ViewManager::NoteEditMode);
     m_intelligentActionOn = true;
     m_analyser->setIntelligentActions(m_intelligentActionOn);
 }
@@ -669,7 +669,7 @@ MainWindow::toolEditSelected()
 void
 MainWindow::toolFreeEditSelected()
 {
-    m_viewManager->setToolMode(ViewManager::EditMode);
+    m_viewManager->setToolMode(ViewManager::NoteEditMode);
     m_intelligentActionOn = false;
     m_analyser->setIntelligentActions(m_intelligentActionOn);
 }
@@ -1457,15 +1457,17 @@ MainWindow::mainModelChanged(WaveFileModel *model)
             Pane *pane = m_paneStack->getCurrentPane();
             if (!pane) {
                 pane = m_paneStack->addPane();
-/*
+
+                //!!! ugly. a waveform "shadow layer" might be nicer
                 Pane *p2 = m_paneStack->addPane();
+                p2->setFixedHeight(60);
                 m_document->addLayerToView
                     (p2,
                      m_document->createMainModelLayer(LayerFactory::TimeRuler));
                 m_document->addLayerToView
                     (p2,
                      m_document->createMainModelLayer(LayerFactory::Waveform));
-*/
+                m_paneStack->sizePanesEqually();
             }
             if (pane) {
                 m_analyser->newFileLoaded
