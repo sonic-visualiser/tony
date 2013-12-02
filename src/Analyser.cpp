@@ -29,12 +29,28 @@
 #include "layer/ColourDatabase.h"
 #include "layer/LayerFactory.h"
 
+#include <QSettings>
+
 Analyser::Analyser() :
     m_document(0),
     m_fileModel(0),
     m_pane(0),
     m_flexiNoteLayer(0)
 {
+    QSettings settings;
+    settings.beginGroup("LayerDefaults");
+    settings.setValue
+        ("timevalues",
+         QString("<layer verticalScale=\"%1\" plotStyle=\"%2\" "
+                 "scaleMinimum=\"%3\" scaleMaximum=\"%4\"/>")
+         .arg(int(TimeValueLayer::LogScale))
+         .arg(int(TimeValueLayer::PlotDiscreteCurves))
+         .arg(27.5f).arg(880.f)); // temporary values: better get the real extents of the data from the model
+    settings.setValue
+        ("flexinotes",
+         QString("<layer verticalScale=\"%1\"/>")
+         .arg(int(FlexiNoteLayer::AutoAlignScale)));
+    settings.endGroup();
 }
 
 Analyser::~Analyser()
@@ -49,14 +65,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_fileModel = model;
     m_pane = pane;
 
-    TransformId f0 = "vamp:pyin:pyin:smoothedpitchtrack";
-    TransformId notes = "vamp:pyin:pyin:notes";
-
-    // TransformId f0 = "vamp:yintony:yintony:notepitchtrack";
-    // TransformId notes = "vamp:yintony:yintony:notes";
-
-    // TransformId f0 = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
-    // TransformId notes = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:notes";
+    QString base = "vamp:pyin:pyin:";
+    QString f0out = "smoothedpitchtrack";
+    QString noteout = "notes";
 
     // We don't want a waveform in the main pane. We must have a
     // main-model layer of some sort, but the layers created by
@@ -67,105 +78,52 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_document->addLayerToView
 	(m_pane, m_document->createMainModelLayer(LayerFactory::TimeRuler));
 
-    Layer *layer = 0;
-
-    layer = addLayerFor(f0);
-
-    if (layer) {
-	TimeValueLayer *tvl = qobject_cast<TimeValueLayer *>(layer);
-	if (tvl) {
-        tvl->setPlotStyle(TimeValueLayer::PlotDiscreteCurves);
-        // tvl->setPlotStyle(TimeValueLayer::PlotPoints);
-	    tvl->setBaseColour(ColourDatabase::getInstance()->
-			       getColourIndex(QString("Black")));
-			tvl->setVerticalScale(TimeValueLayer::LogScale);
-			tvl->setDisplayExtents(27.5f,880.f); // temporary values: better get the real extents of the data form the model
-	}
-    }
-
-    layer = addLayerForNotes(notes);
-
-    if (layer) {
-	FlexiNoteLayer *nl = qobject_cast<FlexiNoteLayer *>(layer);
-	if (nl) {
-	    m_flexiNoteLayer = nl;
-	    nl->setBaseColour(ColourDatabase::getInstance()->
-			      getColourIndex(QString("Bright Blue")));
-            nl->setVerticalScale(FlexiNoteLayer::AutoAlignScale);
-            // nl->setDisplayExtents(80.f,600.f); // temporary values: better get the real extents of the data form the model
-	}
-    }
-
-    paneStack->setCurrentLayer(m_pane, layer);
-}
-
-Layer *
-Analyser::addLayerFor(TransformId id)
-{
+    Transforms transforms;
+    
     TransformFactory *tf = TransformFactory::getInstance();
-
-    if (!tf->haveTransform(id)) {
-	std::cerr << "ERROR: Analyser::addLayerFor(" << id << "): Transform unknown" << std::endl;
-	return 0;
+    if (!tf->haveTransform(base + f0out) || !tf->haveTransform(base + noteout)) {
+        std::cerr << "ERROR: Analyser::newFileLoaded: Transform unknown" << std::endl;
+	return;
     }
+
+    Transform t = tf->getDefaultTransformFor
+        (base + f0out, m_fileModel->getSampleRate());
+    t.setStepSize(256);
+    t.setBlockSize(2048);
+
+    transforms.push_back(t);
+
+    t.setOutput(noteout);
     
-    Transform transform = tf->getDefaultTransformFor
-	(id, m_fileModel->getSampleRate());
-	
-    transform.setStepSize(256);
-    transform.setBlockSize(2048);
-	
-    ModelTransformer::Input input(m_fileModel, -1);
-    
-    Layer *layer;
-    layer = m_document->createDerivedLayer(transform, m_fileModel);
+    transforms.push_back(t);
 
-    if (layer) {
-		m_document->addLayerToView(m_pane, layer);
-    } else {
-		std::cerr << "ERROR: Analyser::addLayerFor: Cound not create layer. " << std::endl;
-	}
+    std::vector<Layer *> layers =
+        m_document->createDerivedLayers(transforms, m_fileModel);
 
-    return layer;
-}
+    if (!layers.empty()) {
 
-Layer *
-Analyser::addLayerForNotes(TransformId id)
-{
-    TransformFactory *tf = TransformFactory::getInstance();
+        ColourDatabase *cdb = ColourDatabase::getInstance();
 
-    if (!tf->haveTransform(id)) {
-	std::cerr << "ERROR: Analyser::addLayerFor(" << id << "): Transform unknown" << std::endl;
-	return 0;
+        for (int i = 0; i < (int)layers.size(); ++i) {
+
+            SingleColourLayer *scl = dynamic_cast<SingleColourLayer *>
+                (layers[i]);
+
+            if (scl) {
+                if (i == 0) {
+                    scl->setBaseColour(cdb->getColourIndex(tr("Black")));
+                } else {
+                    scl->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
+                }
+            }
+
+            m_document->addLayerToView(m_pane, layers[i]);
+        }
+
+        m_flexiNoteLayer = dynamic_cast<FlexiNoteLayer *>
+            (layers[layers.size()-1]);
+        paneStack->setCurrentLayer(m_pane, m_flexiNoteLayer);
     }
-    
-    Transform transform = tf->getDefaultTransformFor
-	(id, m_fileModel->getSampleRate());
-	
-    transform.setStepSize(256);
-    transform.setBlockSize(2048);
-	
-    ModelTransformer::Input input(m_fileModel, -1);
-
-	FeatureExtractionModelTransformer::PreferredOutputModel preferredModel;
-	
-	// preferredModel = FeatureExtractionModelTransformer::NoteOutputModel;
-	preferredModel = FeatureExtractionModelTransformer::FlexiNoteOutputModel;
-
-	// preferredLayer = LayerFactory::Notes ;
-	preferredLayer = LayerFactory::FlexiNotes ;
-	
-	// std::cerr << "NOTE: Trying to create layer type(" << preferredLayer << ")" << std::endl;
-    Layer *layer;
-    layer = m_document->createDerivedLayer(transform, m_fileModel, preferredLayer, preferredModel);
-
-    if (layer) {
-		m_document->addLayerToView(m_pane, layer);
-    } else {
-		std::cerr << "ERROR: Analyser::addLayerForNotes: Cound not create layer type(" << preferredLayer << ")" << std::endl;
-	}
-
-    return layer;
 }
 
 void

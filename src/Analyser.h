@@ -47,11 +47,6 @@ protected:
     WaveFileModel *m_fileModel;
     Pane *m_pane;
     FlexiNoteLayer *m_flexiNoteLayer;
-
-    Layer *addLayerFor(TransformId);
-    Layer *addLayerForNotes(TransformId);
-	LayerFactory::LayerType preferredLayer;
-
 };
 
 #endif
