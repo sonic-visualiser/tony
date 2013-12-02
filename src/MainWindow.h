@@ -38,7 +38,8 @@ protected slots:
     virtual void openRecentFile();
     virtual void saveSession();
     virtual void saveSessionAs();
-    virtual void exportLayer();
+    virtual void exportPitchLayer();
+    virtual void exportNoteLayer();
     virtual void newSession();
     virtual void closeSession();
 
@@ -126,6 +127,8 @@ protected:
     bool           m_intelligentActionOn; // GF: !!! temporary
     
     KeyReference  *m_keyReference;
+
+    QString exportToSVL(QString path, Layer *layer);
 
     virtual void setupMenus();
     virtual void setupFileMenu();
