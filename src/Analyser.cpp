@@ -147,23 +147,14 @@ Analyser::addLayerForNotes(TransformId id)
 	
     ModelTransformer::Input input(m_fileModel, -1);
 
-	FeatureExtractionModelTransformer::PreferredOutputModel preferredModel;
-	
-	// preferredModel = FeatureExtractionModelTransformer::NoteOutputModel;
-	preferredModel = FeatureExtractionModelTransformer::FlexiNoteOutputModel;
-
-	// preferredLayer = LayerFactory::Notes ;
-	preferredLayer = LayerFactory::FlexiNotes ;
-	
-	// std::cerr << "NOTE: Trying to create layer type(" << preferredLayer << ")" << std::endl;
     Layer *layer;
-    layer = m_document->createDerivedLayer(transform, m_fileModel, preferredLayer, preferredModel);
+    layer = m_document->createDerivedLayer(transform, m_fileModel);
 
     if (layer) {
-		m_document->addLayerToView(m_pane, layer);
+        m_document->addLayerToView(m_pane, layer);
     } else {
-		std::cerr << "ERROR: Analyser::addLayerForNotes: Cound not create layer type(" << preferredLayer << ")" << std::endl;
-	}
+        std::cerr << "ERROR: Analyser::addLayerForNotes: Cound not create layer type(" << preferredLayer << ")" << std::endl;
+    }
 
     return layer;
 }
