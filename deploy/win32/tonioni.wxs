@@ -13,7 +13,7 @@
         Id="*"
         Keywords="Installer"
         Description="Tony Installer" 
-        Comments="Copyright (c) 2012 Queen Mary, University of London and others." 
+        Comments="Copyright (c) 2013 Queen Mary, University of London and others." 
         Manufacturer="Queen Mary, University of London" 
         InstallerVersion="100" 
         Languages="1033" 
@@ -28,7 +28,29 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="PFiles">
 
-        <Directory Id="INSTALLDIR" Name="Tony">
+        <Directory Id="VampPlugins" Name="Vamp Plugins">
+          <Component
+              Id="pYin"
+              Guid="5C3B7285-B652-4FE5-8A1D-AC92376F8AD5">
+            <File
+                Id="pyinlib"
+                Name="pyin.dll"
+                DiskId="1"
+                Source="..\pyin\win32-build\release\pyin.dll"/>
+            <File
+                Id="pyincat"
+                Name="pyin.cat"
+                DiskId="1"
+                Source="..\pyin\pyin.cat"/>
+            <File
+                Id="pyinrdf"
+                Name="pyin.n3"
+                DiskId="1"
+                Source="..\pyin\pyin.n3"/>
+          </Component>
+        </Directory>
+
+        <Directory Id="APPLICATIONFOLDER" Name="Tony">
             
             <Component
                 Id="MainExecutable"
@@ -55,7 +77,7 @@
                     WorkingDirectory="INSTALLDIR"
                     Advertise="yes"/>
               </File>
-<!--
+
               <File
                   Id="COPYING"
                   Name="COPYING"
@@ -71,7 +93,13 @@
                   Name="CHANGELOG"
                   DiskId="1"
                   Source="CHANGELOG"/>
-    -->        </Component>
+
+              <File
+                  Id="winicon.ico"
+                  Name="tony-winicon.ico"
+                  DiskId="1"
+                  Source="icons/tony-winicon.ico"/>
+            </Component>
 
             <Component
                 Id="Qt5"
@@ -167,28 +195,6 @@
 	    </Directory>
         </Directory>
 
-        <Directory Id="VampPlugins" Name="Vamp Plugins">
-            <Component
-                Id="Yintony"
-                Guid="5C3B7285-B652-4FE5-8A1D-AC92376F8AD5">
-                <File
-                    Id="yintonylib"
-                    Name="yintony.dll"
-                    DiskId="1"
-                    Source="..\yintony\win32-build\release\yintony.dll"/>
-                <File
-                    Id="yintonycat"
-                    Name="yintony.cat"
-                    DiskId="1"
-                    Source="..\yintony\yintony.cat"/>
-                <File
-                    Id="yintonyrdf"
-                    Name="yintony.n3"
-                    DiskId="1"
-                    Source="..\yintony\yintony.n3"/>
-            </Component>
-        </Directory>
-
       </Directory>
       
       <Directory Id="ProgramMenuFolder" Name="Programs">
@@ -204,13 +210,33 @@
 
     </Directory>
 
-    <Feature Id="Complete" Level="1">
+    <Feature 
+      Id="Complete"
+      Title="Required files"
+      Description="Installs the required files for running Tony."
+      AllowAdvertise="no"
+      Absent="disallow"
+      ConfigurableDirectory="APPLICATIONFOLDER"
+      Level="1">
+      <ComponentRef Id="pYin"/>
       <ComponentRef Id="MainExecutable"/>
-      <ComponentRef Id="Yintony"/>
       <ComponentRef Id="Qt5"/>
       <ComponentRef Id="Qt5PlatformPlugins"/>
       <ComponentRef Id="ProgramMenuDir"/>
     </Feature>
 
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+      <UIRef Id="WixUI_ErrorProgressText" />
+    </UI>
+		
+    <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONFOLDER" />
+    <Property Id="ApplicationFolderName" Value="Tony" />
+    <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    
+    <Icon Id="winicon.ico" SourceFile="icons/tony-winicon.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="winicon.ico" />
+        
   </Product>
 </Wix>
