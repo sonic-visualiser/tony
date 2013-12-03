@@ -136,7 +136,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_viewManager->setIlluminateLocalFeatures(true);
     m_viewManager->setShowWorkTitle(true);
     m_viewManager->setShowCentreLine(false);
-    m_viewManager->setOverlayMode(ViewManager::NoOverlays);
+    m_viewManager->setOverlayMode(ViewManager::MinimalOverlays);
 
     QFrame *frame = new QFrame;
     setCentralWidget(frame);
