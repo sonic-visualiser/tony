@@ -19,6 +19,7 @@
 #include "framework/MainWindowBase.h"
 
 class Analyser;
+class VersionTester;
 
 class MainWindow : public MainWindowBase
 {
@@ -127,6 +128,7 @@ protected:
     bool           m_intelligentActionOn; // GF: !!! temporary
     
     KeyReference  *m_keyReference;
+    VersionTester *m_versionTester;
 
     QString exportToSVL(QString path, Layer *layer);
 

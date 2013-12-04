@@ -71,10 +71,12 @@ PRE_TARGETDEPS += svapp/libsvapp.a \
 RESOURCES += tony.qrc
 
 HEADERS += src/MainWindow.h \
+           src/NetworkPermissionTester.h \
            src/Analyser.h
 
 SOURCES += src/main.cpp \
            src/Analyser.cpp \
+           src/NetworkPermissionTester.cpp \
            src/MainWindow.cpp
 
 QMAKE_INFO_PLIST = deploy/osx/Info.plist

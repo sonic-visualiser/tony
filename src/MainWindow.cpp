@@ -16,9 +16,11 @@
 #include "../version.h"
 
 #include "MainWindow.h"
+#include "NetworkPermissionTester.h"
 #include "Analyser.h"
 
 #include "framework/Document.h"
+#include "framework/VersionTester.h"
 
 #include "view/Pane.h"
 #include "view/PaneStack.h"
@@ -216,9 +218,23 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     statusBar();
 
-    // m_analyser = new Analyser();
-
     newSession();
+
+    settings.beginGroup("MainWindow");
+    settings.setValue("zoom-default", 512);
+    settings.endGroup();
+    zoomDefault();
+
+    NetworkPermissionTester tester;
+    bool networkPermission = tester.havePermission();
+    if (networkPermission) {
+        m_versionTester = new VersionTester
+            ("sonicvisualiser.org", "latest-tony-version.txt", TONY_VERSION);
+        connect(m_versionTester, SIGNAL(newerVersionAvailable(QString)),
+                this, SLOT(newerVersionAvailable(QString)));
+    } else {
+        m_versionTester = 0;
+    }
 }
 
 MainWindow::~MainWindow()
