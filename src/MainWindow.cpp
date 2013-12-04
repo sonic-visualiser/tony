@@ -124,6 +124,10 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     settings.setValue("showstatusbar", false);
     settings.endGroup();
 
+    settings.beginGroup("Transformer");
+    settings.setValue("use-flexi-note-model", true);
+    settings.endGroup();
+
     settings.beginGroup("LayerDefaults");
     settings.setValue("waveform",
                       QString("<layer scale=\"%1\" channelMode=\"%2\"/>")
@@ -639,6 +643,8 @@ MainWindow::setupToolbars()
     group->addAction(action);
     m_keyReference->registerShortcut(action);
 
+/* Remove for now...
+
     action = toolbar->addAction(il.load("notes"),
 				tr("Free Edit"));
     action->setCheckable(true);
@@ -648,28 +654,7 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
     group->addAction(action);
     m_keyReference->registerShortcut(action);
-
-
-    /*
-    toolbar = addToolBar(tr("Test actions toolbar")); // GF: temporary toolbar for triggering actions manually
-    
-    // GF: TEMP : this created a menu item
-    m_editSelectAction = toolbar->addAction(il.load("move"), tr("Edit"));
-    m_editSelectAction->setShortcut(tr("Home"));
-    m_editSelectAction->setStatusTip(tr("Edit Notes"));
-    m_editSelectAction->setEnabled(true);
-    // connect(test, SIGNAL(triggered()), this, SLOT(about()));
-    // connect(test, SIGNAL(triggered()), m_analyser, SLOT(resizeLayer()));
-    connect(m_editSelectAction, SIGNAL(triggered()), this, SLOT(selectNoteEditMode())); 
-    // connect(this, SIGNAL(canPlay(bool)), test, SLOT(setEnabled(bool)));
-    menu->addAction(m_editSelectAction);
-    
-    m_toggleIntelligenceAction = toolbar->addAction(il.load("notes"), tr("EditMode"));
-    // m_toggleIntelligenceAction->setShortcut(tr("Home"));
-    m_toggleIntelligenceAction->setStatusTip(tr("Toggle note edit boundary constraints and automation"));
-    m_toggleIntelligenceAction->setEnabled(true);
-    connect(m_toggleIntelligenceAction, SIGNAL(triggered()), this, SLOT(toggleNoteEditIntelligence()));
-    */
+*/
     Pane::registerShortcuts(*m_keyReference);
 }
 
@@ -695,37 +680,6 @@ MainWindow::toolFreeEditSelected()
     m_intelligentActionOn = false;
     m_analyser->setIntelligentActions(m_intelligentActionOn);
 }
-
-/*
-void
-MainWindow::selectNoteEditMode()   
-{
-    IconLoader il;
-    if (m_viewManager->getToolMode() == ViewManager::NoteEditMode) {
-        m_viewManager->setToolMode(ViewManager::NavigateMode);
-        m_editSelectAction->setIcon(il.load("move"));
-    } else {
-        cerr << "NoteEdit mode selected" << endl;
-        m_viewManager->setToolMode(ViewManager::NoteEditMode);
-        m_editSelectAction->setIcon(il.load("navigate"));
-    }
-}
-
-void
-MainWindow::toggleNoteEditIntelligence()
-{
-    IconLoader il;
-    if (m_intelligentActionOn == true) {
-        m_toggleIntelligenceAction->setIcon(il.load("values"));
-        m_intelligentActionOn = false;
-        m_analyser->setIntelligentActions(false);
-    } else {
-        m_toggleIntelligenceAction->setIcon(il.load("notes"));
-        m_intelligentActionOn = true;
-        m_analyser->setIntelligentActions(true);
-    }
-}
-*/
 
 void
 MainWindow::updateMenuStates()
@@ -1198,7 +1152,7 @@ MainWindow::exportPitchLayer()
         qobject_cast<SparseTimeValueModel *>(layer->getModel());
     if (!model) return;
 
-    FileFinder::FileType type = FileFinder::LayerFileNoMidi;
+    FileFinder::FileType type = FileFinder::LayerFileNoMidiNonSV;
 
     QString path = getSaveFileName(type);
 
@@ -1259,7 +1213,7 @@ MainWindow::exportNoteLayer()
     FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer->getModel());
     if (!model) return;
 
-    FileFinder::FileType type = FileFinder::LayerFile;
+    FileFinder::FileType type = FileFinder::LayerFileNonSV;
 
     QString path = getSaveFileName(type);
 
