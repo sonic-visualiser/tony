@@ -137,6 +137,13 @@ main(int argc, char **argv)
 {
     svSystemSpecificInitialisation();
 
+#ifdef Q_OS_MAC
+    if (QSysInfo::MacintoshVersion > QSysInfo::MV_10_8) {
+        // Fix for OS/X 10.9 font problem
+        QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
+    }
+#endif
+
     TonyApplication application(argc, argv);
 
     QStringList args = application.arguments();
