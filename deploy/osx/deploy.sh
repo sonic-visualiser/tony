@@ -38,7 +38,7 @@ fi
 echo
 echo "Copying in plugin."
 
-cp ../yintony/yintony.{dylib,cat,n3} "$source/Contents/Resources/"
+cp ../pyin/pyin.{dylib,cat,n3} "$source/Contents/Resources/"
 
 echo
 echo "Fixing up paths."
@@ -56,7 +56,7 @@ mkdir "$volume" || exit 1
 
 ln -s /Applications "$volume"/Applications
 cp README README.OSC COPYING CHANGELOG "$volume/"
-cp -rp "$source" "$target"
+cp -r "$source" "$target"
 
 echo "Done"
 
