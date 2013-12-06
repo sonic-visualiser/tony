@@ -146,7 +146,8 @@ main(int argc, char **argv)
 
     TonyApplication application(argc, argv);
 
-    QStringList args = application.arguments();
+//    QStringList args = application.arguments();
+    QStringList args;
 
     signal(SIGINT,  signalHandler);
     signal(SIGTERM, signalHandler);
