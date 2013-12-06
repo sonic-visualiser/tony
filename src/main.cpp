@@ -281,6 +281,8 @@ void TonyApplication::handleFilepathArgument(QString path,
     static bool haveMainModel = false;
     static bool havePriorCommandLineModel = false;
 
+    if (!m_mainWindow) return;
+
     MainWindow::FileOpenStatus status = MainWindow::FileOpenFailed;
 
     if (path.endsWith("ton")) {
