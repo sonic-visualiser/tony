@@ -36,7 +36,7 @@
                 Id="pyinlib"
                 Name="pyin.dll"
                 DiskId="1"
-                Source="..\pyin\win32-build\release\pyin.dll"/>
+                Source="..\pyin.dll"/>
             <File
                 Id="pyincat"
                 Name="pyin.cat"
@@ -88,11 +88,6 @@
                   Name="README"
                   DiskId="1"
                   Source="README"/>
-              <File
-                  Id="CHANGELOG"
-                  Name="CHANGELOG"
-                  DiskId="1"
-                  Source="CHANGELOG"/>
 
               <File
                   Id="winicon.ico"
