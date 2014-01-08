@@ -107,6 +107,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     cdb->addColour(Qt::darkGreen, tr("Green"));
     cdb->addColour(QColor(200, 50, 255), tr("Purple"));
     cdb->addColour(QColor(255, 150, 50), tr("Orange"));
+    cdb->addColour(QColor(180, 180, 180), tr("Grey"));
     cdb->setUseDarkBackground(cdb->addColour(Qt::white, tr("White")), true);
     cdb->setUseDarkBackground(cdb->addColour(Qt::red, tr("Bright Red")), true);
     cdb->setUseDarkBackground(cdb->addColour(QColor(30, 150, 255), tr("Bright Blue")), true);
@@ -155,8 +156,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     scroll->setFrameShape(QFrame::NoFrame);
 
     // We have a pane stack: it comes with the territory. However, we
-    // have a fixed and known number of panes in it (e.g. 1) -- it
-    // isn't variable
+    // have a fixed and known number of panes in it -- it isn't
+    // variable
     m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
     scroll->setWidget(m_paneStack);
 
@@ -1499,17 +1500,6 @@ MainWindow::mainModelChanged(WaveFileModel *model)
             Pane *pane = m_paneStack->getCurrentPane();
             if (!pane) {
                 pane = m_paneStack->addPane();
-
-                //!!! ugly. a waveform "shadow layer" might be nicer
-                Pane *p2 = m_paneStack->addPane();
-                p2->setFixedHeight(60);
-                m_document->addLayerToView
-                    (p2,
-                     m_document->createMainModelLayer(LayerFactory::TimeRuler));
-                m_document->addLayerToView
-                    (p2,
-                     m_document->createMainModelLayer(LayerFactory::Waveform));
-                m_paneStack->sizePanesEqually();
             }
             if (pane) {
                 m_analyser->newFileLoaded

@@ -26,6 +26,7 @@
 #include "layer/TimeValueLayer.h"
 #include "layer/NoteLayer.h"
 #include "layer/FlexiNoteLayer.h"
+#include "layer/WaveformLayer.h"
 #include "layer/ColourDatabase.h"
 #include "layer/LayerFactory.h"
 
@@ -69,14 +70,25 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     QString f0out = "smoothedpitchtrack";
     QString noteout = "notes";
 
-    // We don't want a waveform in the main pane. We must have a
-    // main-model layer of some sort, but the layers created by
-    // transforms are derived layers, so we'll create a time ruler for
-    // the main-model layer. It could subsequently be hidden if we
-    // didn't want it
+    // We need at least one main-model layer (time ruler, waveform or
+    // what have you). It could be hidden if we don't want to see it
+    // but it must exist.
 
     m_document->addLayerToView
 	(m_pane, m_document->createMainModelLayer(LayerFactory::TimeRuler));
+
+    // This waveform layer is just a shadow, light grey and taking up
+    // little space at the bottom
+
+    WaveformLayer *waveform = qobject_cast<WaveformLayer *>
+        (m_document->createMainModelLayer(LayerFactory::Waveform));
+
+    waveform->setMiddleLineHeight(0.9);
+    waveform->setShowMeans(false); // too small & pale for this
+    waveform->setBaseColour
+        (ColourDatabase::getInstance()->getColourIndex(tr("Grey")));
+
+    m_document->addLayerToView(m_pane, waveform);
 
     Transforms transforms;
     
