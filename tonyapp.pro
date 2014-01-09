@@ -28,8 +28,8 @@ exists(config.pri) {
         LIBS += -lportaudio -lwinmm -lws2_32
     }
     macx* {
-        DEFINES += HAVE_COREAUDIO
-        LIBS += -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework AudioToolbox -framework CoreFoundation -framework CoreServices
+        DEFINES += HAVE_COREAUDIO HAVE_PORTAUDIO_2_0
+        LIBS += -lportaudio -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework AudioToolbox -framework CoreFoundation -framework CoreServices
     }
 }
 
