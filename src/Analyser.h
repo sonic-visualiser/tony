@@ -18,16 +18,15 @@
 
 #include <QObject>
 
-#include "transform/Transform.h"
-#include "layer/LayerFactory.h" // GF: added so we can access the FlexiNotes enum value.
-#include "layer/FlexiNoteLayer.h"
+#include <map>
 
 class WaveFileModel;
 class Pane;
 class PaneStack;
 class Document;
 class Layer;
-class LayerFactory;
+class TimeValueLayer;
+class Layer;
 
 class Analyser : public QObject
 {
@@ -42,11 +41,40 @@ public:
 		       
     void setIntelligentActions(bool);
 
+    enum Component {
+        Audio,
+        PitchTrack,
+        Notes,
+    };
+
+    bool isVisible(Component c) const;
+    void setVisible(Component c, bool v);
+
+    bool isAudible(Component c) const;
+    void setAudible(Component c, bool v);
+
+    void cycleStatus(Component c) {
+        if (isVisible(c)) {
+            if (isAudible(c)) {
+                setVisible(c, false);
+                setAudible(c, false);
+            } else {
+                setAudible(c, true);
+            }
+        } else {
+            setVisible(c, true);
+            setAudible(c, false);
+        }
+    }
+
+signals:
+    void layersChanged();
+
 protected:
     Document *m_document;
     WaveFileModel *m_fileModel;
     Pane *m_pane;
-    FlexiNoteLayer *m_flexiNoteLayer;
+    mutable std::map<Component, Layer *> m_layers;
 };
 
 #endif

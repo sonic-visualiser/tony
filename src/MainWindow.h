@@ -50,6 +50,11 @@ protected slots:
     virtual void toolEditSelected();
     virtual void toolFreeEditSelected();
 
+    virtual void cycleWaveform();
+    virtual void cyclePitch();
+    virtual void cycleNotes();
+    virtual void updateLayerStatuses();
+
     virtual void paneAdded(Pane *);
     virtual void paneHidden(Pane *);
     virtual void paneAboutToBeDeleted(Pane *);
@@ -126,6 +131,10 @@ protected:
     QAction       *m_editSelectAction;
     QAction       *m_toggleIntelligenceAction;
     bool           m_intelligentActionOn; // GF: !!! temporary
+
+    QLabel        *m_waveformStatus;
+    QLabel        *m_pitchStatus;
+    QLabel        *m_notesStatus;
     
     KeyReference  *m_keyReference;
     VersionTester *m_versionTester;

@@ -71,6 +71,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QScrollArea>
+#include <QPainter>
 
 #include <iostream>
 #include <cstdio>
@@ -216,6 +217,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     frame->setLayout(layout);
 
     m_analyser = new Analyser();
+    connect(m_analyser, SIGNAL(layersChanged()),
+            this, SLOT(updateLayerStatuses()));
 
     setupMenus();
     setupToolbars();
@@ -661,6 +664,31 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_playSpeed);
     toolbar->addWidget(m_fader);
 
+    toolbar = addToolBar(tr("Show and Play"));
+    
+    QAction *cycleWaveformAction = toolbar->addAction(tr("Audio"));
+    //!!! shortcut etc
+    connect(cycleWaveformAction, SIGNAL(triggered()), this, SLOT(cycleWaveform()));
+
+    m_waveformStatus = new QLabel();
+    toolbar->addWidget(m_waveformStatus);
+    
+    QAction *cyclePitchAction = toolbar->addAction(tr("Pitch"));
+    //!!! shortcut etc
+    connect(cyclePitchAction, SIGNAL(triggered()), this, SLOT(cyclePitch()));
+
+    m_pitchStatus = new QLabel();
+    toolbar->addWidget(m_pitchStatus);
+    
+    QAction *cycleNotesAction = toolbar->addAction(tr("Notes"));
+    //!!! shortcut etc
+    connect(cycleNotesAction, SIGNAL(triggered()), this, SLOT(cycleNotes()));
+
+    m_notesStatus = new QLabel();
+    toolbar->addWidget(m_notesStatus);
+
+    updateLayerStatuses();
+
     Pane::registerShortcuts(*m_keyReference);
 }
 
@@ -739,6 +767,54 @@ MainWindow::updateMenuStates()
             m_rwdAction->setStatusTip(tr("Rewind"));
         }
     }
+}
+
+void
+MainWindow::updateLayerStatuses()
+{
+    IconLoader il;
+    QPixmap eye = il.loadPixmap("eye");
+    QPixmap speaker = il.loadPixmap("speaker");
+
+    // NB these need to be in the same order as the Analyser::Component enum
+    QLabel *statuses[] = { m_waveformStatus, m_pitchStatus, m_notesStatus };
+
+    for (int i = 0; i < sizeof(statuses)/sizeof(statuses[0]); ++i) {
+        QPixmap p(40, 16);
+        p.fill(QColor(0, 0, 0, 0));
+        QPainter paint(&p);
+        if (m_analyser->isVisible((Analyser::Component)i)) {
+            paint.drawPixmap(0, 0, eye);
+        }
+        if (m_analyser->isAudible((Analyser::Component)i)) {
+            paint.drawPixmap(20, 0, speaker);
+        }
+        statuses[i]->setPixmap(p);
+    }
+}    
+
+void
+MainWindow::cycleWaveform()
+{
+    cerr << "cycleWaveform" << endl;
+    m_analyser->cycleStatus(Analyser::Audio);
+    updateLayerStatuses();
+}
+
+void
+MainWindow::cyclePitch()
+{
+    cerr << "cyclePitch" << endl;
+    m_analyser->cycleStatus(Analyser::PitchTrack);
+    updateLayerStatuses();
+}
+
+void
+MainWindow::cycleNotes()
+{
+    cerr << "cycleNotes" << endl;
+    m_analyser->cycleStatus(Analyser::Notes);
+    updateLayerStatuses();
 }
 
 void

@@ -35,8 +35,7 @@
 Analyser::Analyser() :
     m_document(0),
     m_fileModel(0),
-    m_pane(0),
-    m_flexiNoteLayer(0)
+    m_pane(0)
 {
     QSettings settings;
     settings.beginGroup("LayerDefaults");
@@ -87,8 +86,10 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     waveform->setShowMeans(false); // too small & pale for this
     waveform->setBaseColour
         (ColourDatabase::getInstance()->getColourIndex(tr("Grey")));
-
+    
     m_document->addLayerToView(m_pane, waveform);
+
+    m_layers[Audio] = waveform;
 
     Transforms transforms;
     
@@ -114,35 +115,91 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 
     if (!layers.empty()) {
 
-        ColourDatabase *cdb = ColourDatabase::getInstance();
-
         for (int i = 0; i < (int)layers.size(); ++i) {
 
-            SingleColourLayer *scl = dynamic_cast<SingleColourLayer *>
-                (layers[i]);
+            FlexiNoteLayer *f = qobject_cast<FlexiNoteLayer *>(layers[i]);
+            TimeValueLayer *t = qobject_cast<TimeValueLayer *>(layers[i]);
 
-            if (scl) {
-                if (i == 0) {
-                    scl->setBaseColour(cdb->getColourIndex(tr("Black")));
-                } else {
-                    scl->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
-                }
-            }
+            if (f) m_layers[Notes] = f;
+            if (t) m_layers[PitchTrack] = t;
 
             m_document->addLayerToView(m_pane, layers[i]);
         }
+    
+        ColourDatabase *cdb = ColourDatabase::getInstance();
 
-        m_flexiNoteLayer = dynamic_cast<FlexiNoteLayer *>
-            (layers[layers.size()-1]);
-        paneStack->setCurrentLayer(m_pane, m_flexiNoteLayer);
+        TimeValueLayer *pitchLayer = 
+            qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
+        if (pitchLayer) {
+            pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
+            paneStack->setCurrentLayer(m_pane, pitchLayer);
+        }
+
+        FlexiNoteLayer *flexiNoteLayer = 
+            qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+        if (flexiNoteLayer) {
+            flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
+            paneStack->setCurrentLayer(m_pane, flexiNoteLayer);
+        }
     }
+
+    emit layersChanged();
 }
 
 void
 Analyser::setIntelligentActions(bool on) 
 {
     std::cerr << "toggle setIntelligentActions " << on << std::endl;
-    if (m_flexiNoteLayer) {
-        m_flexiNoteLayer->setIntelligentActions(on);
+
+    FlexiNoteLayer *flexiNoteLayer = 
+        qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+    if (flexiNoteLayer) {
+        flexiNoteLayer->setIntelligentActions(on);
     }
 }
+
+bool
+Analyser::isVisible(Component c) const
+{
+    if (m_layers[c]) {
+        return !m_layers[c]->isLayerDormant(m_pane);
+    } else {
+        return false;
+    }
+}
+
+void
+Analyser::setVisible(Component c, bool v)
+{
+    if (m_layers[c]) {
+        m_layers[c]->setLayerDormant(m_pane, !v);
+        m_pane->layerParametersChanged();
+    }
+}
+
+bool
+Analyser::isAudible(Component c) const
+{
+    if (m_layers[c]) {
+
+        PlayParameters *params = m_layers[c]->getPlayParameters();
+        if (!params) return false;
+
+        return params->isPlayAudible();
+    } else {
+        return false;
+    }
+}
+
+void
+Analyser::setAudible(Component c, bool a)
+{
+    if (m_layers[c]) {
+
+        PlayParameters *params = m_layers[c]->getPlayParameters();
+        if (!params) return;
+
+        params->setPlayAudible(a);
+    }
+}
+
