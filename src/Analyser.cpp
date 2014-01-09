@@ -35,6 +35,7 @@
 Analyser::Analyser() :
     m_document(0),
     m_fileModel(0),
+    m_paneStack(0),
     m_pane(0)
 {
     QSettings settings;
@@ -63,6 +64,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 {
     m_document = doc;
     m_fileModel = model;
+    m_paneStack = paneStack;
     m_pane = pane;
 
     QString base = "vamp:pyin:pyin:";
@@ -131,7 +133,6 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
             qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
         if (pitchLayer) {
             pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
-            paneStack->setCurrentLayer(m_pane, pitchLayer);
             PlayParameters *params = pitchLayer->getPlayParameters();
             if (params) params->setPlayPan(-1);
         }
@@ -140,7 +141,6 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
             qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
         if (flexiNoteLayer) {
             flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
-            paneStack->setCurrentLayer(m_pane, flexiNoteLayer);
             PlayParameters *params = flexiNoteLayer->getPlayParameters();
             if (params) params->setPlayPan(0);
         }
@@ -204,6 +204,11 @@ Analyser::setVisible(Component c, bool v)
 {
     if (m_layers[c]) {
         m_layers[c]->setLayerDormant(m_pane, !v);
+
+        if (v && (c == Notes)) {
+            m_paneStack->setCurrentLayer(m_pane, m_layers[c]);
+        }
+
         m_pane->layerParametersChanged();
         saveState(c);
     }

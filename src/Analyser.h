@@ -73,6 +73,7 @@ signals:
 protected:
     Document *m_document;
     WaveFileModel *m_fileModel;
+    PaneStack *m_paneStack;
     Pane *m_pane;
     mutable std::map<Component, Layer *> m_layers;
 
