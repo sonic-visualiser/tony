@@ -73,10 +73,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     // what have you). It could be hidden if we don't want to see it
     // but it must exist.
 
-    m_document->addLayerToView
-	(m_pane, m_document->createMainModelLayer(LayerFactory::TimeRuler));
-
-    // This waveform layer is just a shadow, light grey and taking up
+    // Our waveform layer is just a shadow, light grey and taking up
     // little space at the bottom
 
     WaveformLayer *waveform = qobject_cast<WaveformLayer *>

@@ -1581,6 +1581,17 @@ MainWindow::mainModelChanged(WaveFileModel *model)
             Pane *pane = m_paneStack->getCurrentPane();
             if (!pane) {
                 pane = m_paneStack->addPane();
+
+                Pane *selectionStrip = m_paneStack->addPane();
+                selectionStrip->setFixedHeight(26);
+                m_document->addLayerToView
+                    (selectionStrip,
+                     m_document->createMainModelLayer(LayerFactory::TimeRuler));
+                m_paneStack->sizePanesEqually();
+
+                m_viewManager->clearToolModeOverrides();
+                m_viewManager->setToolModeFor(selectionStrip,
+                                              ViewManager::SelectMode);
             }
             if (pane) {
                 m_analyser->newFileLoaded
