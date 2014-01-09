@@ -336,6 +336,53 @@ MainWindow::setupEditMenu()
     QMenu *menu = menuBar()->addMenu(tr("&Edit"));
     menu->setTearOffEnabled(true);
     CommandHistory::getInstance()->registerMenu(menu);
+    menu->addSeparator();
+
+    QToolBar *toolbar = addToolBar(tr("Tools Toolbar"));
+    
+    CommandHistory::getInstance()->registerToolbar(toolbar);
+
+    m_keyReference->setCategory(tr("Tool Selection"));
+
+    QActionGroup *group = new QActionGroup(this);
+
+    IconLoader il;
+
+    QAction *action = toolbar->addAction(il.load("navigate"),
+                                         tr("Navigate"));
+    action->setCheckable(true);
+    action->setChecked(true);
+    action->setShortcut(tr("1"));
+    action->setStatusTip(tr("Navigate"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolNavigateSelected()));
+    connect(this, SIGNAL(replacedDocument()), action, SLOT(trigger()));
+    group->addAction(action);
+    menu->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+    action = toolbar->addAction(il.load("move"),
+				tr("Edit"));
+    action->setCheckable(true);
+    action->setShortcut(tr("2"));
+    action->setStatusTip(tr("Edit with Note Intelligence"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolEditSelected()));
+    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
+    group->addAction(action);
+    menu->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+/* Remove for now...
+
+    action = toolbar->addAction(il.load("notes"),
+				tr("Free Edit"));
+    action->setCheckable(true);
+    action->setShortcut(tr("3"));
+    action->setStatusTip(tr("Free Edit"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolFreeEditSelected()));
+    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
+    group->addAction(action);
+    m_keyReference->registerShortcut(action);
+*/
 }
 
 void
@@ -614,48 +661,6 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_playSpeed);
     toolbar->addWidget(m_fader);
 
-    toolbar = addToolBar(tr("Tools Toolbar"));
-    
-    CommandHistory::getInstance()->registerToolbar(toolbar);
-
-    m_keyReference->setCategory(tr("Tool Selection"));
-
-    toolbar = addToolBar(tr("Tools Toolbar"));
-    QActionGroup *group = new QActionGroup(this);
-
-    QAction *action = toolbar->addAction(il.load("navigate"),
-                                         tr("Navigate"));
-    action->setCheckable(true);
-    action->setChecked(true);
-    action->setShortcut(tr("1"));
-    action->setStatusTip(tr("Navigate"));
-    connect(action, SIGNAL(triggered()), this, SLOT(toolNavigateSelected()));
-    connect(this, SIGNAL(replacedDocument()), action, SLOT(trigger()));
-    group->addAction(action);
-    m_keyReference->registerShortcut(action);
-
-    action = toolbar->addAction(il.load("move"),
-				tr("Edit"));
-    action->setCheckable(true);
-    action->setShortcut(tr("2"));
-    action->setStatusTip(tr("Edit with Note Intelligence"));
-    connect(action, SIGNAL(triggered()), this, SLOT(toolEditSelected()));
-    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
-    group->addAction(action);
-    m_keyReference->registerShortcut(action);
-
-/* Remove for now...
-
-    action = toolbar->addAction(il.load("notes"),
-				tr("Free Edit"));
-    action->setCheckable(true);
-    action->setShortcut(tr("3"));
-    action->setStatusTip(tr("Free Edit"));
-    connect(action, SIGNAL(triggered()), this, SLOT(toolFreeEditSelected()));
-    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
-    group->addAction(action);
-    m_keyReference->registerShortcut(action);
-*/
     Pane::registerShortcuts(*m_keyReference);
 }
 
