@@ -86,6 +86,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     waveform->setShowMeans(false); // too small & pale for this
     waveform->setBaseColour
         (ColourDatabase::getInstance()->getColourIndex(tr("Grey")));
+    PlayParameters *params = waveform->getPlayParameters();
+    if (params) params->setPlayPan(1);
     
     m_document->addLayerToView(m_pane, waveform);
 
@@ -133,6 +135,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
         if (pitchLayer) {
             pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
             paneStack->setCurrentLayer(m_pane, pitchLayer);
+            PlayParameters *params = pitchLayer->getPlayParameters();
+            if (params) params->setPlayPan(-1);
         }
 
         FlexiNoteLayer *flexiNoteLayer = 
@@ -140,6 +144,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
         if (flexiNoteLayer) {
             flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
             paneStack->setCurrentLayer(m_pane, flexiNoteLayer);
+            PlayParameters *params = flexiNoteLayer->getPlayParameters();
+            if (params) params->setPlayPan(0);
         }
     }
 
