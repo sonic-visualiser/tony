@@ -146,7 +146,35 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
         }
     }
 
+    loadState(Audio);
+    loadState(PitchTrack);
+    loadState(Notes);
+
     emit layersChanged();
+}
+
+void
+Analyser::saveState(Component c) const
+{
+    bool v = isVisible(c);
+    bool a = isAudible(c);
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue(QString("Visibility %1").arg(int(c)), v);
+    settings.setValue(QString("Audibility %1").arg(int(c)), a);
+    settings.endGroup();
+}
+
+void
+Analyser::loadState(Component c)
+{
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    bool v = settings.value(QString("Visibility %1").arg(int(c)), true).toBool();
+    bool a = settings.value(QString("Audibility %1").arg(int(c)), true).toBool();
+    settings.endGroup();
+    setVisible(c, v);
+    setAudible(c, a);
 }
 
 void
@@ -177,6 +205,7 @@ Analyser::setVisible(Component c, bool v)
     if (m_layers[c]) {
         m_layers[c]->setLayerDormant(m_pane, !v);
         m_pane->layerParametersChanged();
+        saveState(c);
     }
 }
 
@@ -184,10 +213,8 @@ bool
 Analyser::isAudible(Component c) const
 {
     if (m_layers[c]) {
-
         PlayParameters *params = m_layers[c]->getPlayParameters();
         if (!params) return false;
-
         return params->isPlayAudible();
     } else {
         return false;
@@ -198,11 +225,10 @@ void
 Analyser::setAudible(Component c, bool a)
 {
     if (m_layers[c]) {
-
         PlayParameters *params = m_layers[c]->getPlayParameters();
         if (!params) return;
-
         params->setPlayAudible(a);
+        saveState(c);
     }
 }
 

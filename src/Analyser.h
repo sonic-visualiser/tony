@@ -75,6 +75,9 @@ protected:
     WaveFileModel *m_fileModel;
     Pane *m_pane;
     mutable std::map<Component, Layer *> m_layers;
+
+    void saveState(Component c) const;
+    void loadState(Component c);
 };
 
 #endif
