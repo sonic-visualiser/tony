@@ -160,6 +160,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     // have a fixed and known number of panes in it -- it isn't
     // variable
     m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
+    m_paneStack->setShowPaneAccessories(false);
     scroll->setWidget(m_paneStack);
 
     m_overview = new Overview(frame);
