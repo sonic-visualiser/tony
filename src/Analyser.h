@@ -67,6 +67,8 @@ public:
         }
     }
 
+    void getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1);
+
 signals:
     void layersChanged();
 

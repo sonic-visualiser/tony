@@ -55,6 +55,8 @@ protected slots:
     virtual void cycleNotes();
     virtual void updateLayerStatuses();
 
+    virtual void doubleClickSelectInvoked(size_t);
+
     virtual void paneAdded(Pane *);
     virtual void paneHidden(Pane *);
     virtual void paneAboutToBeDeleted(Pane *);

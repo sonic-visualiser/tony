@@ -45,6 +45,7 @@
 #include "base/Profiler.h"
 #include "base/UnitDatabase.h"
 #include "layer/ColourDatabase.h"
+#include "base/Selection.h"
 
 #include "data/fileio/CSVFileWriter.h"
 #include "data/fileio/MIDIFileWriter.h"
@@ -161,6 +162,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     // variable
     m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
     m_paneStack->setShowPaneAccessories(false);
+    connect(m_paneStack, SIGNAL(doubleClickSelectInvoked(size_t)),
+            this, SLOT(doubleClickSelectInvoked(size_t)));
     scroll->setWidget(m_paneStack);
 
     m_overview = new Overview(frame);
@@ -1353,18 +1356,29 @@ MainWindow::renameCurrentLayer()
 {
     Pane *pane = m_paneStack->getCurrentPane();
     if (pane) {
-    Layer *layer = pane->getSelectedLayer();
-    if (layer) {
-        bool ok = false;
-        QString newName = QInputDialog::getText
-        (this, tr("Rename Layer"),
-         tr("New name for this layer:"),
-         QLineEdit::Normal, layer->objectName(), &ok);
-        if (ok) {
-        layer->setObjectName(newName);
+        Layer *layer = pane->getSelectedLayer();
+        if (layer) {
+            bool ok = false;
+            QString newName = QInputDialog::getText
+                (this, tr("Rename Layer"),
+                 tr("New name for this layer:"),
+                 QLineEdit::Normal, layer->objectName(), &ok);
+            if (ok) {
+                layer->setObjectName(newName);
+            }
         }
     }
-    }
+}
+
+void
+MainWindow::doubleClickSelectInvoked(size_t frame)
+{
+    size_t f0, f1;
+    m_analyser->getEnclosingSelectionScope(frame, f0, f1);
+    
+    cerr << "MainWindow::doubleClickSelectInvoked(" << frame << "): [" << f0 << "," << f1 << "]" << endl;
+
+    m_viewManager->setSelection(Selection(f0, f1));
 }
 
 void

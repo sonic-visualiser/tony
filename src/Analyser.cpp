@@ -167,6 +167,27 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 }
 
 void
+Analyser::getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1)
+{
+    FlexiNoteLayer *flexiNoteLayer = 
+        qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+
+    int f0i = f, f1i = f;
+    size_t res = 1;
+
+    if (!flexiNoteLayer) {
+        f0 = f1 = f;
+        return;
+    }
+    
+    flexiNoteLayer->snapToFeatureFrame(m_pane, f0i, res, Layer::SnapLeft);
+    flexiNoteLayer->snapToFeatureFrame(m_pane, f1i, res, Layer::SnapRight);
+
+    f0 = (f0i < 0 ? 0 : f0i);
+    f1 = (f1i < 0 ? 0 : f1i);
+}
+
+void
 Analyser::saveState(Component c) const
 {
     bool v = isVisible(c);
