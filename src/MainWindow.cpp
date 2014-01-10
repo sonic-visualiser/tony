@@ -704,29 +704,48 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_fader);
 
     toolbar = addToolBar(tr("Show and Play"));
+
+    QLabel *eye = new QLabel;
+    eye->setFixedWidth(40);
+    eye->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    eye->setPixmap(il.loadPixmap("eye"));
+    toolbar->addWidget(eye);
+
+    m_showAudio = toolbar->addAction(il.load("waveform"), tr("Show Audio"));
+    m_showAudio->setCheckable(true);
+    connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
+
+    m_showPitch = toolbar->addAction(il.load("values"), tr("Show Pitch Track"));
+    m_showPitch->setCheckable(true);
+    connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
+
+    m_showNotes = toolbar->addAction(il.load("notes"), tr("Show Notes"));
+    m_showNotes->setCheckable(true);
+    connect(m_showNotes, SIGNAL(triggered()), this, SLOT(showNotesToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
+        
+    QLabel *speaker = new QLabel;
+    speaker->setFixedWidth(40);
+    speaker->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    speaker->setPixmap(il.loadPixmap("speaker"));
+    toolbar->addWidget(speaker);
     
-    QAction *cycleWaveformAction = toolbar->addAction(tr("Audio"));
-    //!!! shortcut etc
-    connect(cycleWaveformAction, SIGNAL(triggered()), this, SLOT(cycleWaveform()));
+    m_playAudio = toolbar->addAction(il.load("waveform"), tr("Play Audio"));
+    m_playAudio->setCheckable(true);
+    connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_playAudio, SLOT(setEnabled(bool)));
 
-    m_waveformStatus = new QLabel();
-    toolbar->addWidget(m_waveformStatus);
-    
-    QAction *cyclePitchAction = toolbar->addAction(tr("Pitch"));
-    //!!! shortcut etc
-    connect(cyclePitchAction, SIGNAL(triggered()), this, SLOT(cyclePitch()));
+    m_playPitch = toolbar->addAction(il.load("values"), tr("Play Pitch Track"));
+    m_playPitch->setCheckable(true);
+    connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool)));
 
-    m_pitchStatus = new QLabel();
-    toolbar->addWidget(m_pitchStatus);
-    
-    QAction *cycleNotesAction = toolbar->addAction(tr("Notes"));
-    //!!! shortcut etc
-    connect(cycleNotesAction, SIGNAL(triggered()), this, SLOT(cycleNotes()));
-
-    m_notesStatus = new QLabel();
-    toolbar->addWidget(m_notesStatus);
-
-    updateLayerStatuses();
+    m_playNotes = toolbar->addAction(il.load("notes"), tr("Play Notes"));
+    m_playNotes->setCheckable(true);
+    connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_playNotes, SLOT(setEnabled(bool)));
 
     Pane::registerShortcuts(*m_keyReference);
 }
@@ -809,51 +828,50 @@ MainWindow::updateMenuStates()
 }
 
 void
+MainWindow::showAudioToggled()
+{
+    m_analyser->toggleVisible(Analyser::Audio);
+}
+
+void
+MainWindow::showPitchToggled()
+{
+    m_analyser->toggleVisible(Analyser::PitchTrack);
+}
+
+void
+MainWindow::showNotesToggled()
+{
+    m_analyser->toggleVisible(Analyser::Notes);
+}
+
+void
+MainWindow::playAudioToggled()
+{
+    m_analyser->toggleAudible(Analyser::Audio);
+}
+
+void
+MainWindow::playPitchToggled()
+{
+    m_analyser->toggleAudible(Analyser::PitchTrack);
+}
+
+void
+MainWindow::playNotesToggled()
+{
+    m_analyser->toggleAudible(Analyser::Notes);
+}
+
+void
 MainWindow::updateLayerStatuses()
 {
-    IconLoader il;
-    QPixmap eye = il.loadPixmap("eye");
-    QPixmap speaker = il.loadPixmap("speaker");
-
-    // NB these need to be in the same order as the Analyser::Component enum
-    QLabel *statuses[] = { m_waveformStatus, m_pitchStatus, m_notesStatus };
-
-    for (int i = 0; i < sizeof(statuses)/sizeof(statuses[0]); ++i) {
-        QPixmap p(40, 16);
-        p.fill(QColor(0, 0, 0, 0));
-        QPainter paint(&p);
-        if (m_analyser->isVisible((Analyser::Component)i)) {
-            paint.drawPixmap(0, 0, eye);
-        }
-        if (m_analyser->isAudible((Analyser::Component)i)) {
-            paint.drawPixmap(20, 0, speaker);
-        }
-        statuses[i]->setPixmap(p);
-    }
-}    
-
-void
-MainWindow::cycleWaveform()
-{
-    cerr << "cycleWaveform" << endl;
-    m_analyser->cycleStatus(Analyser::Audio);
-    updateLayerStatuses();
-}
-
-void
-MainWindow::cyclePitch()
-{
-    cerr << "cyclePitch" << endl;
-    m_analyser->cycleStatus(Analyser::PitchTrack);
-    updateLayerStatuses();
-}
-
-void
-MainWindow::cycleNotes()
-{
-    cerr << "cycleNotes" << endl;
-    m_analyser->cycleStatus(Analyser::Notes);
-    updateLayerStatuses();
+    m_showAudio->setChecked(m_analyser->isVisible(Analyser::Audio));
+    m_showPitch->setChecked(m_analyser->isVisible(Analyser::PitchTrack));
+    m_showNotes->setChecked(m_analyser->isVisible(Analyser::Notes));
+    m_playAudio->setChecked(m_analyser->isAudible(Analyser::Audio));
+    m_playPitch->setChecked(m_analyser->isAudible(Analyser::PitchTrack));
+    m_playNotes->setChecked(m_analyser->isAudible(Analyser::Notes));
 }
 
 void

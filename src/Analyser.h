@@ -50,9 +50,11 @@ public:
 
     bool isVisible(Component c) const;
     void setVisible(Component c, bool v);
+    void toggleVisible(Component c) { setVisible(c, !isVisible(c)); }
 
     bool isAudible(Component c) const;
     void setAudible(Component c, bool v);
+    void toggleAudible(Component c) { setAudible(c, !isAudible(c)); }
 
     void cycleStatus(Component c) {
         if (isVisible(c)) {

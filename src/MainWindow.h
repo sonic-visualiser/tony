@@ -53,10 +53,13 @@ protected slots:
     virtual void octaveShiftUp();
     virtual void octaveShiftDown();
 
-    virtual void cycleWaveform();
-    virtual void cyclePitch();
-    virtual void cycleNotes();
-    virtual void updateLayerStatuses();
+    virtual void showAudioToggled();
+    virtual void showPitchToggled();
+    virtual void showNotesToggled();
+
+    virtual void playAudioToggled();
+    virtual void playPitchToggled();
+    virtual void playNotesToggled();
 
     virtual void doubleClickSelectInvoked(size_t);
 
@@ -86,6 +89,7 @@ protected slots:
 
     virtual void updateMenuStates();
     virtual void updateDescriptionLabel();
+    virtual void updateLayerStatuses();
 
     virtual void layerRemoved(Layer *);
     virtual void layerInAView(Layer *, bool);
@@ -136,6 +140,13 @@ protected:
     QAction       *m_editSelectAction;
     QAction       *m_toggleIntelligenceAction;
     bool           m_intelligentActionOn; // GF: !!! temporary
+
+    QAction       *m_showAudio;
+    QAction       *m_showPitch;
+    QAction       *m_showNotes;
+    QAction       *m_playAudio;
+    QAction       *m_playPitch;
+    QAction       *m_playNotes;
 
     QLabel        *m_waveformStatus;
     QLabel        *m_pitchStatus;
