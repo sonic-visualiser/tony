@@ -393,7 +393,29 @@ MainWindow::setupEditMenu()
 
     menu->addSeparator();
     
-    //!!! shortcuts, status tip etc
+    m_keyReference->setCategory(tr("Selection"));
+
+    action = new QAction(tr("Select &All"), this);
+    action->setShortcut(tr("Ctrl+A"));
+    action->setStatusTip(tr("Select the whole duration of the current session"));
+    connect(action, SIGNAL(triggered()), this, SLOT(selectAll()));
+    connect(this, SIGNAL(canSelect(bool)), action, SLOT(setEnabled(bool)));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+
+    action = new QAction(tr("C&lear Selection"), this);
+    action->setShortcut(tr("Esc"));
+    action->setStatusTip(tr("Clear the selection"));
+    connect(action, SIGNAL(triggered()), this, SLOT(clearSelection()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+
+    menu->addSeparator();
+    
+    //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Octave Shift Up"), this);
     action->setShortcut(tr("PgUp"));
     connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftUp()));
