@@ -1609,8 +1609,15 @@ MainWindow::mainModelChanged(WaveFileModel *model)
                                               ViewManager::SelectMode);
             }
             if (pane) {
-                m_analyser->newFileLoaded
+                QString error = m_analyser->newFileLoaded
                     (m_document, getMainModel(), m_paneStack, pane);
+                if (error != "") {
+                    QMessageBox::warning
+                        (this,
+                         tr("Failed to analyse audio"),
+                         tr("<b>Analysis failed</b><p>%1</p>").arg(error),
+                         QMessageBox::Ok);
+                }
             }
         }
     }

@@ -58,7 +58,7 @@ Analyser::~Analyser()
 {
 }
 
-void
+QString
 Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 			PaneStack *paneStack, Pane *pane)
 {
@@ -67,6 +67,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
+    QString plugname = "pYIN";
     QString base = "vamp:pyin:pyin:";
     QString f0out = "smoothedpitchtrack";
     QString noteout = "notes";
@@ -108,9 +109,12 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     }
 */
 
-    if (!tf->haveTransform(base + f0out) || !tf->haveTransform(base + noteout)) {
-        std::cerr << "ERROR: Analyser::newFileLoaded: Transform unknown" << std::endl;
-	return;
+    QString notFound = tr("Transform \"%1\" not found. Unable to analyse audio file.<br><br>Is the %2 Vamp plugin correctly installed?");
+    if (!tf->haveTransform(base + f0out)) {
+	return notFound.arg(base + f0out).arg(plugname);
+    }
+    if (!tf->haveTransform(base + noteout)) {
+	return notFound.arg(base + noteout).arg(plugname);
     }
 
     Transform t = tf->getDefaultTransformFor
@@ -164,6 +168,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     loadState(Notes);
 
     emit layersChanged();
+
+    return "";
 }
 
 void

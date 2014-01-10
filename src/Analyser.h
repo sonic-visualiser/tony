@@ -36,8 +36,9 @@ public:
     Analyser();
     virtual ~Analyser();
 
-    void newFileLoaded(Document *newDocument, WaveFileModel *model,
-		       PaneStack *paneStack, Pane *pane);
+    // Process new main model, add derived layers; return "" on success or error string on failure
+    QString newFileLoaded(Document *newDocument, WaveFileModel *model,
+                          PaneStack *paneStack, Pane *pane);
 		       
     void setIntelligentActions(bool);
 
