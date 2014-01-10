@@ -50,6 +50,9 @@ protected slots:
     virtual void toolEditSelected();
     virtual void toolFreeEditSelected();
 
+    virtual void octaveShiftUp();
+    virtual void octaveShiftDown();
+
     virtual void cycleWaveform();
     virtual void cyclePitch();
     virtual void cycleNotes();
@@ -149,6 +152,8 @@ protected:
     virtual void setupViewMenu();
     virtual void setupHelpMenu();
     virtual void setupToolbars();
+
+    virtual void octaveShift(bool up);
 
     virtual void closeEvent(QCloseEvent *e);
     bool checkSaveModified();

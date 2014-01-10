@@ -390,6 +390,21 @@ MainWindow::setupEditMenu()
     group->addAction(action);
     m_keyReference->registerShortcut(action);
 */
+
+    menu->addSeparator();
+    
+    //!!! shortcuts, status tip etc
+    action = new QAction(tr("Octave Shift Up"), this);
+    action->setShortcut(tr("PgUp"));
+    connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftUp()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+
+    action = new QAction(tr("Octave Shift Down"), this);
+    action->setShortcut(tr("PgDown"));
+    connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftDown()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
 }
 
 void
@@ -555,7 +570,6 @@ MainWindow::setupToolbars()
 
     QAction *m_rwdAction = toolbar->addAction(il.load("rewind"),
                                               tr("Rewind"));
-    m_rwdAction->setShortcut(tr("PgUp"));
     m_rwdAction->setStatusTip(tr("Rewind to the previous time instant or time ruler notch"));
     connect(m_rwdAction, SIGNAL(triggered()), this, SLOT(rewind()));
     connect(this, SIGNAL(canRewind(bool)), m_rwdAction, SLOT(setEnabled(bool)));
@@ -572,7 +586,6 @@ MainWindow::setupToolbars()
 
     m_ffwdAction = toolbar->addAction(il.load("ffwd"),
                                               tr("Fast Forward"));
-    m_ffwdAction->setShortcut(tr("PgDown"));
     m_ffwdAction->setStatusTip(tr("Fast-forward to the next time instant or time ruler notch"));
     connect(m_ffwdAction, SIGNAL(triggered()), this, SLOT(ffwd()));
     connect(this, SIGNAL(canFfwd(bool)), m_ffwdAction, SLOT(setEnabled(bool)));
@@ -1379,6 +1392,63 @@ MainWindow::doubleClickSelectInvoked(size_t frame)
     cerr << "MainWindow::doubleClickSelectInvoked(" << frame << "): [" << f0 << "," << f1 << "]" << endl;
 
     m_viewManager->setSelection(Selection(f0, f1));
+}
+
+void
+MainWindow::octaveShiftUp()
+{
+    octaveShift(true);
+}
+
+void
+MainWindow::octaveShiftDown()
+{
+    octaveShift(false);
+}
+
+void
+MainWindow::octaveShift(bool up)
+{
+    float factor = (up ? 2.f : 0.5f);
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    CommandHistory::getInstance()->startCompoundOperation(tr("Octave Shift"), true);
+
+    for (int i = 0; i < m_paneStack->getPaneCount(); ++i) {
+
+        Pane *pane = m_paneStack->getPane(i);
+        if (!pane) continue;
+
+        for (int j = 0; j < pane->getLayerCount(); ++j) {
+
+            Layer *layer = pane->getLayer(j);
+            if (!layer) continue;
+
+            for (MultiSelection::SelectionList::iterator k = selections.begin();
+                 k != selections.end(); ++k) {
+
+                Clipboard clip;
+                layer->copy(pane, *k, clip);
+                layer->deleteSelection(*k);
+
+                Clipboard shifted;
+                foreach (Clipboard::Point p, clip.getPoints()) {
+                    if (p.haveValue()) {
+                        Clipboard::Point sp = 
+                            p.withValue(p.getValue() * factor);
+                        shifted.addPoint(sp);
+                    } else {
+                        shifted.addPoint(p);
+                    }
+                }
+
+                layer->paste(pane, shifted, 0, false);
+            }
+        }
+    }
+
+    CommandHistory::getInstance()->endCompoundOperation();
 }
 
 void
