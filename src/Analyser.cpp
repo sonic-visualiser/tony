@@ -95,6 +95,19 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     Transforms transforms;
     
     TransformFactory *tf = TransformFactory::getInstance();
+
+/*!!! we could have more than one pitch track...
+    QString cx = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
+    if (tf->haveTransform(cx)) {
+        Transform tx = tf->getDefaultTransformFor(cx);
+        TimeValueLayer *lx = qobject_cast<TimeValueLayer *>
+            (m_document->createDerivedLayer(tx, m_fileModel));
+        lx->setVerticalScale(TimeValueLayer::AutoAlignScale);
+        lx->setBaseColour(ColourDatabase::getInstance()->getColourIndex(tr("Bright Red")));
+        m_document->addLayerToView(m_pane, lx);
+    }
+*/
+
     if (!tf->haveTransform(base + f0out) || !tf->haveTransform(base + noteout)) {
         std::cerr << "ERROR: Analyser::newFileLoaded: Transform unknown" << std::endl;
 	return;
