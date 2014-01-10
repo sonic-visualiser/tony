@@ -54,6 +54,7 @@ protected slots:
     virtual void octaveShiftDown();
 
     virtual void showAudioToggled();
+    virtual void showSpectToggled();
     virtual void showPitchToggled();
     virtual void showNotesToggled();
 
@@ -142,6 +143,7 @@ protected:
     bool           m_intelligentActionOn; // GF: !!! temporary
 
     QAction       *m_showAudio;
+    QAction       *m_showSpect;
     QAction       *m_showPitch;
     QAction       *m_showNotes;
     QAction       *m_playAudio;

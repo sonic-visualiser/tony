@@ -716,6 +716,11 @@ MainWindow::setupToolbars()
     connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
 
+    m_showSpect = toolbar->addAction(il.load("spectrogram"), tr("Show Spectrogram"));
+    m_showSpect->setCheckable(true);
+    connect(m_showSpect, SIGNAL(triggered()), this, SLOT(showSpectToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showSpect, SLOT(setEnabled(bool)));
+
     m_showPitch = toolbar->addAction(il.load("values"), tr("Show Pitch Track"));
     m_showPitch->setCheckable(true);
     connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
@@ -840,6 +845,12 @@ MainWindow::showPitchToggled()
 }
 
 void
+MainWindow::showSpectToggled()
+{
+    m_analyser->toggleVisible(Analyser::Spectrogram);
+}
+
+void
 MainWindow::showNotesToggled()
 {
     m_analyser->toggleVisible(Analyser::Notes);
@@ -867,6 +878,7 @@ void
 MainWindow::updateLayerStatuses()
 {
     m_showAudio->setChecked(m_analyser->isVisible(Analyser::Audio));
+    m_showSpect->setChecked(m_analyser->isVisible(Analyser::Spectrogram));
     m_showPitch->setChecked(m_analyser->isVisible(Analyser::PitchTrack));
     m_showNotes->setChecked(m_analyser->isVisible(Analyser::Notes));
     m_playAudio->setChecked(m_analyser->isAudible(Analyser::Audio));

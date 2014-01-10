@@ -46,6 +46,7 @@ public:
         Audio,
         PitchTrack,
         Notes,
+        Spectrogram,
     };
 
     bool isVisible(Component c) const;

@@ -28,7 +28,9 @@
 #include "layer/FlexiNoteLayer.h"
 #include "layer/WaveformLayer.h"
 #include "layer/ColourDatabase.h"
+#include "layer/ColourMapper.h"
 #include "layer/LayerFactory.h"
+#include "layer/SpectrogramLayer.h"
 
 #include <QSettings>
 
@@ -44,7 +46,7 @@ Analyser::Analyser() :
         ("timevalues",
          QString("<layer verticalScale=\"%1\" plotStyle=\"%2\" "
                  "scaleMinimum=\"%3\" scaleMaximum=\"%4\"/>")
-         .arg(int(TimeValueLayer::LogScale))
+         .arg(int(TimeValueLayer::AutoAlignScale))
          .arg(int(TimeValueLayer::PlotDiscreteCurves))
          .arg(27.5f).arg(880.f)); // temporary values: better get the real extents of the data from the model
     settings.setValue
@@ -75,6 +77,17 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     // We need at least one main-model layer (time ruler, waveform or
     // what have you). It could be hidden if we don't want to see it
     // but it must exist.
+
+    // A spectrogram, off by default. Must go at the back because it's
+    // opaque
+
+    SpectrogramLayer *spectrogram = qobject_cast<SpectrogramLayer *>
+        (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
+    spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
+    m_document->addLayerToView(m_pane, spectrogram);
+    spectrogram->setLayerDormant(m_pane, true);
+
+    m_layers[Spectrogram] = spectrogram;
 
     // Our waveform layer is just a shadow, light grey and taking up
     // little space at the bottom
@@ -166,6 +179,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     loadState(Audio);
     loadState(PitchTrack);
     loadState(Notes);
+    loadState(Spectrogram);
 
     emit layersChanged();
 
@@ -200,8 +214,8 @@ Analyser::saveState(Component c) const
     bool a = isAudible(c);
     QSettings settings;
     settings.beginGroup("Analyser");
-    settings.setValue(QString("Visibility %1").arg(int(c)), v);
-    settings.setValue(QString("Audibility %1").arg(int(c)), a);
+    settings.setValue(QString("visible-%1").arg(int(c)), v);
+    settings.setValue(QString("audible-%1").arg(int(c)), a);
     settings.endGroup();
 }
 
@@ -210,8 +224,9 @@ Analyser::loadState(Component c)
 {
     QSettings settings;
     settings.beginGroup("Analyser");
-    bool v = settings.value(QString("Visibility %1").arg(int(c)), true).toBool();
-    bool a = settings.value(QString("Audibility %1").arg(int(c)), true).toBool();
+    bool deflt = (c == Spectrogram ? false : true);
+    bool v = settings.value(QString("visible-%1").arg(int(c)), deflt).toBool();
+    bool a = settings.value(QString("audible-%1").arg(int(c)), true).toBool();
     settings.endGroup();
     setVisible(c, v);
     setAudible(c, a);
