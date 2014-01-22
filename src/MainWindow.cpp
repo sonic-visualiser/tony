@@ -705,6 +705,7 @@ MainWindow::setupToolbars()
 
     toolbar = addToolBar(tr("Show and Play"));
 
+    /* ORIGINAL DESIGN
     QLabel *eye = new QLabel;
     eye->setFixedWidth(40);
     eye->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -751,6 +752,72 @@ MainWindow::setupToolbars()
     m_playNotes->setCheckable(true);
     connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_playNotes, SLOT(setEnabled(bool)));
+    */
+
+    // Audio
+    QLabel *icon_audio = new QLabel;
+    icon_audio->setFixedWidth(40);
+    icon_audio->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    icon_audio->setPixmap(il.loadPixmap("waveform"));
+    toolbar->addWidget(icon_audio);
+
+    m_showAudio = toolbar->addAction(il.load("eye"), tr("Show Audio"));
+    m_showAudio->setCheckable(true);
+    connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
+
+    m_playAudio = toolbar->addAction(il.load("speaker"), tr("Play Audio"));
+    m_playAudio->setCheckable(true);
+    connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_playAudio, SLOT(setEnabled(bool)));
+
+    // Pitch (f0)
+    QLabel *icon_pitch = new QLabel;
+    icon_pitch->setFixedWidth(40);
+    icon_pitch->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    icon_pitch->setPixmap(il.loadPixmap("values"));
+    toolbar->addWidget(icon_pitch);
+
+    m_showPitch = toolbar->addAction(il.load("eye"), tr("Show Pitch Track"));
+    m_showPitch->setCheckable(true);
+    connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
+
+    m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
+    m_playPitch->setCheckable(true);
+    connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool)));
+
+    //toolbar->addWidget(m_volumePitch);
+
+    // Notes
+    QLabel *icon_notes = new QLabel;
+    icon_notes->setFixedWidth(40);
+    icon_notes->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    icon_notes->setPixmap(il.loadPixmap("notes"));
+    toolbar->addWidget(icon_notes);
+
+    m_showNotes = toolbar->addAction(il.load("eye"), tr("Show Notes"));
+    m_showNotes->setCheckable(true);
+    connect(m_showNotes, SIGNAL(triggered()), this, SLOT(showNotesToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
+
+    m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
+    m_playNotes->setCheckable(true);
+    connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_playNotes, SLOT(setEnabled(bool)));
+
+    // Spectrogram
+    QLabel *icon_spectrogram = new QLabel;
+    icon_spectrogram->setFixedWidth(40);
+    icon_spectrogram->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    icon_spectrogram->setPixmap(il.loadPixmap("spectrogram"));
+    toolbar->addWidget(icon_spectrogram);
+
+    m_showSpect = toolbar->addAction(il.load("eye"), tr("Show Spectrogram"));
+    m_showSpect->setCheckable(true);
+    connect(m_showSpect, SIGNAL(triggered()), this, SLOT(showSpectToggled()));
+    connect(this, SIGNAL(canPlay(bool)), m_showSpect, SLOT(setEnabled(bool)));
 
     Pane::registerShortcuts(*m_keyReference);
 }

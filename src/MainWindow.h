@@ -149,6 +149,9 @@ protected:
     QAction       *m_playAudio;
     QAction       *m_playPitch;
     QAction       *m_playNotes;
+    //AudioDial     *m_volumeAudio;
+    //AudioDial     *m_volumePitch;
+    //AudioDial     *m_volumeNotes;
 
     QLabel        *m_waveformStatus;
     QLabel        *m_pitchStatus;
