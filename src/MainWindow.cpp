@@ -212,6 +212,25 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_playSpeed, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
+    /* not there yet...
+    m_gainPitch = new AudioDial(frame);
+    m_gainPitch->setMinimum(0);
+    m_gainPitch->setMaximum(200);
+    m_gainPitch->setValue(100);
+    m_gainPitch->setFixedWidth(24);
+    m_gainPitch->setFixedHeight(24);
+    m_gainPitch->setNotchesVisible(true);
+    m_gainPitch->setPageStep(10);
+    m_gainPitch->setObjectName(tr("Playback Speedup"));
+    m_gainPitch->setDefaultValue(100);
+    m_gainPitch->setRangeMapper(new PlaySpeedRangeMapper(0, 200));
+    m_gainPitch->setShowToolTip(true);
+    connect(m_gainPitch, SIGNAL(valueChanged(int)),
+        this, SLOT(playSpeedChanged(int)));
+    connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+    connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    */
+
     layout->setSpacing(4);
     layout->addWidget(m_overview, 0, 1);
     layout->addWidget(scroll, 1, 1);
@@ -788,7 +807,7 @@ MainWindow::setupToolbars()
     connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool)));
 
-    //toolbar->addWidget(m_volumePitch);
+    //toolbar->addWidget(m_gainPitch);
 
     // Notes
     QLabel *icon_notes = new QLabel;
@@ -1606,6 +1625,7 @@ MainWindow::playSharpenToggled()
     settings.endGroup();
 
     playSpeedChanged(m_playSpeed->value());
+    // TODO: pitch gain?
 }
 
 void
@@ -1617,6 +1637,7 @@ MainWindow::playMonoToggled()
     settings.endGroup();
 
     playSpeedChanged(m_playSpeed->value());
+    // TODO: pitch gain?
 }    
 
 void
@@ -1642,6 +1663,60 @@ MainWindow::restoreNormalPlayback()
 {
     m_playSpeed->setValue(m_playSpeed->defaultValue());
 }
+
+/* Pitch Gain Functions
+void
+MainWindow::pitchGainChanged(int position)
+{
+    PlaySpeedRangeMapper mapper(0, 200);
+
+    float percent = m_gainPitch->mappedValue();
+    float factor = mapper.getFactorForValue(percent);
+
+    cerr << "speed = " << position << " percent = " << percent << " factor = " << factor << endl;
+
+    bool something = (position != 100);
+
+    int pc = lrintf(percent);
+
+    if (!something) {
+        contextHelpChanged(tr("Pitch Gain: Normal"));
+    } else {
+        contextHelpChanged(tr("Pitch Gain: %1%2%")
+                           .arg(position > 100 ? "+" : "")
+                           .arg(pc));
+    }
+
+    //m_playSource->setTimeStretch(factor);
+    // TODO: pitch gain
+
+    updateMenuStates();
+} 
+
+void
+MainWindow::increasePitchGain()
+{
+    int value = m_gainPitch->value();
+    value = value + m_gainPitch->pageStep();
+    if (value > m_gainPitch->maximum()) value = m_gainPitch->maximum();
+    m_gainPitch->setValue(value);
+}
+
+void
+MainWindow::decreasePitchGain()
+{
+    int value = m_gainPitch->value();
+    value = value - m_gainPitch->pageStep();
+    if (value < m_gainPitch->minimum()) value = m_gainPitch->minimum();
+    m_gainPitch->setValue(value);
+}
+
+void
+MainWindow::restoreNormalPitchGain()
+{
+    m_gainPitch->setValue(m_gainPitch->defaultValue());
+}
+*/
 
 void
 MainWindow::updateVisibleRangeDisplay(Pane *p) const
