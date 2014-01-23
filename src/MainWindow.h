@@ -94,6 +94,21 @@ protected slots:
     virtual void decreaseNotesGain();
     virtual void restoreNormalNotesGain();
 
+    virtual void audioPanChanged(int);
+    virtual void increaseAudioPan();
+    virtual void decreaseAudioPan();
+    virtual void restoreNormalAudioPan();
+
+    virtual void pitchPanChanged(int);
+    virtual void increasePitchPan();
+    virtual void decreasePitchPan();
+    virtual void restoreNormalPitchPan();
+
+    virtual void notesPanChanged(int);
+    virtual void increaseNotesPan();
+    virtual void decreaseNotesPan();
+    virtual void restoreNormalNotesPan();
+
     virtual void sampleRateMismatch(size_t, size_t, bool);
     virtual void audioOverloadPluginDisabled();
     virtual void audioTimeStretchMultiChannelDisabled();
@@ -167,6 +182,9 @@ protected:
     AudioDial     *m_gainAudio;
     AudioDial     *m_gainPitch;
     AudioDial     *m_gainNotes;
+    AudioDial     *m_panAudio;
+    AudioDial     *m_panPitch;
+    AudioDial     *m_panNotes;
 
     QLabel        *m_waveformStatus;
     QLabel        *m_pitchStatus;

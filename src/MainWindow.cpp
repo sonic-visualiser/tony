@@ -265,6 +265,59 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
     // End of Gain controls
 
+    // Pan controls
+    m_panAudio = new AudioDial(frame);
+    m_panAudio->setMinimum(-100);
+    m_panAudio->setMaximum(100);
+    m_panAudio->setValue(-100);
+    m_panAudio->setDefaultValue(-100);
+    m_panAudio->setFixedWidth(24);
+    m_panAudio->setFixedHeight(24);
+    m_panAudio->setNotchesVisible(true);
+    m_panAudio->setPageStep(10);
+    m_panAudio->setObjectName(tr("Audio Track Pan"));
+    m_panAudio->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+    m_panAudio->setShowToolTip(true);
+    connect(m_panAudio, SIGNAL(valueChanged(int)),
+            this, SLOT(audioPanChanged(int)));
+    connect(m_panAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+    connect(m_panAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+    m_panPitch = new AudioDial(frame);
+    m_panPitch->setMinimum(-100);
+    m_panPitch->setMaximum(100);
+    m_panPitch->setValue(100);
+    m_panPitch->setDefaultValue(100);
+    m_panPitch->setFixedWidth(24);
+    m_panPitch->setFixedHeight(24);
+    m_panPitch->setNotchesVisible(true);
+    m_panPitch->setPageStep(10);
+    m_panPitch->setObjectName(tr("Pitch Track Pan"));
+    m_panPitch->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+    m_panPitch->setShowToolTip(true);
+    connect(m_panPitch, SIGNAL(valueChanged(int)),
+            this, SLOT(pitchPanChanged(int)));
+    connect(m_panPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+    connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+    m_panNotes = new AudioDial(frame);
+    m_panNotes->setMinimum(-100);
+    m_panNotes->setMaximum(100);
+    m_panNotes->setValue(100);
+    m_panNotes->setDefaultValue(100);
+    m_panNotes->setFixedWidth(24);
+    m_panNotes->setFixedHeight(24);
+    m_panNotes->setNotchesVisible(true);
+    m_panNotes->setPageStep(10);
+    m_panNotes->setObjectName(tr("Notes Track Pan"));
+    m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+    m_panNotes->setShowToolTip(true);
+    connect(m_panNotes, SIGNAL(valueChanged(int)),
+            this, SLOT(notesPanChanged(int)));
+    connect(m_panNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+    connect(m_panNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    // End of Pan controls
+
     layout->setSpacing(4);
     layout->addWidget(m_overview, 0, 1);
     layout->addWidget(scroll, 1, 1);
@@ -825,6 +878,7 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_playAudio, SLOT(setEnabled(bool)));
 
     toolbar->addWidget(m_gainAudio);
+    toolbar->addWidget(m_panAudio);
 
     // Pitch (f0)
     QLabel *icon_pitch = new QLabel;
@@ -844,6 +898,7 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool)));
 
     toolbar->addWidget(m_gainPitch);
+    toolbar->addWidget(m_panPitch);
 
     // Notes
     QLabel *icon_notes = new QLabel;
@@ -863,6 +918,7 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_playNotes, SLOT(setEnabled(bool)));
 
     toolbar->addWidget(m_gainNotes);
+    toolbar->addWidget(m_panNotes);
 
     // Spectrogram
     QLabel *icon_spectrogram = new QLabel;
@@ -1817,6 +1873,123 @@ void
 MainWindow::restoreNormalNotesGain()
 {
     m_gainNotes->setValue(m_gainNotes->defaultValue());
+}
+
+void
+MainWindow::audioPanChanged(int position)
+{
+    float level = m_panAudio->mappedValue();
+    float pan = level/100.f;
+
+    cerr << "pan = " << pan << " (" << position << ")" << endl;
+
+    contextHelpChanged(tr("Audio Pan: %1").arg(position));
+
+    m_analyser->setPan(Analyser::Audio, pan);
+
+    updateMenuStates();
+} 
+
+void
+MainWindow::increaseAudioPan()
+{
+    int value = m_panAudio->value();
+    value = value + m_panAudio->pageStep();
+    if (value > m_panAudio->maximum()) value = m_panAudio->maximum();
+    m_panAudio->setValue(value);
+}
+
+void
+MainWindow::decreaseAudioPan()
+{
+    int value = m_panAudio->value();
+    value = value - m_panAudio->pageStep();
+    if (value < m_panAudio->minimum()) value = m_panAudio->minimum();
+    m_panAudio->setValue(value);
+}
+
+void
+MainWindow::restoreNormalAudioPan()
+{
+    m_panAudio->setValue(m_panAudio->defaultValue());
+}
+
+void
+MainWindow::pitchPanChanged(int position)
+{
+    float level = m_panPitch->mappedValue();
+    float pan = level/100.f;
+
+    cerr << "pan = " << pan << " (" << position << ")" << endl;
+
+    contextHelpChanged(tr("Pitch Pan: %1").arg(position));
+
+    m_analyser->setPan(Analyser::PitchTrack, pan);
+
+    updateMenuStates();
+} 
+
+void
+MainWindow::increasePitchPan()
+{
+    int value = m_panPitch->value();
+    value = value + m_panPitch->pageStep();
+    if (value > m_panPitch->maximum()) value = m_panPitch->maximum();
+    m_panPitch->setValue(value);
+}
+
+void
+MainWindow::decreasePitchPan()
+{
+    int value = m_panPitch->value();
+    value = value - m_panPitch->pageStep();
+    if (value < m_panPitch->minimum()) value = m_panPitch->minimum();
+    m_panPitch->setValue(value);
+}
+
+void
+MainWindow::restoreNormalPitchPan()
+{
+    m_panPitch->setValue(m_panPitch->defaultValue());
+}
+
+void
+MainWindow::notesPanChanged(int position)
+{
+    float level = m_panNotes->mappedValue();
+    float pan = level/100.f;
+
+    cerr << "pan = " << pan << " (" << position << ")" << endl;
+
+    contextHelpChanged(tr("Notes Pan: %1").arg(position));
+
+    m_analyser->setPan(Analyser::Notes, pan);
+
+    updateMenuStates();
+} 
+
+void
+MainWindow::increaseNotesPan()
+{
+    int value = m_panNotes->value();
+    value = value + m_panNotes->pageStep();
+    if (value > m_panNotes->maximum()) value = m_panNotes->maximum();
+    m_panNotes->setValue(value);
+}
+
+void
+MainWindow::decreaseNotesPan()
+{
+    int value = m_panNotes->value();
+    value = value - m_panNotes->pageStep();
+    if (value < m_panNotes->minimum()) value = m_panNotes->minimum();
+    m_panNotes->setValue(value);
+}
+
+void
+MainWindow::restoreNormalNotesPan()
+{
+    m_panNotes->setValue(m_panNotes->defaultValue());
 }
 
 void
