@@ -79,10 +79,20 @@ protected slots:
     virtual void slowDownPlayback();
     virtual void restoreNormalPlayback();
 
+    virtual void audioGainChanged(int);
+    virtual void increaseAudioGain();
+    virtual void decreaseAudioGain();
+    virtual void restoreNormalAudioGain();
+
     virtual void pitchGainChanged(int);
     virtual void increasePitchGain();
     virtual void decreasePitchGain();
     virtual void restoreNormalPitchGain();
+
+    virtual void notesGainChanged(int);
+    virtual void increaseNotesGain();
+    virtual void decreaseNotesGain();
+    virtual void restoreNormalNotesGain();
 
     virtual void sampleRateMismatch(size_t, size_t, bool);
     virtual void audioOverloadPluginDisabled();

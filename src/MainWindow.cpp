@@ -212,6 +212,24 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_playSpeed, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
+    // Gain controls
+    m_gainAudio = new AudioDial(frame);
+    m_gainAudio->setMinimum(-50);
+    m_gainAudio->setMaximum(50);
+    m_gainAudio->setValue(0);
+    m_gainAudio->setDefaultValue(0);
+    m_gainAudio->setFixedWidth(24);
+    m_gainAudio->setFixedHeight(24);
+    m_gainAudio->setNotchesVisible(true);
+    m_gainAudio->setPageStep(10);
+    m_gainAudio->setObjectName(tr("Audio Track Gain"));
+    m_gainAudio->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
+    m_gainAudio->setShowToolTip(true);
+    connect(m_gainAudio, SIGNAL(valueChanged(int)),
+            this, SLOT(audioGainChanged(int)));
+    connect(m_gainAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+    connect(m_gainAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
     m_gainPitch = new AudioDial(frame);
     m_gainPitch->setMinimum(-50);
     m_gainPitch->setMaximum(50);
@@ -228,6 +246,24 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
             this, SLOT(pitchGainChanged(int)));
     connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+    m_gainNotes = new AudioDial(frame);
+    m_gainNotes->setMinimum(-50);
+    m_gainNotes->setMaximum(50);
+    m_gainNotes->setValue(0);
+    m_gainNotes->setDefaultValue(0);
+    m_gainNotes->setFixedWidth(24);
+    m_gainNotes->setFixedHeight(24);
+    m_gainNotes->setNotchesVisible(true);
+    m_gainNotes->setPageStep(10);
+    m_gainNotes->setObjectName(tr("Pitch Track Gain"));
+    m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
+    m_gainNotes->setShowToolTip(true);
+    connect(m_gainNotes, SIGNAL(valueChanged(int)),
+            this, SLOT(notesGainChanged(int)));
+    connect(m_gainNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+    connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    // End of Gain controls
 
     layout->setSpacing(4);
     layout->addWidget(m_overview, 0, 1);
@@ -788,6 +824,8 @@ MainWindow::setupToolbars()
     connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_playAudio, SLOT(setEnabled(bool)));
 
+    toolbar->addWidget(m_gainAudio);
+
     // Pitch (f0)
     QLabel *icon_pitch = new QLabel;
     icon_pitch->setFixedWidth(40);
@@ -823,6 +861,8 @@ MainWindow::setupToolbars()
     m_playNotes->setCheckable(true);
     connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_playNotes, SLOT(setEnabled(bool)));
+
+    toolbar->addWidget(m_gainNotes);
 
     // Spectrogram
     QLabel *icon_spectrogram = new QLabel;
@@ -1663,6 +1703,45 @@ MainWindow::restoreNormalPlayback()
 }
 
 void
+MainWindow::audioGainChanged(int position)
+{
+    float level = m_gainAudio->mappedValue();
+    float gain = powf(10, level / 20.0);
+
+    cerr << "gain = " << gain << " (" << position << " dB)" << endl;
+
+    contextHelpChanged(tr("Audio Gain: %1 dB").arg(position));
+
+    m_analyser->setGain(Analyser::Audio, gain);
+
+    updateMenuStates();
+} 
+
+void
+MainWindow::increaseAudioGain()
+{
+    int value = m_gainAudio->value();
+    value = value + m_gainAudio->pageStep();
+    if (value > m_gainAudio->maximum()) value = m_gainAudio->maximum();
+    m_gainAudio->setValue(value);
+}
+
+void
+MainWindow::decreaseAudioGain()
+{
+    int value = m_gainAudio->value();
+    value = value - m_gainAudio->pageStep();
+    if (value < m_gainAudio->minimum()) value = m_gainAudio->minimum();
+    m_gainAudio->setValue(value);
+}
+
+void
+MainWindow::restoreNormalAudioGain()
+{
+    m_gainAudio->setValue(m_gainAudio->defaultValue());
+}
+
+void
 MainWindow::pitchGainChanged(int position)
 {
     float level = m_gainPitch->mappedValue();
@@ -1699,6 +1778,45 @@ void
 MainWindow::restoreNormalPitchGain()
 {
     m_gainPitch->setValue(m_gainPitch->defaultValue());
+}
+
+void
+MainWindow::notesGainChanged(int position)
+{
+    float level = m_gainNotes->mappedValue();
+    float gain = powf(10, level / 20.0);
+
+    cerr << "gain = " << gain << " (" << position << " dB)" << endl;
+
+    contextHelpChanged(tr("Notes Gain: %1 dB").arg(position));
+
+    m_analyser->setGain(Analyser::Notes, gain);
+
+    updateMenuStates();
+} 
+
+void
+MainWindow::increaseNotesGain()
+{
+    int value = m_gainNotes->value();
+    value = value + m_gainNotes->pageStep();
+    if (value > m_gainNotes->maximum()) value = m_gainNotes->maximum();
+    m_gainNotes->setValue(value);
+}
+
+void
+MainWindow::decreaseNotesGain()
+{
+    int value = m_gainNotes->value();
+    value = value - m_gainNotes->pageStep();
+    if (value < m_gainNotes->minimum()) value = m_gainNotes->minimum();
+    m_gainNotes->setValue(value);
+}
+
+void
+MainWindow::restoreNormalNotesGain()
+{
+    m_gainNotes->setValue(m_gainNotes->defaultValue());
 }
 
 void
