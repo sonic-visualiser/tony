@@ -71,6 +71,12 @@ public:
         }
     }
 
+    float getGain(Component c) const;
+    void setGain(Component c, float gain);
+
+    float getPan(Component c) const;
+    void setPan(Component c, float pan);
+
     void getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1);
 
 signals:

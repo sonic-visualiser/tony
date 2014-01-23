@@ -292,3 +292,51 @@ Analyser::setAudible(Component c, bool a)
     }
 }
 
+float
+Analyser::getGain(Component c) const
+{
+    if (m_layers[c]) {
+        PlayParameters *params = m_layers[c]->getPlayParameters();
+        if (!params) return 1.f;
+        return params->getPlayGain();
+    } else {
+        return 1.f;
+    }
+}
+    
+void
+Analyser::setGain(Component c, float gain)
+{
+    if (m_layers[c]) {
+        PlayParameters *params = m_layers[c]->getPlayParameters();
+        if (!params) return;
+        params->setPlayGain(gain);
+        saveState(c);
+    }
+}
+
+float
+Analyser::getPan(Component c) const
+{
+    if (m_layers[c]) {
+        PlayParameters *params = m_layers[c]->getPlayParameters();
+        if (!params) return 1.f;
+        return params->getPlayPan();
+    } else {
+        return 1.f;
+    }
+}
+    
+void
+Analyser::setPan(Component c, float pan)
+{
+    if (m_layers[c]) {
+        PlayParameters *params = m_layers[c]->getPlayParameters();
+        if (!params) return;
+        params->setPlayPan(pan);
+        saveState(c);
+    }
+}
+
+
+    

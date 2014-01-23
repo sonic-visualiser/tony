@@ -79,10 +79,10 @@ protected slots:
     virtual void slowDownPlayback();
     virtual void restoreNormalPlayback();
 
-    //virtual void pitchGainChanged(int);
-    //virtual void increasePitchGain();
-    //virtual void decreasePitchGain();
-    //virtual void restoreNormalPitchGain();
+    virtual void pitchGainChanged(int);
+    virtual void increasePitchGain();
+    virtual void decreasePitchGain();
+    virtual void restoreNormalPitchGain();
 
     virtual void sampleRateMismatch(size_t, size_t, bool);
     virtual void audioOverloadPluginDisabled();
@@ -154,9 +154,9 @@ protected:
     QAction       *m_playAudio;
     QAction       *m_playPitch;
     QAction       *m_playNotes;
-    //AudioDial     *m_gainAudio;
-    //AudioDial     *m_gainPitch;
-    //AudioDial     *m_gainNotes;
+    AudioDial     *m_gainAudio;
+    AudioDial     *m_gainPitch;
+    AudioDial     *m_gainNotes;
 
     QLabel        *m_waveformStatus;
     QLabel        *m_pitchStatus;
