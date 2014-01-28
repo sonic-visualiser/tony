@@ -93,6 +93,8 @@ protected:
     QString addWaveform();
     QString addAnalyses();
 
+    QString addTestCandidates();
+
     void saveState(Component c) const;
     void loadState(Component c);
 };

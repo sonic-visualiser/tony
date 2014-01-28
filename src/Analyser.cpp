@@ -86,6 +86,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     error = addAnalyses();
     if (error != "") return error;
 
+    error = addTestCandidates();
+    if (error != "") return error;
+
     loadState(Audio);
     loadState(PitchTrack);
     loadState(Notes);
@@ -115,6 +118,7 @@ Analyser::addVisualisations()
 
     Transform transform = tf->getDefaultTransformFor
         (base + out, m_fileModel->getSampleRate());
+    transform.setParameter("bpo", 36);
 
     Colour3DPlotLayer *spectrogram = qobject_cast<Colour3DPlotLayer *>
         (m_document->createDerivedLayer(transform, m_fileModel));
@@ -126,6 +130,9 @@ Analyser::addVisualisations()
         (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
 */
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
+    spectrogram->setNormalizeHybrid(true);
+    spectrogram->setSmooth(true);
+    spectrogram->setGain(0.5); //!!! arbitrary at this point
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 
@@ -202,38 +209,74 @@ Analyser::addAnalyses()
     std::vector<Layer *> layers =
         m_document->createDerivedLayers(transforms, m_fileModel);
 
-    if (!layers.empty()) {
+    for (int i = 0; i < (int)layers.size(); ++i) {
 
-        for (int i = 0; i < (int)layers.size(); ++i) {
-
-            FlexiNoteLayer *f = qobject_cast<FlexiNoteLayer *>(layers[i]);
-            TimeValueLayer *t = qobject_cast<TimeValueLayer *>(layers[i]);
-
-            if (f) m_layers[Notes] = f;
-            if (t) m_layers[PitchTrack] = t;
-
-            m_document->addLayerToView(m_pane, layers[i]);
-        }
-    
-        ColourDatabase *cdb = ColourDatabase::getInstance();
-
-        TimeValueLayer *pitchLayer = 
-            qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
-        if (pitchLayer) {
-            pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
-            PlayParameters *params = pitchLayer->getPlayParameters();
-            if (params) params->setPlayPan(1);
-        }
-
-        FlexiNoteLayer *flexiNoteLayer = 
-            qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
-        if (flexiNoteLayer) {
-            flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
-            PlayParameters *params = flexiNoteLayer->getPlayParameters();
-            if (params) params->setPlayPan(1);
-        }
+        FlexiNoteLayer *f = qobject_cast<FlexiNoteLayer *>(layers[i]);
+        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(layers[i]);
+        
+        if (f) m_layers[Notes] = f;
+        if (t) m_layers[PitchTrack] = t;
+        
+        m_document->addLayerToView(m_pane, layers[i]);
     }
     
+    ColourDatabase *cdb = ColourDatabase::getInstance();
+    
+    TimeValueLayer *pitchLayer = 
+        qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
+    if (pitchLayer) {
+        pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
+        PlayParameters *params = pitchLayer->getPlayParameters();
+        if (params) params->setPlayPan(1);
+    }
+    
+    FlexiNoteLayer *flexiNoteLayer = 
+        qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+    if (flexiNoteLayer) {
+        flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
+        PlayParameters *params = flexiNoteLayer->getPlayParameters();
+        if (params) params->setPlayPan(1);
+    }
+    
+    return "";
+}
+
+QString
+Analyser::addTestCandidates()
+{
+    TransformFactory *tf = TransformFactory::getInstance();
+    
+    QString plugname = "pYIN";
+    QString base = "vamp:pyin:localcandidatepyin:";
+    QString out = "pitchtrackcandidates";
+
+    Transforms transforms;
+
+    QString notFound = tr("Transform \"%1\" not found. Unable to perform interactive analysis.<br><br>Is the %2 Vamp plugin correctly installed?");
+    if (!tf->haveTransform(base + out)) {
+	return notFound.arg(base + out).arg(plugname);
+    }
+
+    Transform t = tf->getDefaultTransformFor
+        (base + out, m_fileModel->getSampleRate());
+    t.setStepSize(256);
+    t.setBlockSize(2048);
+
+    t.setStartTime(RealTime::fromSeconds(10.785));
+    t.setDuration(RealTime::fromSeconds(1.2));
+
+    transforms.push_back(t);
+
+    std::vector<Layer *> layers =
+        m_document->createDerivedLayers(transforms, m_fileModel);
+
+    std::cerr << "Analyser::addTestCandidates: Have " << layers.size() << " layer(s)" << std::endl;
+
+    for (int i = 0; i < (int)layers.size(); ++i) {
+        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(layers[i]);
+        if (t) m_document->addLayerToView(m_pane, t);
+    }
+
     return "";
 }
 
