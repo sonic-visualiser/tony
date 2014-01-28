@@ -31,6 +31,7 @@
 #include "layer/ColourMapper.h"
 #include "layer/LayerFactory.h"
 #include "layer/SpectrogramLayer.h"
+#include "layer/Colour3DPlotLayer.h"
 
 #include <QSettings>
 
@@ -69,26 +70,73 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
-    QString plugname = "pYIN";
-    QString base = "vamp:pyin:pyin:";
-    QString f0out = "smoothedpitchtrack";
-    QString noteout = "notes";
+    // Note that we need at least one main-model layer (time ruler,
+    // waveform or what have you). It could be hidden if we don't want
+    // to see it but it must exist.
 
-    // We need at least one main-model layer (time ruler, waveform or
-    // what have you). It could be hidden if we don't want to see it
-    // but it must exist.
+    QString warning, error;
+
+    // This isn't fatal -- we can proceed without
+    // visualisations. Other failures are fatal though.
+    warning = addVisualisations();
+
+    error = addWaveform();
+    if (error != "") return error;
+
+    error = addAnalyses();
+    if (error != "") return error;
+
+    loadState(Audio);
+    loadState(PitchTrack);
+    loadState(Notes);
+    loadState(Spectrogram);
+
+    emit layersChanged();
+
+    return warning;
+}
+
+QString
+Analyser::addVisualisations()
+{
+    TransformFactory *tf = TransformFactory::getInstance();
+
+    QString name = "Constant-Q";
+    QString base = "vamp:cqvamp:cqvamp:";
+    QString out = "constantq";
 
     // A spectrogram, off by default. Must go at the back because it's
     // opaque
 
+    QString notFound = tr("Transform \"%1\" not found, spectrogram will not be enabled.<br><br>Is the %2 Vamp plugin correctly installed?");
+    if (!tf->haveTransform(base + out)) {
+	return notFound.arg(base + out).arg(name);
+    }
+
+    Transform transform = tf->getDefaultTransformFor
+        (base + out, m_fileModel->getSampleRate());
+
+    Colour3DPlotLayer *spectrogram = qobject_cast<Colour3DPlotLayer *>
+        (m_document->createDerivedLayer(transform, m_fileModel));
+
+    if (!spectrogram) return tr("Transform \"%1\" did not run correctly (no layer or wrong layer type returned)").arg(base + out);
+    
+/*
     SpectrogramLayer *spectrogram = qobject_cast<SpectrogramLayer *>
         (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
+*/
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 
     m_layers[Spectrogram] = spectrogram;
 
+    return "";
+}
+
+QString
+Analyser::addWaveform()
+{
     // Our waveform layer is just a shadow, light grey and taking up
     // little space at the bottom
 
@@ -105,10 +153,20 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_document->addLayerToView(m_pane, waveform);
 
     m_layers[Audio] = waveform;
+    return "";
+}
+
+QString
+Analyser::addAnalyses()
+{
+    TransformFactory *tf = TransformFactory::getInstance();
+    
+    QString plugname = "pYIN";
+    QString base = "vamp:pyin:pyin:";
+    QString f0out = "smoothedpitchtrack";
+    QString noteout = "notes";
 
     Transforms transforms;
-    
-    TransformFactory *tf = TransformFactory::getInstance();
 
 /*!!! we could have more than one pitch track...
     QString cx = "vamp:cepstral-pitchtracker:cepstral-pitchtracker:f0";
@@ -175,14 +233,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
             if (params) params->setPlayPan(1);
         }
     }
-
-    loadState(Audio);
-    loadState(PitchTrack);
-    loadState(Notes);
-    loadState(Spectrogram);
-
-    emit layersChanged();
-
+    
     return "";
 }
 

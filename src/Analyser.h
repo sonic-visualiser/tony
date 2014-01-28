@@ -89,6 +89,10 @@ protected:
     Pane *m_pane;
     mutable std::map<Component, Layer *> m_layers;
 
+    QString addVisualisations();
+    QString addWaveform();
+    QString addAnalyses();
+
     void saveState(Component c) const;
     void loadState(Component c);
 };
