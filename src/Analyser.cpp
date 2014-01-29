@@ -35,6 +35,8 @@
 
 #include <QSettings>
 
+using std::vector;
+
 Analyser::Analyser() :
     m_document(0),
     m_fileModel(0),
@@ -267,17 +269,24 @@ Analyser::addTestCandidates()
 
     transforms.push_back(t);
 
-    std::vector<Layer *> layers =
-        m_document->createDerivedLayers(transforms, m_fileModel);
+    m_document->createDerivedLayersAsync(transforms, m_fileModel, this);
 
-    std::cerr << "Analyser::addTestCandidates: Have " << layers.size() << " layer(s)" << std::endl;
+    return "";
+}
 
-    for (int i = 0; i < (int)layers.size(); ++i) {
-        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(layers[i]);
+void
+Analyser::layersCreated(vector<Layer *> primary,
+                        vector<Layer *> additional)
+{
+    for (int i = 0; i < (int)primary.size(); ++i) {
+        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(primary[i]);
         if (t) m_document->addLayerToView(m_pane, t);
     }
 
-    return "";
+    for (int i = 0; i < (int)additional.size(); ++i) {
+        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(additional[i]);
+        if (t) m_document->addLayerToView(m_pane, t);
+    }
 }
 
 void

@@ -19,16 +19,19 @@
 #include <QObject>
 
 #include <map>
+#include <vector>
+
+#include "framework/Document.h"
 
 class WaveFileModel;
 class Pane;
 class PaneStack;
-class Document;
 class Layer;
 class TimeValueLayer;
 class Layer;
 
-class Analyser : public QObject
+class Analyser : public QObject,
+                 public Document::LayerCreationHandler
 {
     Q_OBJECT
 
@@ -94,6 +97,9 @@ protected:
     QString addAnalyses();
 
     QString addTestCandidates();
+
+    // Document::LayerCreationHandler method
+    void layersCreated(std::vector<Layer *>, std::vector<Layer *>);
 
     void saveState(Component c) const;
     void loadState(Component c);
