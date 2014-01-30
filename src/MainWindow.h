@@ -149,6 +149,8 @@ protected slots:
     virtual void about();
     virtual void keyReference();
 
+    virtual void selectionChanged();
+
 protected:
     Analyser      *m_analyser;
 

@@ -147,6 +147,9 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_viewManager->setShowCentreLine(false);
     m_viewManager->setOverlayMode(ViewManager::MinimalOverlays);
 
+    connect(m_viewManager, SIGNAL(selectionChanged()),
+	    this, SLOT(selectionChanged()));
+
     QFrame *frame = new QFrame;
     setCentralWidget(frame);
 
@@ -1623,7 +1626,27 @@ MainWindow::doubleClickSelectInvoked(size_t frame)
     
     cerr << "MainWindow::doubleClickSelectInvoked(" << frame << "): [" << f0 << "," << f1 << "]" << endl;
 
-    m_viewManager->setSelection(Selection(f0, f1));
+    Selection sel(f0, f1);
+    m_viewManager->setSelection(sel);
+}
+
+void
+MainWindow::selectionChanged()
+{
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    cerr << "MainWindow::selectionChanged" << endl;
+
+    if (!selections.empty()) {
+        Selection sel = *selections.begin();
+        cerr << "MainWindow::selectionChanged: have selection" << endl;
+        QString error = m_analyser->reAnalyseSelection(sel);
+        if (error != "") {
+            QMessageBox::critical
+                (this, tr("Failed to analyse selection"),
+                 tr("<b>Analysis failed</b><p>%2</p>").arg(error));
+        }
+    }
 }
 
 void

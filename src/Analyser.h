@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "framework/Document.h"
+#include "base/Selection.h"
 
 class WaveFileModel;
 class Pane;
@@ -82,6 +83,13 @@ public:
 
     void getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1);
 
+    /**
+     * Analyse the selection and add candidates layers for the region
+     * it contains. Returns "" on success or a user-readable error
+     * string on failure.
+     */
+    QString reAnalyseSelection(Selection sel);
+
 signals:
     void layersChanged();
 
@@ -96,7 +104,7 @@ protected:
     QString addWaveform();
     QString addAnalyses();
 
-    QString addTestCandidates();
+    QString addTestCandidates(Selection sel);
 
     // Document::LayerCreationHandler method
     void layersCreated(std::vector<Layer *>, std::vector<Layer *>);

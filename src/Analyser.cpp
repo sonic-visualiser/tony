@@ -88,9 +88,6 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     error = addAnalyses();
     if (error != "") return error;
 
-    error = addTestCandidates();
-    if (error != "") return error;
-
     loadState(Audio);
     loadState(PitchTrack);
     loadState(Notes);
@@ -99,6 +96,12 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     emit layersChanged();
 
     return warning;
+}
+
+QString
+Analyser::reAnalyseSelection(Selection sel)
+{
+    return addTestCandidates(sel);
 }
 
 QString
@@ -244,7 +247,7 @@ Analyser::addAnalyses()
 }
 
 QString
-Analyser::addTestCandidates()
+Analyser::addTestCandidates(Selection sel)
 {
     TransformFactory *tf = TransformFactory::getInstance();
     
@@ -264,8 +267,20 @@ Analyser::addTestCandidates()
     t.setStepSize(256);
     t.setBlockSize(2048);
 
-    t.setStartTime(RealTime::fromSeconds(10.785));
-    t.setDuration(RealTime::fromSeconds(1.2));
+    RealTime start = RealTime::frame2RealTime
+        (sel.getStartFrame(), m_fileModel->getSampleRate());
+
+    RealTime end = RealTime::frame2RealTime
+        (sel.getEndFrame(), m_fileModel->getSampleRate());
+
+    RealTime duration;
+
+    if (sel.getEndFrame() > sel.getStartFrame()) {
+        duration = end - start;
+    }
+
+    t.setStartTime(start);
+    t.setDuration(duration);
 
     transforms.push_back(t);
 
