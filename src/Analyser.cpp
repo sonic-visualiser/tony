@@ -72,6 +72,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
+    m_reAnalysingSelection = Selection();
+    m_reAnalysisCandidates.clear();
+
     // Note that we need at least one main-model layer (time ruler,
     // waveform or what have you). It could be hidden if we don't want
     // to see it but it must exist.
@@ -99,14 +102,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 }
 
 QString
-Analyser::reAnalyseSelection(Selection sel)
-{
-    return addTestCandidates(sel);
-}
-
-QString
 Analyser::addVisualisations()
 {
+/*
     TransformFactory *tf = TransformFactory::getInstance();
 
     QString name = "Constant-Q";
@@ -129,15 +127,16 @@ Analyser::addVisualisations()
         (m_document->createDerivedLayer(transform, m_fileModel));
 
     if (!spectrogram) return tr("Transform \"%1\" did not run correctly (no layer or wrong layer type returned)").arg(base + out);
-    
-/*
+*/    
+
     SpectrogramLayer *spectrogram = qobject_cast<SpectrogramLayer *>
         (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
-*/
+
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
     spectrogram->setNormalizeHybrid(true);
-    spectrogram->setSmooth(true);
-    spectrogram->setGain(0.5); //!!! arbitrary at this point
+//    spectrogram->setSmooth(true);
+//    spectrogram->setGain(0.5); //!!! arbitrary at this point
+    spectrogram->setGain(100);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 
@@ -247,8 +246,18 @@ Analyser::addAnalyses()
 }
 
 QString
-Analyser::addTestCandidates(Selection sel)
+Analyser::reAnalyseSelection(Selection sel)
 {
+    if (sel == m_reAnalysingSelection) return "";
+
+    foreach (Layer *layer, m_reAnalysisCandidates) {
+        cerr << "deleting previous candidate layer " << layer << endl;
+        m_pane->removeLayer(layer);
+        m_document->deleteLayer(layer); // also releases its model
+    }
+    m_reAnalysisCandidates.clear();
+    m_reAnalysingSelection = sel;
+
     TransformFactory *tf = TransformFactory::getInstance();
     
     QString plugname = "pYIN";
@@ -293,14 +302,23 @@ void
 Analyser::layersCreated(vector<Layer *> primary,
                         vector<Layer *> additional)
 {
+    //!!! how do we know these came from the right selection? user
+    //!!! might have made another one since this request was issued
+
     for (int i = 0; i < (int)primary.size(); ++i) {
         TimeValueLayer *t = qobject_cast<TimeValueLayer *>(primary[i]);
-        if (t) m_document->addLayerToView(m_pane, t);
+        if (t) {
+            m_document->addLayerToView(m_pane, t);
+            m_reAnalysisCandidates.push_back(t);
+        }
     }
 
     for (int i = 0; i < (int)additional.size(); ++i) {
         TimeValueLayer *t = qobject_cast<TimeValueLayer *>(additional[i]);
-        if (t) m_document->addLayerToView(m_pane, t);
+        if (t) {
+            m_document->addLayerToView(m_pane, t);
+            m_reAnalysisCandidates.push_back(t);
+        }
     }
 }
 

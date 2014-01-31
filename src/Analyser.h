@@ -84,9 +84,9 @@ public:
     void getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1);
 
     /**
-     * Analyse the selection and add candidates layers for the region
-     * it contains. Returns "" on success or a user-readable error
-     * string on failure.
+     * Analyse the selection and schedule asynchronous adds of
+     * candidate layers for the region it contains. Returns "" on
+     * success or a user-readable error string on failure.
      */
     QString reAnalyseSelection(Selection sel);
 
@@ -98,13 +98,15 @@ protected:
     WaveFileModel *m_fileModel;
     PaneStack *m_paneStack;
     Pane *m_pane;
+
     mutable std::map<Component, Layer *> m_layers;
+
+    Selection m_reAnalysingSelection;
+    std::vector<Layer *> m_reAnalysisCandidates;
 
     QString addVisualisations();
     QString addWaveform();
     QString addAnalyses();
-
-    QString addTestCandidates(Selection sel);
 
     // Document::LayerCreationHandler method
     void layersCreated(std::vector<Layer *>, std::vector<Layer *>);
