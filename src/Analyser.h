@@ -90,6 +90,18 @@ public:
      */
     QString reAnalyseSelection(Selection sel);
 
+    /**
+     * If a re-analysis has been activated, switch the selected area
+     * of the main pitch track to a different candidate from the
+     * analysis results.
+     */
+    void switchPitchCandidate(Selection sel, bool up);
+
+    /**
+     * Remove any re-analysis layers.
+     */
+    void clearReAnalysis();
+
 signals:
     void layersChanged();
 
@@ -103,6 +115,7 @@ protected:
 
     Selection m_reAnalysingSelection;
     std::vector<Layer *> m_reAnalysisCandidates;
+    int m_currentCandidate;
 
     QString addVisualisations();
     QString addWaveform();

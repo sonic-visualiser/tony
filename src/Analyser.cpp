@@ -74,6 +74,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
+    m_currentCandidate = -1;
 
     // Note that we need at least one main-model layer (time ruler,
     // waveform or what have you). It could be hidden if we don't want
@@ -136,6 +137,7 @@ Analyser::addVisualisations()
     spectrogram->setNormalizeHybrid(true);
 //    spectrogram->setSmooth(true);
 //    spectrogram->setGain(0.5); //!!! arbitrary at this point
+    spectrogram->setMinFrequency(15);
     spectrogram->setGain(100);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
@@ -250,12 +252,8 @@ Analyser::reAnalyseSelection(Selection sel)
 {
     if (sel == m_reAnalysingSelection) return "";
 
-    foreach (Layer *layer, m_reAnalysisCandidates) {
-        cerr << "deleting previous candidate layer " << layer << endl;
-        m_pane->removeLayer(layer);
-        m_document->deleteLayer(layer); // also releases its model
-    }
-    m_reAnalysisCandidates.clear();
+    clearReAnalysis();
+
     m_reAnalysingSelection = sel;
 
     TransformFactory *tf = TransformFactory::getInstance();
@@ -305,22 +303,77 @@ Analyser::layersCreated(vector<Layer *> primary,
     //!!! how do we know these came from the right selection? user
     //!!! might have made another one since this request was issued
 
+    vector<Layer *> all;
     for (int i = 0; i < (int)primary.size(); ++i) {
-        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(primary[i]);
-        if (t) {
-            m_document->addLayerToView(m_pane, t);
-            m_reAnalysisCandidates.push_back(t);
-        }
+        all.push_back(primary[i]);
+    }
+    for (int i = 0; i < (int)additional.size(); ++i) {
+        all.push_back(additional[i]);
     }
 
-    for (int i = 0; i < (int)additional.size(); ++i) {
-        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(additional[i]);
+    for (int i = 0; i < (int)all.size(); ++i) {
+        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(all[i]);
         if (t) {
+            PlayParameters *params = t->getPlayParameters();
+            if (params) {
+                params->setPlayAudible(false);
+            }
+            t->setBaseColour
+                (ColourDatabase::getInstance()->getColourIndex(tr("Bright Orange")));
             m_document->addLayerToView(m_pane, t);
             m_reAnalysisCandidates.push_back(t);
         }
     }
 }
+
+void
+Analyser::switchPitchCandidate(Selection sel, bool up)
+{
+    if (m_reAnalysisCandidates.empty()) return;
+
+    if (up) {
+        m_currentCandidate = m_currentCandidate + 1;
+        if (m_currentCandidate >= m_reAnalysisCandidates.size()) {
+            m_currentCandidate = 0;
+        }
+    } else {
+        m_currentCandidate = m_currentCandidate - 1;
+        if (m_currentCandidate < 0) {
+            m_currentCandidate = m_reAnalysisCandidates.size() - 1;
+        }
+    }
+
+    Layer *pitchTrack = m_layers[PitchTrack];
+    if (!pitchTrack) return;
+
+    CommandHistory::getInstance()->startCompoundOperation
+        (tr("Switch Pitch Candidate"), true);
+
+    Clipboard clip;
+    pitchTrack->deleteSelection(sel);
+    m_reAnalysisCandidates[m_currentCandidate]->copy(m_pane, sel, clip);
+    pitchTrack->paste(m_pane, clip, 0, false);
+
+    CommandHistory::getInstance()->endCompoundOperation();
+
+    // raise the pitch track, then notes on top (if present)
+    m_paneStack->setCurrentLayer(m_pane, m_layers[PitchTrack]);
+    if (m_layers[Notes] && !m_layers[Notes]->isLayerDormant(m_pane)) {
+        m_paneStack->setCurrentLayer(m_pane, m_layers[Notes]);
+    }
+}
+
+void
+Analyser::clearReAnalysis()
+{
+    foreach (Layer *layer, m_reAnalysisCandidates) {
+        m_pane->removeLayer(layer);
+        m_document->deleteLayer(layer); // also releases its model
+    }
+    m_reAnalysisCandidates.clear();
+    m_reAnalysingSelection = Selection();
+    m_currentCandidate = -1;
+}    
 
 void
 Analyser::getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1)
@@ -396,8 +449,17 @@ Analyser::setVisible(Component c, bool v)
     if (m_layers[c]) {
         m_layers[c]->setLayerDormant(m_pane, !v);
 
-        if (v && (c == Notes)) {
-            m_paneStack->setCurrentLayer(m_pane, m_layers[c]);
+        if (v) {
+            if (c == Notes) {
+                m_paneStack->setCurrentLayer(m_pane, m_layers[c]);
+            } else if (c == PitchTrack) {
+                // raise the pitch track, then notes on top (if present)
+                m_paneStack->setCurrentLayer(m_pane, m_layers[c]);
+                if (m_layers[Notes] &&
+                    !m_layers[Notes]->isLayerDormant(m_pane)) {
+                    m_paneStack->setCurrentLayer(m_pane, m_layers[Notes]);
+                }
+            }
         }
 
         m_pane->layerParametersChanged();

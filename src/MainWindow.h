@@ -52,6 +52,8 @@ protected slots:
 
     virtual void octaveShiftUp();
     virtual void octaveShiftDown();
+    virtual void switchPitchUp();
+    virtual void switchPitchDown();
 
     virtual void showAudioToggled();
     virtual void showSpectToggled();
@@ -63,6 +65,7 @@ protected slots:
     virtual void playNotesToggled();
 
     virtual void doubleClickSelectInvoked(size_t);
+    virtual void clearSelection();
 
     virtual void paneAdded(Pane *);
     virtual void paneHidden(Pane *);

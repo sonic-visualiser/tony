@@ -536,6 +536,13 @@ MainWindow::setupEditMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftDown()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+    
+    //!!! shortcuts, status tip, key reference etc
+    action = new QAction(tr("Switch Pitch Candidate"), this);
+    action->setShortcut(tr("Return"));
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
 }
 
 void
@@ -1119,29 +1126,29 @@ MainWindow::closeSession()
 
     while (m_paneStack->getPaneCount() > 0) {
 
-    Pane *pane = m_paneStack->getPane(m_paneStack->getPaneCount() - 1);
+        Pane *pane = m_paneStack->getPane(m_paneStack->getPaneCount() - 1);
 
-    while (pane->getLayerCount() > 0) {
-        m_document->removeLayerFromView
-        (pane, pane->getLayer(pane->getLayerCount() - 1));
-    }
-
-    m_overview->unregisterView(pane);
-    m_paneStack->deletePane(pane);
+        while (pane->getLayerCount() > 0) {
+            m_document->removeLayerFromView
+                (pane, pane->getLayer(pane->getLayerCount() - 1));
+        }
+        
+        m_overview->unregisterView(pane);
+        m_paneStack->deletePane(pane);
     }
 
     while (m_paneStack->getHiddenPaneCount() > 0) {
 
-    Pane *pane = m_paneStack->getHiddenPane
-        (m_paneStack->getHiddenPaneCount() - 1);
-
-    while (pane->getLayerCount() > 0) {
-        m_document->removeLayerFromView
-        (pane, pane->getLayer(pane->getLayerCount() - 1));
-    }
-
-    m_overview->unregisterView(pane);
-    m_paneStack->deletePane(pane);
+        Pane *pane = m_paneStack->getHiddenPane
+            (m_paneStack->getHiddenPaneCount() - 1);
+        
+        while (pane->getLayerCount() > 0) {
+            m_document->removeLayerFromView
+                (pane, pane->getLayer(pane->getLayerCount() - 1));
+        }
+        
+        m_overview->unregisterView(pane);
+        m_paneStack->deletePane(pane);
     }
 
     delete m_document;
@@ -1631,6 +1638,15 @@ MainWindow::doubleClickSelectInvoked(size_t frame)
 }
 
 void
+MainWindow::clearSelection()
+{
+    cerr << "MainWindow::clearSelection()" << endl;
+
+    m_analyser->clearReAnalysis();
+    MainWindowBase::clearSelection();
+}
+
+void
 MainWindow::selectionChanged()
 {
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
@@ -1664,6 +1680,8 @@ MainWindow::octaveShiftDown()
 void
 MainWindow::octaveShift(bool up)
 {
+    // Should this be in the Analyser?
+
     float factor = (up ? 2.f : 0.5f);
 
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
@@ -1704,6 +1722,28 @@ MainWindow::octaveShift(bool up)
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
+}
+
+void
+MainWindow::switchPitchUp()
+{
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    for (MultiSelection::SelectionList::iterator k = selections.begin();
+         k != selections.end(); ++k) {
+        m_analyser->switchPitchCandidate(*k, true);
+    }
+}
+
+void
+MainWindow::switchPitchDown()
+{
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    for (MultiSelection::SelectionList::iterator k = selections.begin();
+         k != selections.end(); ++k) {
+        m_analyser->switchPitchCandidate(*k, false);
+    }
 }
 
 void
