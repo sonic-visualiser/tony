@@ -4,17 +4,19 @@ Matthias Mauch and Chris Cannam: Efficient Computer-Aided Pitch Track and Note E
 Abstract.
 We present **Tony**, a free, open-source software tool for 
 computer-aided pitch track and note annotation of melodic audio content.
-The accurate annotation of fundamental frequencies 
-per time instant and per note
+The accurate annotation of fundamental frequencies and notes
 is essential to the scientific study of 
-intonation in singing (and other instruments).
+intonation in singing and other instruments.
 Unlike commercial applications for singers and producers 
 or other academic tools for generic music annotation and visualisation
 **Tony** has been designed for the scientific study of monophonic music:
 a) it implements state-of-the art algorithms for pitch and note estimation from audio,
-b) it provides a graphical user interface, including auditory feedback of pitch and note tracks, 
+b) it provides visual and auditory feedback of the extracted pitches 
+for the identification of detection errors,
+b) it provides an intelligent graphical user interface 
 through which the user can identify and rapidly correct estimation errors,
-c) it exports the pitch track and note track for further use in spreadsheets or post-processing.
+c) it provides functions for exporting pitch track and note track 
+enabling further processing in spreadsheets or other applications.
 Software versions for Windows, OSX and Linux platforms can be downloaded from
 http://code.soundsoftware.ac.uk/projects/tony
 
@@ -28,7 +30,7 @@ Keyword 3.
 Singing.
 
 Aims.
-We aim to make scientific annotation of intonation more efficient.
+We aim to make the scientific annotation of melodic content more efficient.
 Music psychologists interested in the analysis of pitch and intonation 
 usually use software programs originally aimed at the analysis of speech
 (e.g. Praat http://www.fon.hum.uva.nl/praat/) or generic audio annotation
@@ -48,14 +50,15 @@ This is why, during our own research on intonation [2],
 we decided to code our own pitch extraction tool that would avoid the shortcomings.
 
 Methods.
-For automatic pitch estimation we use the pYIN method [3]. 
+For automatic pitch and note estimation we use the pYIN method [3]. 
 The method provides precise pitch and note estimates and 
 automatically determines which parts of the recording are voiced.
 The graphical user interface is based upon the 
-open source software libraries from Sonic Visualiser. 
-We simplified the interface and added the capability for playing back 
-not only the original audio, but also sonifications of the pitch track 
-(melody line) 
+open source software libraries from Sonic Visualiser.
+It features the audio waveform, a spectrogram representation, 
+the pitch track and notes. Users can scroll and zoom in time.
+**Tony** does not only play back the original audio, 
+but also, optionally, sonifications of the pitch track (melody line) 
 and the note track (discrete pitches with durations).
 Notes' pitches are robustly estimated as the median of the pitch track
 that occurs during the duration of the note.
@@ -63,9 +66,9 @@ The user can delete, move, cut, merge, crop and extend notes,
 and the note's frequency is adapted accordingly.
 The user can delete spurious parts of the pitch track 
 and shift the pitch track in frequency.
-In order to correct erroneous pitch tracks, the user can select 
+In order to efficiently correct erroneous pitch tracks, the user can select 
 a time interval, and **Tony** will provide various alternative 
-pitch tracks the user can select from.
+pitch tracks. The user can then pick the correct one.
 
 Outcomes.
 The system is currently being used for two projects:
