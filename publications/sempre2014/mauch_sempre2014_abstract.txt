@@ -1,27 +1,102 @@
 Paper title.
+Matthias Mauch and Chris Cannam: Efficient Computer-Aided Pitch Track and Note Estimation for Scientific Applications
 
 Abstract.
+We present **Tony**, a free, open-source software tool for 
+computer-aided pitch track and note annotation of melodic audio content.
+The accurate annotation of fundamental frequencies 
+per time instant and per note
+is essential to the scientific study of 
+intonation in singing (and other instruments).
+Unlike commercial applications for singers and producers 
+or other academic tools for generic music annotation and visualisation
+**Tony** has been designed for the scientific study of monophonic music:
+a) it implements state-of-the art algorithms for pitch and note estimation from audio,
+b) it provides a graphical user interface, including auditory feedback of pitch and note tracks, 
+through which the user can identify and rapidly correct estimation errors,
+c) it exports the pitch track and note track for further use in spreadsheets or post-processing.
+Software versions for Windows, OSX and Linux platforms can be downloaded from
+http://code.soundsoftware.ac.uk/projects/tony
 
 Keyword 1.
+Pitch/Note Analysis
 
 Keyword 2.
+Software
 
 Keyword 3.
+Singing.
 
 Aims.
+We aim to make scientific annotation of intonation more efficient.
+Music psychologists interested in the analysis of pitch and intonation 
+usually use software programs originally aimed at the analysis of speech
+(e.g. Praat http://www.fon.hum.uva.nl/praat/) or generic audio annotation
+tools (e.g. Sonic Visualiser http://www.sonicvisualiser.org/)
+to extract pitches of notes from audio recordings. 
+Since these programs were not conceived for musical pitch analysis, 
+the process of extracting note frequencies remains laborious and can take
+many times the duration of the recording.
+On the other hand, commercial tools such as
+Melodyne (http://www.celemony.com/), Songs2See (http://www.songs2see.com/) or 
+Sing&See (http://www.singandsee.com/) have 
+unknown frequency estimation procedures (proprietary code)
+and do not provide export formats needed for scientific analysis.
+An academic note annotation system [1] exists, but does not feature 
+note extraction. It is also not openly available.
+This is why, during our own research on intonation [2], 
+we decided to code our own pitch extraction tool that would avoid the shortcomings.
 
 Methods.
+For automatic pitch estimation we use the pYIN method [3]. 
+The method provides precise pitch and note estimates and 
+automatically determines which parts of the recording are voiced.
+The graphical user interface is based upon the 
+open source software libraries from Sonic Visualiser. 
+We simplified the interface and added the capability for playing back 
+not only the original audio, but also sonifications of the pitch track 
+(melody line) 
+and the note track (discrete pitches with durations).
+Notes' pitches are robustly estimated as the median of the pitch track
+that occurs during the duration of the note.
+The user can delete, move, cut, merge, crop and extend notes, 
+and the note's frequency is adapted accordingly.
+The user can delete spurious parts of the pitch track 
+and shift the pitch track in frequency.
+In order to correct erroneous pitch tracks, the user can select 
+a time interval, and **Tony** will provide various alternative 
+pitch tracks the user can select from.
 
 Outcomes.
+The system is currently being used for two projects:
+for the generation of new training and test data for Music Informatics research, 
+and for a new project on intonation in unaccompanied solo singing.
+Preliminary feedback by the users suggests that 
+the system does indeed facilitate pitch annotation 
+and provides vital features that cannot be found in other tools.
 
 Title for final section.
 Conclusions
 
 [Q37].
+We presented **Tony** a new software tool for computer-assisted
+annotation of melodic audio content for scientific analysis.
+No other existing program combines pitch and note estimation, 
+a graphical user interface with auditory feedback,
+rapid, computer-aided correction of pitches and
+and extensive exporting facilities.
+**Tony** is freely available for use on Windows, OSX and Linux platforms
+from http://code.soundsoftware.ac.uk/projects/tony/.
 
 Acknowledgements.
+Matthias Mauch is funded by the Royal Academy of Engineering. 
+We would like to thank Justin Salamon, Rachel Bittner and Juan Bello 
+for their comments and coding help.
 
 Three key references. (APA v6)
+[1] Pant, S., Rao, V., & Rao, P. (2010). A melody detection user interface for polyphonic music. 2010 National Conference On Communications (NCC), 2010.
+[2] Mauch, M., Frieler, K., & Dixon, S. (under review). Intonation in Unaccompanied Singing: Accuracy, Drift and a Model of Intonation Memory.
+[3] Mauch, M., & Dixon, S. (2014). pYIN : a Fundamental Frequency Estimator Using Probabilistic Threshold Distributions. In Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP 2014).
 
 Comments/queries to organisers.
 
