@@ -2177,11 +2177,8 @@ MainWindow::mainModelChanged(WaveFileModel *model)
     MainWindowBase::mainModelChanged(model);
 
     if (m_playTarget) {
-
         connect(m_fader, SIGNAL(valueChanged(float)),
                 m_playTarget, SLOT(setOutputGain(float)));
-
-        m_playSource->setSelectionMargin(RealTime(2, 0));
     }
 
     if (model) {
