@@ -333,28 +333,23 @@ Analyser::switchPitchCandidate(Selection sel, bool up)
 
     if (up) {
         m_currentCandidate = m_currentCandidate + 1;
-        if (m_currentCandidate >= m_reAnalysisCandidates.size()) {
+        if (m_currentCandidate >= (int)m_reAnalysisCandidates.size()) {
             m_currentCandidate = 0;
         }
     } else {
         m_currentCandidate = m_currentCandidate - 1;
         if (m_currentCandidate < 0) {
-            m_currentCandidate = m_reAnalysisCandidates.size() - 1;
+            m_currentCandidate = (int)m_reAnalysisCandidates.size() - 1;
         }
     }
 
     Layer *pitchTrack = m_layers[PitchTrack];
     if (!pitchTrack) return;
 
-    CommandHistory::getInstance()->startCompoundOperation
-        (tr("Switch Pitch Candidate"), true);
-
     Clipboard clip;
     pitchTrack->deleteSelection(sel);
     m_reAnalysisCandidates[m_currentCandidate]->copy(m_pane, sel, clip);
     pitchTrack->paste(m_pane, clip, 0, false);
-
-    CommandHistory::getInstance()->endCompoundOperation();
 
     // raise the pitch track, then notes on top (if present)
     m_paneStack->setCurrentLayer(m_pane, m_layers[PitchTrack]);
@@ -364,10 +359,53 @@ Analyser::switchPitchCandidate(Selection sel, bool up)
 }
 
 void
+Analyser::shiftOctave(Selection sel, bool up)
+{
+    float factor = (up ? 2.f : 0.5f);
+    
+    vector<Layer *> actOn;
+
+    Layer *pitchTrack = m_layers[PitchTrack];
+    if (pitchTrack) actOn.push_back(pitchTrack);
+
+    foreach (Layer *c, m_reAnalysisCandidates) {
+        actOn.push_back(c);
+    }
+
+    foreach (Layer *layer, actOn) {
+        
+        Clipboard clip;
+        layer->copy(m_pane, sel, clip);
+        layer->deleteSelection(sel);
+
+        Clipboard shifted;
+        foreach (Clipboard::Point p, clip.getPoints()) {
+            if (p.haveValue()) {
+                Clipboard::Point sp = p.withValue(p.getValue() * factor);
+                shifted.addPoint(sp);
+            } else {
+                shifted.addPoint(p);
+            }
+        }
+        
+        layer->paste(m_pane, shifted, 0, false);
+    }
+}
+
+void
+Analyser::clearPitches(Selection sel)
+{
+    Layer *pitchTrack = m_layers[PitchTrack];
+    if (!pitchTrack) return;
+
+    pitchTrack->deleteSelection(sel);
+}
+
+void
 Analyser::clearReAnalysis()
 {
     foreach (Layer *layer, m_reAnalysisCandidates) {
-        m_pane->removeLayer(layer);
+        m_document->removeLayerFromView(m_pane, layer);
         m_document->deleteLayer(layer); // also releases its model
     }
     m_reAnalysisCandidates.clear();

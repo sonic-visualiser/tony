@@ -98,6 +98,18 @@ public:
     void switchPitchCandidate(Selection sel, bool up);
 
     /**
+     * Remove the pitch estimates from the selected area of the main
+     * pitch track.
+     */
+    void clearPitches(Selection sel);
+
+    /**
+     * Move the main pitch track and any active analysis candidate
+     * tracks up or down an octave in the selected area.
+     */
+    void shiftOctave(Selection sel, bool up);
+
+    /**
      * Remove any re-analysis layers.
      */
     void clearReAnalysis();

@@ -85,7 +85,6 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     MainWindowBase(withAudioOutput, withOSCSupport, false),
     m_overview(0),
     m_mainMenusCreated(false),
-    m_intelligentActionOn(true), //GF: !!! temporary
     m_playbackMenu(0),
     m_recentFilesMenu(0), 
     m_rightButtonMenu(0),
@@ -93,6 +92,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_deleteSelectedAction(0),
     m_ffwdAction(0),
     m_rwdAction(0),
+    m_intelligentActionOn(true), //GF: !!! temporary
     m_keyReference(new KeyReference())
 {
     setWindowTitle(QApplication::applicationName());
@@ -525,6 +525,13 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     
     //!!! shortcuts, status tip, key reference etc
+    action = new QAction(tr("Clear Pitches"), this);
+    action->setShortcut(tr("Backspace"));
+    connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+
+    //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Octave Shift Up"), this);
     action->setShortcut(tr("PgUp"));
     connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftUp()));
@@ -540,7 +547,7 @@ MainWindow::setupEditMenu()
     //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Switch Pitch Candidate"), this);
     action->setShortcut(tr("Return"));
-    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitch()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 }
@@ -1642,8 +1649,12 @@ MainWindow::clearSelection()
 {
     cerr << "MainWindow::clearSelection()" << endl;
 
+    CommandHistory::getInstance()->startCompoundOperation(tr("Clear Selection"), true);
+
     m_analyser->clearReAnalysis();
     MainWindowBase::clearSelection();
+
+    CommandHistory::getInstance()->endCompoundOperation();
 }
 
 void
@@ -1666,6 +1677,21 @@ MainWindow::selectionChanged()
 }
 
 void
+MainWindow::clearPitches()
+{
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    CommandHistory::getInstance()->startCompoundOperation(tr("Clear Pitches"), true);
+
+    for (MultiSelection::SelectionList::iterator k = selections.begin();
+         k != selections.end(); ++k) {
+        m_analyser->clearPitches(*k);
+    }
+
+    CommandHistory::getInstance()->endCompoundOperation();
+}
+
+void
 MainWindow::octaveShiftUp()
 {
     octaveShift(true);
@@ -1680,70 +1706,33 @@ MainWindow::octaveShiftDown()
 void
 MainWindow::octaveShift(bool up)
 {
-    // Should this be in the Analyser?
-
-    float factor = (up ? 2.f : 0.5f);
-
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
     CommandHistory::getInstance()->startCompoundOperation(tr("Octave Shift"), true);
 
-    for (int i = 0; i < m_paneStack->getPaneCount(); ++i) {
+    for (MultiSelection::SelectionList::iterator k = selections.begin();
+         k != selections.end(); ++k) {
 
-        Pane *pane = m_paneStack->getPane(i);
-        if (!pane) continue;
-
-        for (int j = 0; j < pane->getLayerCount(); ++j) {
-
-            Layer *layer = pane->getLayer(j);
-            if (!layer) continue;
-
-            for (MultiSelection::SelectionList::iterator k = selections.begin();
-                 k != selections.end(); ++k) {
-
-                Clipboard clip;
-                layer->copy(pane, *k, clip);
-                layer->deleteSelection(*k);
-
-                Clipboard shifted;
-                foreach (Clipboard::Point p, clip.getPoints()) {
-                    if (p.haveValue()) {
-                        Clipboard::Point sp = 
-                            p.withValue(p.getValue() * factor);
-                        shifted.addPoint(sp);
-                    } else {
-                        shifted.addPoint(p);
-                    }
-                }
-
-                layer->paste(pane, shifted, 0, false);
-            }
-        }
+        m_analyser->shiftOctave(*k, up);
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
 }
 
 void
-MainWindow::switchPitchUp()
+MainWindow::switchPitch()
 {
+    CommandHistory::getInstance()->startCompoundOperation
+        (tr("Switch Pitch Candidate"), true);
+
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
     for (MultiSelection::SelectionList::iterator k = selections.begin();
          k != selections.end(); ++k) {
         m_analyser->switchPitchCandidate(*k, true);
     }
-}
 
-void
-MainWindow::switchPitchDown()
-{
-    MultiSelection::SelectionList selections = m_viewManager->getSelections();
-
-    for (MultiSelection::SelectionList::iterator k = selections.begin();
-         k != selections.end(); ++k) {
-        m_analyser->switchPitchCandidate(*k, false);
-    }
+    CommandHistory::getInstance()->endCompoundOperation();
 }
 
 void
@@ -2188,8 +2177,11 @@ MainWindow::mainModelChanged(WaveFileModel *model)
     MainWindowBase::mainModelChanged(model);
 
     if (m_playTarget) {
+
         connect(m_fader, SIGNAL(valueChanged(float)),
                 m_playTarget, SLOT(setOutputGain(float)));
+
+        m_playSource->setSelectionMargin(RealTime(2, 0));
     }
 
     if (model) {

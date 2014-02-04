@@ -50,10 +50,10 @@ protected slots:
     virtual void toolEditSelected();
     virtual void toolFreeEditSelected();
 
+    virtual void clearPitches();
     virtual void octaveShiftUp();
     virtual void octaveShiftDown();
-    virtual void switchPitchUp();
-    virtual void switchPitchDown();
+    virtual void switchPitch();
 
     virtual void showAudioToggled();
     virtual void showSpectToggled();
