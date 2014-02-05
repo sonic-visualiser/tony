@@ -114,6 +114,20 @@ public:
      */
     void clearReAnalysis();
 
+    /**
+     * Import the pitch track from the given layer into our
+     * pitch-track layer.
+     */
+    void takePitchTrackFrom(Layer *layer);
+
+    Pane *getPane() {
+        return m_pane;
+    }
+
+    Layer *getLayer(Component type) {
+        return m_layers[type];
+    }
+
 signals:
     void layersChanged();
 

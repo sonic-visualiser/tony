@@ -47,6 +47,9 @@
 #include "layer/ColourDatabase.h"
 #include "base/Selection.h"
 
+#include "rdf/RDFImporter.h"
+#include "data/fileio/DataFileReaderFactory.h"
+#include "data/fileio/CSVFormat.h"
 #include "data/fileio/CSVFileWriter.h"
 #include "data/fileio/MIDIFileWriter.h"
 #include "rdf/RDFExporter.h"
@@ -423,6 +426,12 @@ MainWindow::setupFileMenu()
             this, SLOT(setupRecentFilesMenu()));
 
     menu->addSeparator();
+    action = new QAction(tr("Import Pitch Track Data..."), this);
+    action->setStatusTip(tr("Import pitch-track data from a file"));
+    connect(action, SIGNAL(triggered()), this, SLOT(importPitchLayer()));
+    connect(this, SIGNAL(canImportLayer(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+
     action = new QAction(tr("Export Pitch Track Data..."), this);
     action->setStatusTip(tr("Export pitch-track data to a file"));
     connect(action, SIGNAL(triggered()), this, SLOT(exportPitchLayer()));
@@ -1482,18 +1491,105 @@ MainWindow::exportToSVL(QString path, Layer *layer)
 }
 
 void
+MainWindow::importPitchLayer()
+{
+    QString path = getOpenFileName(FileFinder::LayerFileNoMidiNonSV);
+    if (path == "") return;
+
+    FileOpenStatus status = importPitchLayer(path);
+
+    if (status == FileOpenFailed) {
+        emit hideSplash();
+        QMessageBox::critical(this, tr("Failed to open file"),
+                              tr("<b>File open failed</b><p>Layer file %1 could not be opened.").arg(path));
+        return;
+    } else if (status == FileOpenWrongMode) {
+        emit hideSplash();
+        QMessageBox::critical(this, tr("Failed to open file"),
+                              tr("<b>Audio required</b><p>Unable to load layer data from \"%1\" without an audio file.<br>Please load at least one audio file before importing annotations.").arg(path));
+    }
+}
+
+MainWindow::FileOpenStatus
+MainWindow::importPitchLayer(FileSource source)
+{
+    if (!source.isAvailable()) return FileOpenFailed;
+    source.waitForData();
+
+    QString path = source.getLocalFilename();
+
+    RDFImporter::RDFDocumentType rdfType = 
+        RDFImporter::identifyDocumentType(QUrl::fromLocalFile(path).toString());
+
+    if (rdfType != RDFImporter::NotRDF) {
+
+        //!!!
+        return FileOpenFailed;
+
+    } else if (source.getExtension().toLower() == "svl" ||
+               (source.getExtension().toLower() == "xml" &&
+                (SVFileReader::identifyXmlFile(source.getLocalFilename())
+                 == SVFileReader::SVLayerFile))) {
+        
+        //!!!
+        return FileOpenFailed;
+
+    } else {
+        
+        try {
+
+            CSVFormat format(path);
+            format.setSampleRate(getMainModel()->getSampleRate());
+
+            if (format.getModelType() != CSVFormat::TwoDimensionalModel) {
+                //!!! error report
+                return FileOpenFailed;
+            }
+
+            Model *model = DataFileReaderFactory::loadCSV
+                (path, format, getMainModel()->getSampleRate());
+
+            if (model) {
+
+                SVDEBUG << "MainWindow::importPitchLayer: Have model" << endl;
+
+                CommandHistory::getInstance()->startCompoundOperation
+                    (tr("Import Pitch Track"), true);
+
+                Layer *newLayer = m_document->createImportedLayer(model);
+
+                m_analyser->takePitchTrackFrom(newLayer);
+
+                m_document->deleteLayer(newLayer);
+
+                CommandHistory::getInstance()->endCompoundOperation();
+
+                //!!! swap all data in to existing layer instead of this
+
+                m_recentFiles.addFile(source.getLocation());
+                    
+                if (!source.isRemote()) {
+                    registerLastOpenedFilePath
+                        (FileFinder::LayerFile,
+                         path); // for file dialog
+                }
+
+                return FileOpenSucceeded;
+            }
+        } catch (DataFileReaderFactory::Exception e) {
+            if (e == DataFileReaderFactory::ImportCancelled) {
+                return FileOpenCancelled;
+            }
+        }
+    }
+    
+    return FileOpenFailed;
+}
+
+void
 MainWindow::exportPitchLayer()
 {
-    Layer *layer = 0;
-    for (int i = 0; i < m_paneStack->getPaneCount(); ++i) {
-        Pane *pane = m_paneStack->getPane(i);
-        for (int j = 0; j < pane->getLayerCount(); ++j) {
-            layer = qobject_cast<TimeValueLayer *>(pane->getLayer(j));
-            if (layer) break;
-        }
-        if (layer) break;
-    }
-
+    Layer *layer = m_analyser->getLayer(Analyser::PitchTrack);
     if (!layer) return;
 
     SparseTimeValueModel *model =
@@ -1546,16 +1642,7 @@ MainWindow::exportPitchLayer()
 void
 MainWindow::exportNoteLayer()
 {
-    Layer *layer = 0;
-    for (int i = 0; i < m_paneStack->getPaneCount(); ++i) {
-        Pane *pane = m_paneStack->getPane(i);
-        for (int j = 0; j < pane->getLayerCount(); ++j) {
-            layer = qobject_cast<FlexiNoteLayer *>(pane->getLayer(j));
-            if (layer) break;
-        }
-        if (layer) break;
-    }
-
+    Layer *layer = m_analyser->getLayer(Analyser::Notes);
     if (!layer) return;
 
     FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer->getModel());
@@ -1609,26 +1696,6 @@ MainWindow::exportNoteLayer()
     } else {
         m_recentFiles.addFile(path);
         emit activity(tr("Export layer to \"%1\"").arg(path));
-    }
-}
-
-
-void
-MainWindow::renameCurrentLayer()
-{
-    Pane *pane = m_paneStack->getCurrentPane();
-    if (pane) {
-        Layer *layer = pane->getSelectedLayer();
-        if (layer) {
-            bool ok = false;
-            QString newName = QInputDialog::getText
-                (this, tr("Rename Layer"),
-                 tr("New name for this layer:"),
-                 QLineEdit::Normal, layer->objectName(), &ok);
-            if (ok) {
-                layer->setObjectName(newName);
-            }
-        }
     }
 }
 
@@ -2183,8 +2250,11 @@ MainWindow::mainModelChanged(WaveFileModel *model)
 
     if (model) {
         if (m_paneStack) {
-            Pane *pane = m_paneStack->getCurrentPane();
-            if (!pane) {
+
+            int pc = m_paneStack->getPaneCount();
+            Pane *pane = 0;
+
+            if (pc < 1) {
                 pane = m_paneStack->addPane();
 
                 Pane *selectionStrip = m_paneStack->addPane();
@@ -2197,7 +2267,10 @@ MainWindow::mainModelChanged(WaveFileModel *model)
                 m_viewManager->clearToolModeOverrides();
                 m_viewManager->setToolModeFor(selectionStrip,
                                               ViewManager::SelectMode);
+            } else {
+                pane = m_paneStack->getPane(0);
             }
+
             if (pane) {
                 QString error = m_analyser->newFileLoaded
                     (m_document, getMainModel(), m_paneStack, pane);

@@ -41,10 +41,9 @@ protected slots:
     virtual void saveSessionAs();
     virtual void exportPitchLayer();
     virtual void exportNoteLayer();
+    virtual void importPitchLayer();
     virtual void newSession();
     virtual void closeSession();
-
-    virtual void renameCurrentLayer();
 
     virtual void toolNavigateSelected();
     virtual void toolEditSelected();
@@ -199,6 +198,7 @@ protected:
     VersionTester *m_versionTester;
 
     QString exportToSVL(QString path, Layer *layer);
+    FileOpenStatus importPitchLayer(FileSource source);
 
     virtual void setupMenus();
     virtual void setupFileMenu();

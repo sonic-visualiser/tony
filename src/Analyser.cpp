@@ -414,6 +414,25 @@ Analyser::clearReAnalysis()
 }    
 
 void
+Analyser::takePitchTrackFrom(Layer *otherLayer)
+{
+    Layer *myLayer = m_layers[PitchTrack];
+    if (!myLayer) return;
+
+    Clipboard clip;
+
+    Selection sel = Selection(myLayer->getModel()->getStartFrame(),
+                              myLayer->getModel()->getEndFrame());
+    myLayer->deleteSelection(sel);
+
+    sel = Selection(otherLayer->getModel()->getStartFrame(),
+                    otherLayer->getModel()->getEndFrame());
+    otherLayer->copy(m_pane, sel, clip);
+
+    myLayer->paste(m_pane, clip, 0, false);
+}
+
+void
 Analyser::getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1)
 {
     FlexiNoteLayer *flexiNoteLayer = 
