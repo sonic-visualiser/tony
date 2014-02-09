@@ -1,5 +1,5 @@
 Paper title.
-Matthias Mauch and Chris Cannam: Efficient Computer-Aided Pitch Track and Note Estimation for Scientific Applications
+Matthias Mauch, Chris Cannam and György Fazekas: Efficient Computer-Aided Pitch Track and Note Estimation for Scientific Applications
 
 Abstract.
 We present **Tony**, a free, open-source software tool for 
@@ -30,7 +30,7 @@ Keyword 3.
 Singing.
 
 Aims.
-We aim to make the scientific annotation of melodic content more efficient.
+
 Music psychologists interested in the analysis of pitch and intonation 
 usually use software programs originally aimed at the analysis of speech
 (e.g. Praat http://www.fon.hum.uva.nl/praat/) or generic audio annotation
@@ -39,29 +39,29 @@ to extract pitches of notes from audio recordings.
 Since these programs were not conceived for musical pitch analysis, 
 the process of extracting note frequencies remains laborious and can take
 many times the duration of the recording.
-On the other hand, commercial tools such as
-Melodyne (http://www.celemony.com/), Songs2See (http://www.songs2see.com/) or 
-Sing&See (http://www.singandsee.com/) have 
-unknown frequency estimation procedures (proprietary code)
-and do not provide export formats needed for scientific analysis.
-An academic note annotation system [1] exists, but does not feature 
-note extraction. It is also not openly available.
-This is why, during our own research on intonation [2], 
-we decided to code our own pitch extraction tool that would avoid the shortcomings.
+Commercial tools such as Melodyne (http://www.celemony.com/), Songs2See (http://www.songs2see.com/) or 
+Sing&See (http://www.singandsee.com/) also exists for these purposes, however 
+their frequency estimation procedures are typically not public (proprietary code),
+and they do not provide export formats well suited for scientific analysis.
+Albeit a note annotation system [1] developed for scientific use also exists already, it does not feature 
+note extraction, and it is not available as free and open-source software.
+This is why we decided to develop our own pitch extraction tool during our research on intonation [2],
+that would avoid the above shortcomings.
+Our goal is to make the annotation of melodic content for scientific analysis more efficient.
 
 Methods.
 For automatic pitch and note estimation we use the pYIN method [3]. 
 The method provides precise pitch and note estimates and 
 automatically determines which parts of the recording are voiced.
-The graphical user interface is based upon the 
-open source software libraries from Sonic Visualiser.
+The graphical user interface is based upon 
+open source software libraries originally developed for the Sonic Visualiser software.
 It features the audio waveform, a spectrogram representation, 
 the pitch track and notes. Users can scroll and zoom in time.
 **Tony** does not only play back the original audio, 
 but also, optionally, sonifications of the pitch track (melody line) 
 and the note track (discrete pitches with durations).
-Notes' pitches are robustly estimated as the median of the pitch track
-that occurs during the duration of the note.
+Notes' pitches are estimated using the median of the pitch track
+corresponding to the time extent (duration) of the note.
 The user can delete, move, cut, merge, crop and extend notes, 
 and the note's frequency is adapted accordingly.
 The user can delete spurious parts of the pitch track 
@@ -71,9 +71,9 @@ a time interval, and **Tony** will provide various alternative
 pitch tracks. The user can then pick the correct one.
 
 Outcomes.
-The system is currently being used for two projects:
-for the generation of new training and test data for Music Informatics research, 
-and for a new project on intonation in unaccompanied solo singing.
+The system is currently used for two projects:
+1) the generation of new training and test data for Music Informatics research, 
+and 2) a research project on intonation in unaccompanied solo singing.
 Preliminary feedback by the users suggests that 
 the system does indeed facilitate pitch annotation 
 and provides vital features that cannot be found in other tools.
