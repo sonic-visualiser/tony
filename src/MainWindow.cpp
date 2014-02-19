@@ -535,7 +535,7 @@ MainWindow::setupEditMenu()
     
     //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Clear Pitches"), this);
-    action->setShortcut(tr("Backspace"));
+    action->setShortcut(tr("Ctrl+Backspace"));
     connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
@@ -555,7 +555,7 @@ MainWindow::setupEditMenu()
     
     //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Switch Pitch Candidate"), this);
-    action->setShortcut(tr("Return"));
+    action->setShortcut(tr("Ctrl+Return"));
     connect(action, SIGNAL(triggered()), this, SLOT(switchPitch()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
