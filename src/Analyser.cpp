@@ -50,7 +50,7 @@ Analyser::Analyser() :
          QString("<layer verticalScale=\"%1\" plotStyle=\"%2\" "
                  "scaleMinimum=\"%3\" scaleMaximum=\"%4\"/>")
          .arg(int(TimeValueLayer::AutoAlignScale))
-         .arg(int(TimeValueLayer::PlotDiscreteCurves))
+         .arg(int(TimeValueLayer::PlotPoints))
          .arg(27.5f).arg(880.f)); // temporary values: better get the real extents of the data from the model
     settings.setValue
         ("flexinotes",
@@ -278,7 +278,7 @@ Analyser::reAnalyseSelection(Selection sel)
         ((sel.getStartFrame()/256) * 256 - 2*256, m_fileModel->getSampleRate());
 
     RealTime end = RealTime::frame2RealTime
-        ((sel.getEndFrame()/256) * 256 + 10*256, m_fileModel->getSampleRate());
+        ((sel.getEndFrame()/256) * 256 + 11*256, m_fileModel->getSampleRate());
 
     RealTime duration;
 
