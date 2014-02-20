@@ -275,10 +275,10 @@ Analyser::reAnalyseSelection(Selection sel)
     t.setBlockSize(2048);
 
     RealTime start = RealTime::frame2RealTime
-        ((sel.getStartFrame()/256) * 256 - 2*256, m_fileModel->getSampleRate());
+        (round(sel.getStartFrame()*1.0/256) * 256 - 2*256, m_fileModel->getSampleRate());
 
     RealTime end = RealTime::frame2RealTime
-        ((sel.getEndFrame()/256) * 256 + 11*256, m_fileModel->getSampleRate());
+        (round(sel.getEndFrame()*1.0/256) * 256 + 11*256, m_fileModel->getSampleRate());
 
     RealTime duration;
 
