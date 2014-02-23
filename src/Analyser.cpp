@@ -75,6 +75,7 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
+    m_candidatesVisible = false;
 
     // Note that we need at least one main-model layer (time ruler,
     // waveform or what have you). It could be hidden if we don't want
@@ -296,6 +297,28 @@ Analyser::reAnalyseSelection(Selection sel)
     return "";
 }
 
+bool
+Analyser::arePitchCandidatesShown() const
+{
+    return m_candidatesVisible;
+}
+
+void
+Analyser::showPitchCandidates(bool shown) 
+{
+    if (m_candidatesVisible == shown) return;
+
+    foreach (Layer *layer, m_reAnalysisCandidates) {
+        if (shown) {
+            m_document->addLayerToView(m_pane, layer);
+        } else {
+            m_document->removeLayerFromView(m_pane, layer);
+        }
+    }
+
+    m_candidatesVisible = shown;
+}
+
 void
 Analyser::layersCreated(vector<Layer *> primary,
                         vector<Layer *> additional)
@@ -320,7 +343,9 @@ Analyser::layersCreated(vector<Layer *> primary,
             }
             t->setBaseColour
                 (ColourDatabase::getInstance()->getColourIndex(tr("Bright Orange")));
-            m_document->addLayerToView(m_pane, t);
+            if (m_candidatesVisible) {
+                m_document->addLayerToView(m_pane, t);
+            }
             m_reAnalysisCandidates.push_back(t);
         }
     }
@@ -393,7 +418,7 @@ Analyser::shiftOctave(Selection sel, bool up)
 }
 
 void
-Analyser::clearPitches(Selection sel)
+Analyser::deletePitches(Selection sel)
 {
     Layer *pitchTrack = m_layers[PitchTrack];
     if (!pitchTrack) return;

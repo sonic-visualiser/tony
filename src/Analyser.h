@@ -91,6 +91,24 @@ public:
     QString reAnalyseSelection(Selection sel);
 
     /**
+     * Return true if the analysed pitch candidates are currently
+     * visible (by default they are hidden after construction until
+     * the user requests them). Note that the shown/hidden state is
+     * independent of whether any pitch candidates actually exist --
+     * it's possible they might be shown but not have been created yet
+     * because creation (through reAnalyseSelection) is asynchronous.
+     */
+    bool arePitchCandidatesShown() const;
+
+    /**
+     * Show or hide the analysed pitch candidate layers. As in
+     * arePitchCandidatesShown, this is independent of whether the
+     * candidate layers actually exist. Call reAnalyseSelection to
+     * schedule creation of those layers.
+     */
+    void showPitchCandidates(bool shown);
+
+    /**
      * If a re-analysis has been activated, switch the selected area
      * of the main pitch track to a different candidate from the
      * analysis results.
@@ -98,10 +116,10 @@ public:
     void switchPitchCandidate(Selection sel, bool up);
 
     /**
-     * Remove the pitch estimates from the selected area of the main
+     * Delete the pitch estimates from the selected area of the main
      * pitch track.
      */
-    void clearPitches(Selection sel);
+    void deletePitches(Selection sel);
 
     /**
      * Move the main pitch track and any active analysis candidate
@@ -142,6 +160,7 @@ protected:
     Selection m_reAnalysingSelection;
     std::vector<Layer *> m_reAnalysisCandidates;
     int m_currentCandidate;
+    bool m_candidatesVisible;
 
     QString addVisualisations();
     QString addWaveform();

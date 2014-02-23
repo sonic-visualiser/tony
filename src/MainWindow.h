@@ -52,7 +52,9 @@ protected slots:
     virtual void clearPitches();
     virtual void octaveShiftUp();
     virtual void octaveShiftDown();
-    virtual void switchPitch();
+    virtual void togglePitchCandidates();
+    virtual void switchPitchUp();
+    virtual void switchPitchDown();
 
     virtual void showAudioToggled();
     virtual void showSpectToggled();

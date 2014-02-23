@@ -554,9 +554,23 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     
     //!!! shortcuts, status tip, key reference etc
-    action = new QAction(tr("Switch Pitch Candidate"), this);
+    action = new QAction(tr("Toggle Alternative Pitch Candidates"), this);
     action->setShortcut(tr("Ctrl+Return"));
-    connect(action, SIGNAL(triggered()), this, SLOT(switchPitch()));
+    connect(action, SIGNAL(triggered()), this, SLOT(togglePitchCandidates()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    
+    //!!! shortcuts, status tip, key reference etc
+    action = new QAction(tr("Pick Higher Pitch Candidate"), this);
+    action->setShortcut(tr("Ctrl+Up"));
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    
+    //!!! shortcuts, status tip, key reference etc
+    action = new QAction(tr("Pick Lower Pitch Candidate"), this);
+    action->setShortcut(tr("Ctrl+Down"));
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 }
@@ -1752,7 +1766,7 @@ MainWindow::clearPitches()
 
     for (MultiSelection::SelectionList::iterator k = selections.begin();
          k != selections.end(); ++k) {
-        m_analyser->clearPitches(*k);
+        m_analyser->deletePitches(*k);
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
@@ -1787,7 +1801,13 @@ MainWindow::octaveShift(bool up)
 }
 
 void
-MainWindow::switchPitch()
+MainWindow::togglePitchCandidates()
+{
+    m_analyser->showPitchCandidates(!m_analyser->arePitchCandidatesShown());
+}
+
+void
+MainWindow::switchPitchUp()
 {
     CommandHistory::getInstance()->startCompoundOperation
         (tr("Switch Pitch Candidate"), true);
@@ -1797,6 +1817,22 @@ MainWindow::switchPitch()
     for (MultiSelection::SelectionList::iterator k = selections.begin();
          k != selections.end(); ++k) {
         m_analyser->switchPitchCandidate(*k, true);
+    }
+
+    CommandHistory::getInstance()->endCompoundOperation();
+}
+
+void
+MainWindow::switchPitchDown()
+{
+    CommandHistory::getInstance()->startCompoundOperation
+        (tr("Switch Pitch Candidate"), true);
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    for (MultiSelection::SelectionList::iterator k = selections.begin();
+         k != selections.end(); ++k) {
+        m_analyser->switchPitchCandidate(*k, false);
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
