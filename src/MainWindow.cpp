@@ -1062,6 +1062,17 @@ void
 MainWindow::showPitchToggled()
 {
     m_analyser->toggleVisible(Analyser::PitchTrack);
+
+    if (!m_analyser->isVisible(Analyser::PitchTrack))
+    {
+        m_analyser->setAudible(Analyser::PitchTrack,false);
+        m_playPitch->setChecked(false);
+        m_playPitch->setEnabled(false);
+    }
+    else
+    {
+        m_playPitch->setEnabled(true);
+    }
 }
 
 void
