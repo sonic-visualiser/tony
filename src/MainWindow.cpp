@@ -935,7 +935,7 @@ MainWindow::setupToolbars()
     m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
     m_playPitch->setCheckable(true);
     connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
-    connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool))); // JTEST: this resets the enabled state of m_playPitch.
 
     toolbar->addWidget(m_gainPitch);
     toolbar->addWidget(m_panPitch);
@@ -1063,6 +1063,7 @@ MainWindow::showPitchToggled()
 {
     m_analyser->toggleVisible(Analyser::PitchTrack);
 
+    // JTEST
     if (!m_analyser->isVisible(Analyser::PitchTrack))
     {
         m_analyser->setAudible(Analyser::PitchTrack,false);
