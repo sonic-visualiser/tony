@@ -30,6 +30,9 @@ public:
                bool withOSCSupport = true);
     virtual ~MainWindow();
 
+signals:
+    virtual void canChangePitchCandidate(bool);
+
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
 
@@ -175,6 +178,7 @@ protected:
     QAction       *m_ffwdAction;
     QAction       *m_rwdAction;
     QAction       *m_editSelectAction;
+    QAction       *m_showCandidatesAction;
     QAction       *m_toggleIntelligenceAction;
     bool           m_intelligentActionOn; // GF: !!! temporary
 

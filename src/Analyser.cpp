@@ -349,6 +349,8 @@ Analyser::layersCreated(vector<Layer *> primary,
             m_reAnalysisCandidates.push_back(t);
         }
     }
+
+    emit layersChanged();
 }
 
 void

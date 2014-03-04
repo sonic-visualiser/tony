@@ -335,6 +335,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_analyser = new Analyser();
     connect(m_analyser, SIGNAL(layersChanged()),
             this, SLOT(updateLayerStatuses()));
+    connect(m_analyser, SIGNAL(layersChanged()),
+            this, SLOT(updateMenuStates()));
 
     setupMenus();
     setupToolbars();
@@ -534,12 +536,28 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     
     //!!! shortcuts, status tip, key reference etc
-    action = new QAction(tr("Clear Pitches"), this);
-    action->setShortcut(tr("Ctrl+Backspace"));
-    connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
-    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    m_showCandidatesAction = new QAction(tr("Show Pitch Candidates"), this);
+    m_showCandidatesAction->setShortcut(tr("Ctrl+Return"));
+    connect(m_showCandidatesAction, SIGNAL(triggered()), this, SLOT(togglePitchCandidates()));
+    connect(this, SIGNAL(canClearSelection(bool)), m_showCandidatesAction, SLOT(setEnabled(bool)));
+    menu->addAction(m_showCandidatesAction);
+    
+    //!!! shortcuts, status tip, key reference etc
+    action = new QAction(tr("Pick Higher Pitch Candidate"), this);
+    action->setShortcut(tr("Ctrl+Up"));
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
+    connect(this, SIGNAL(canChangePitchCandidate(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
-
+    
+    //!!! shortcuts, status tip, key reference etc
+    action = new QAction(tr("Pick Lower Pitch Candidate"), this);
+    action->setShortcut(tr("Ctrl+Down"));
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
+    connect(this, SIGNAL(canChangePitchCandidate(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    
+    menu->addSeparator();
+    
     //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Octave Shift Up"), this);
     action->setShortcut(tr("PgUp"));
@@ -552,25 +570,13 @@ MainWindow::setupEditMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftDown()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+
+    menu->addSeparator();
     
     //!!! shortcuts, status tip, key reference etc
-    action = new QAction(tr("Toggle Alternative Pitch Candidates"), this);
-    action->setShortcut(tr("Ctrl+Return"));
-    connect(action, SIGNAL(triggered()), this, SLOT(togglePitchCandidates()));
-    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    
-    //!!! shortcuts, status tip, key reference etc
-    action = new QAction(tr("Pick Higher Pitch Candidate"), this);
-    action->setShortcut(tr("Ctrl+Up"));
-    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
-    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    
-    //!!! shortcuts, status tip, key reference etc
-    action = new QAction(tr("Pick Lower Pitch Candidate"), this);
-    action->setShortcut(tr("Ctrl+Down"));
-    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
+    action = new QAction(tr("Remove Pitches"), this);
+    action->setShortcut(tr("Ctrl+Backspace"));
+    connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 }
@@ -1015,22 +1021,34 @@ MainWindow::updateMenuStates()
         (haveCurrentPane &&
          (currentLayer != 0));
     bool haveSelection = 
-    (m_viewManager &&
-     !m_viewManager->getSelections().empty());
+        (m_viewManager &&
+         !m_viewManager->getSelections().empty());
     bool haveCurrentEditableLayer =
-    (haveCurrentLayer &&
-     currentLayer->isLayerEditable());
+        (haveCurrentLayer &&
+         currentLayer->isLayerEditable());
     bool haveCurrentTimeInstantsLayer = 
-    (haveCurrentLayer &&
-     qobject_cast<TimeInstantLayer *>(currentLayer));
+        (haveCurrentLayer &&
+         qobject_cast<TimeInstantLayer *>(currentLayer));
     bool haveCurrentTimeValueLayer = 
-    (haveCurrentLayer &&
-     qobject_cast<TimeValueLayer *>(currentLayer));
+        (haveCurrentLayer &&
+         qobject_cast<TimeValueLayer *>(currentLayer));
+    bool pitchCandidatesVisible = 
+        m_analyser->arePitchCandidatesShown();
 
     emit canChangePlaybackSpeed(true);
     int v = m_playSpeed->value();
     emit canSpeedUpPlayback(v < m_playSpeed->maximum());
     emit canSlowDownPlayback(v > m_playSpeed->minimum());
+
+    emit canChangePitchCandidate(pitchCandidatesVisible && haveSelection);
+
+    if (pitchCandidatesVisible) {
+        m_showCandidatesAction->setText(tr("Hide Pitch Candidates"));
+        m_showCandidatesAction->setStatusTip(tr("Remove the display of alternate pitch candidates for the selected region"));
+    } else {
+        m_showCandidatesAction->setText(tr("Show Pitch Candidates"));
+        m_showCandidatesAction->setStatusTip(tr("Show alternate pitch candidates for the selected region"));
+    }
 
     if (m_ffwdAction && m_rwdAction) {
         if (haveCurrentTimeInstantsLayer) {
@@ -1760,6 +1778,7 @@ MainWindow::selectionChanged()
     if (!selections.empty()) {
         Selection sel = *selections.begin();
         cerr << "MainWindow::selectionChanged: have selection" << endl;
+        m_analyser->showPitchCandidates(false);
         QString error = m_analyser->reAnalyseSelection(sel);
         if (error != "") {
             QMessageBox::critical
@@ -1816,6 +1835,7 @@ void
 MainWindow::togglePitchCandidates()
 {
     m_analyser->showPitchCandidates(!m_analyser->arePitchCandidatesShown());
+    updateMenuStates();
 }
 
 void
