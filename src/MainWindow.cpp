@@ -1789,10 +1789,11 @@ MainWindow::selectionChanged()
 
     cerr << "MainWindow::selectionChanged" << endl;
 
+    m_analyser->showPitchCandidates(false);
+
     if (!selections.empty()) {
         Selection sel = *selections.begin();
         cerr << "MainWindow::selectionChanged: have selection" << endl;
-        m_analyser->showPitchCandidates(false);
         QString error = m_analyser->reAnalyseSelection(sel);
         if (error != "") {
             QMessageBox::critical
