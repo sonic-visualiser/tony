@@ -534,51 +534,69 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
 
     menu->addSeparator();
+    m_rightButtonMenu->addSeparator();
     
-    //!!! shortcuts, status tip, key reference etc
+    m_keyReference->setCategory(tr("Pitch Track"));
+
     m_showCandidatesAction = new QAction(tr("Show Pitch Candidates"), this);
     m_showCandidatesAction->setShortcut(tr("Ctrl+Return"));
+    m_showCandidatesAction->setStatusTip(tr("Toggle the display of alternative pitch candidates for the selected region"));
+    m_keyReference->registerShortcut(m_showCandidatesAction);
     connect(m_showCandidatesAction, SIGNAL(triggered()), this, SLOT(togglePitchCandidates()));
     connect(this, SIGNAL(canClearSelection(bool)), m_showCandidatesAction, SLOT(setEnabled(bool)));
     menu->addAction(m_showCandidatesAction);
+    m_rightButtonMenu->addAction(m_showCandidatesAction);
     
-    //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Pick Higher Pitch Candidate"), this);
     action->setShortcut(tr("Ctrl+Up"));
+    action->setStatusTip(tr("Switch to the next higher pitch candidate in the selected region"));
+    m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
     connect(this, SIGNAL(canChangePitchCandidate(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
     
-    //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Pick Lower Pitch Candidate"), this);
     action->setShortcut(tr("Ctrl+Down"));
+    action->setStatusTip(tr("Switch to the next lower pitch candidate in the selected region"));
+    m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
     connect(this, SIGNAL(canChangePitchCandidate(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
     
     menu->addSeparator();
+    m_rightButtonMenu->addSeparator();
     
-    //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Octave Shift Up"), this);
     action->setShortcut(tr("PgUp"));
+    action->setStatusTip(tr("Move all pitches up an octave in the selected region"));    
+    m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftUp()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("Octave Shift Down"), this);
     action->setShortcut(tr("PgDown"));
+    action->setStatusTip(tr("Move all pitches down an octave in the selected region"));    
+    m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftDown()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
 
     menu->addSeparator();
+    m_rightButtonMenu->addSeparator();
     
-    //!!! shortcuts, status tip, key reference etc
     action = new QAction(tr("Remove Pitches"), this);
     action->setShortcut(tr("Ctrl+Backspace"));
+    action->setStatusTip(tr("Remove all pitch estimates within the selected region (converting it to unvoiced)"));
+    m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
 }
 
 void
