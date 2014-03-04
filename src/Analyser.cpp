@@ -74,6 +74,11 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
+    disconnect(m_pane, SIGNAL(regionOutlined(QRect)),
+               m_pane, SLOT(zoomToRegion(QRect)));
+    connect(m_pane, SIGNAL(regionOutlined(QRect)),
+            this, SLOT(regionOutlined(QRect)));
+
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
@@ -248,6 +253,12 @@ Analyser::addAnalyses()
     }
     
     return "";
+}
+
+void
+Analyser::regionOutlined(QRect r)
+{
+    cerr << "regionOutlined(" << r.x() << "," << r.y() << "," << r.width() << "," << r.height() << ")" << endl;
 }
 
 QString

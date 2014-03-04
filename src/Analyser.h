@@ -17,6 +17,7 @@
 #define ANALYSER_H
 
 #include <QObject>
+#include <QRect>
 
 #include <map>
 #include <vector>
@@ -148,6 +149,9 @@ public:
 
 signals:
     void layersChanged();
+
+protected slots:
+    void regionOutlined(QRect);
 
 protected:
     Document *m_document;
