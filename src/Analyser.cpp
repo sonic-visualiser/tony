@@ -41,7 +41,9 @@ Analyser::Analyser() :
     m_document(0),
     m_fileModel(0),
     m_paneStack(0),
-    m_pane(0)
+    m_pane(0),
+    m_currentCandidate(-1),
+    m_candidatesVisible(false)
 {
     QSettings settings;
     settings.beginGroup("LayerDefaults");

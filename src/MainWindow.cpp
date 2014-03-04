@@ -1282,9 +1282,9 @@ MainWindow::openRecentFile()
     QAction *action = qobject_cast<QAction *>(obj);
     
     if (!action) {
-    cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
-          << endl;
-    return;
+        cerr << "WARNING: MainWindow::openRecentFile: sender is not an action"
+             << endl;
+        return;
     }
 
     QString path = action->text();
@@ -1610,8 +1610,6 @@ MainWindow::importPitchLayer(FileSource source)
 
                 //!!! swap all data in to existing layer instead of this
 
-                m_recentFiles.addFile(source.getLocation());
-                    
                 if (!source.isRemote()) {
                     registerLastOpenedFilePath
                         (FileFinder::LayerFile,
@@ -1678,7 +1676,6 @@ MainWindow::exportPitchLayer()
     if (error != "") {
         QMessageBox::critical(this, tr("Failed to write file"), error);
     } else {
-        m_recentFiles.addFile(path);
         emit activity(tr("Export layer to \"%1\"").arg(path));
     }
 }
@@ -1738,7 +1735,6 @@ MainWindow::exportNoteLayer()
     if (error != "") {
         QMessageBox::critical(this, tr("Failed to write file"), error);
     } else {
-        m_recentFiles.addFile(path);
         emit activity(tr("Export layer to \"%1\"").arg(path));
     }
 }
