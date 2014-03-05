@@ -553,7 +553,7 @@ MainWindow::setupEditMenu()
     action->setStatusTip(tr("Switch to the next higher pitch candidate in the selected region"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
-    connect(this, SIGNAL(canChangePitchCandidate(bool)), action, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canChangeToHigherCandidate(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
     
@@ -562,7 +562,7 @@ MainWindow::setupEditMenu()
     action->setStatusTip(tr("Switch to the next lower pitch candidate in the selected region"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
-    connect(this, SIGNAL(canChangePitchCandidate(bool)), action, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canChangeToLowerCandidate(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
     
@@ -1055,6 +1055,10 @@ MainWindow::updateMenuStates()
          qobject_cast<TimeValueLayer *>(currentLayer));
     bool pitchCandidatesVisible = 
         m_analyser->arePitchCandidatesShown();
+    bool haveHigher =
+        m_analyser->haveHigherPitchCandidate();
+    bool haveLower =
+        m_analyser->haveLowerPitchCandidate();
 
     emit canChangePlaybackSpeed(true);
     int v = m_playSpeed->value();
@@ -1062,6 +1066,8 @@ MainWindow::updateMenuStates()
     emit canSlowDownPlayback(v > m_playSpeed->minimum());
 
     emit canChangePitchCandidate(pitchCandidatesVisible && haveSelection);
+    emit canChangeToHigherCandidate(pitchCandidatesVisible && haveSelection && haveHigher);
+    emit canChangeToLowerCandidate(pitchCandidatesVisible && haveSelection && haveLower);
 
     if (pitchCandidatesVisible) {
         m_showCandidatesAction->setText(tr("Hide Pitch Candidates"));

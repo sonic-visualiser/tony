@@ -372,6 +372,21 @@ Analyser::layersCreated(vector<Layer *> primary,
     emit layersChanged();
 }
 
+bool
+Analyser::haveHigherPitchCandidate() const
+{
+    if (m_reAnalysisCandidates.empty()) return false;
+    return (m_currentCandidate < 0 ||
+            (m_currentCandidate + 1 < (int)m_reAnalysisCandidates.size()));
+}    
+
+bool
+Analyser::haveLowerPitchCandidate() const
+{
+    if (m_reAnalysisCandidates.empty()) return false;
+    return (m_currentCandidate < 0 || m_currentCandidate >= 1);
+}    
+
 void
 Analyser::switchPitchCandidate(Selection sel, bool up)
 {

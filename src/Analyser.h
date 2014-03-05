@@ -124,6 +124,9 @@ public:
      */
     void showPitchCandidates(bool shown);
 
+    bool haveHigherPitchCandidate() const;
+    bool haveLowerPitchCandidate() const;
+
     /**
      * If a re-analysis has been activated, switch the selected area
      * of the main pitch track to a different candidate from the

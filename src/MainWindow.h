@@ -32,6 +32,8 @@ public:
 
 signals:
     virtual void canChangePitchCandidate(bool);
+    virtual void canChangeToHigherCandidate(bool);
+    virtual void canChangeToLowerCandidate(bool);
 
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
