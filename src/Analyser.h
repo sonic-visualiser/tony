@@ -104,28 +104,24 @@ public:
 
     /**
      * Return true if the analysed pitch candidates are currently
-     * visible (by default they are hidden after construction until
-     * the user requests them). Note that the shown/hidden state is
-     * independent of whether any pitch candidates actually exist --
-     * it's possible they might be shown but not have been created yet
-     * because creation (through reAnalyseSelection) is asynchronous.
-     *
-     *!!! this interface is not right
+     * visible (they are hidden from the call to reAnalyseSelection
+     * until they are requested through showPitchCandidates()). Note
+     * that this may return true even when no pitch candidate layers
+     * actually exist yet, because they are constructed
+     * asynchronously. If that is the case, then the layers will
+     * appear when they are created (otherwise they will remain hidden
+     * after creation).
      */
     bool arePitchCandidatesShown() const;
 
     /**
-     * Show or hide the analysed pitch candidate layers. As in
-     * arePitchCandidatesShown, this is independent of whether the
-     * candidate layers actually exist. Call reAnalyseSelection to
-     * schedule creation of those layers.
-     *
-     *!!! this interface is not right
+     * Show or hide the analysed pitch candidate layers. This is reset
+     * (to "hide") with each new call to reAnalyseSelection. Because
+     * the layers are created asynchronously, setting this to true
+     * does not guarantee that they appear immediately, only that they
+     * will appear once they have been created.
      */
     void showPitchCandidates(bool shown);
-
-    bool haveHigherPitchCandidate() const;
-    bool haveLowerPitchCandidate() const;
 
     /**
      * If a re-analysis has been activated, switch the selected area
@@ -133,6 +129,24 @@ public:
      * analysis results.
      */
     void switchPitchCandidate(Selection sel, bool up);
+
+    /**
+     * Return true if it is possible to switch up to another pitch
+     * candidate. This may mean that the currently selected pitch
+     * candidate is not the highest, or it may mean that no alternate
+     * pitch candidate has been selected at all yet (but some are
+     * available).
+     */
+    bool haveHigherPitchCandidate() const;
+
+    /**
+     * Return true if it is possible to switch down to another pitch
+     * candidate. This may mean that the currently selected pitch
+     * candidate is not the lowest, or it may mean that no alternate
+     * pitch candidate has been selected at all yet (but some are
+     * available).
+     */
+    bool haveLowerPitchCandidate() const;
 
     /**
      * Delete the pitch estimates from the selected area of the main
@@ -147,12 +161,13 @@ public:
     void shiftOctave(Selection sel, bool up);
 
     /**
-     * Remove any re-analysis layers (equivalent to
-     * showPitchCandidates(false)) and also reset the pitch track in
+     * Remove any re-analysis layers and also reset the pitch track in
      * the given selection to its state prior to the last re-analysis,
-     * abandoning any changes made since then.
+     * abandoning any changes made since then. No re-analysis layers
+     * will be available until after the next call to
+     * reAnalyseSelection.
      */
-    void clearReAnalysis(Selection sel);
+    void abandonReAnalysis(Selection sel);
 
     /**
      * Import the pitch track from the given layer into our
@@ -189,6 +204,8 @@ protected:
     QString addWaveform();
     QString addAnalyses();
 
+    void discardPitchCandidates();
+    
     // Document::LayerCreationHandler method
     void layersCreated(std::vector<Layer *>, std::vector<Layer *>);
 

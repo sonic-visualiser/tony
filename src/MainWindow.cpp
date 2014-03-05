@@ -1788,12 +1788,12 @@ MainWindow::abandonSelection()
 
     cerr << "MainWindow::abandonSelection()" << endl;
 
-    CommandHistory::getInstance()->startCompoundOperation(tr("Clear Selection"), true);
+    CommandHistory::getInstance()->startCompoundOperation(tr("Abandon Selection"), true);
 
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
     if (!selections.empty()) {
         Selection sel = *selections.begin();
-        m_analyser->clearReAnalysis(sel);
+        m_analyser->abandonReAnalysis(sel);
     }
 
     MainWindowBase::clearSelection();
@@ -1909,7 +1909,12 @@ MainWindow::octaveShift(bool up)
 void
 MainWindow::togglePitchCandidates()
 {
+    CommandHistory::getInstance()->startCompoundOperation(tr("Toggle Pitch Candidates"), true);
+
     m_analyser->showPitchCandidates(!m_analyser->arePitchCandidatesShown());
+
+    CommandHistory::getInstance()->endCompoundOperation();
+
     updateMenuStates();
 }
 

@@ -32,6 +32,7 @@
 #include "layer/LayerFactory.h"
 #include "layer/SpectrogramLayer.h"
 #include "layer/Colour3DPlotLayer.h"
+#include "layer/ShowLayerCommand.h"
 
 #include <QSettings>
 
@@ -255,9 +256,8 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
     if (sel == m_reAnalysingSelection) return "";
 
-    showPitchCandidates(false);
-    m_reAnalysisCandidates.clear();
-    m_currentCandidate = -1;
+    discardPitchCandidates();
+
     m_reAnalysingSelection = sel;
 
     m_preAnalysis = Clipboard();
@@ -329,9 +329,13 @@ Analyser::showPitchCandidates(bool shown)
 
     foreach (Layer *layer, m_reAnalysisCandidates) {
         if (shown) {
-            m_document->addLayerToView(m_pane, layer);
+            CommandHistory::getInstance()->addCommand
+                (new ShowLayerCommand(m_pane, layer, true,
+                                      tr("Show Pitch Candidates")));
         } else {
-            m_document->removeLayerFromView(m_pane, layer);
+            CommandHistory::getInstance()->addCommand
+                (new ShowLayerCommand(m_pane, layer, false,
+                                      tr("Hide Pitch Candidates")));
         }
     }
 
@@ -344,6 +348,9 @@ Analyser::layersCreated(vector<Layer *> primary,
 {
     //!!! how do we know these came from the right selection? user
     //!!! might have made another one since this request was issued
+
+    CommandHistory::getInstance()->startCompoundOperation
+        (tr("Re-Analyse Selection"), true);
 
     vector<Layer *> all;
     for (int i = 0; i < (int)primary.size(); ++i) {
@@ -362,12 +369,18 @@ Analyser::layersCreated(vector<Layer *> primary,
             }
             t->setBaseColour
                 (ColourDatabase::getInstance()->getColourIndex(tr("Bright Orange")));
-            if (m_candidatesVisible) {
-                m_document->addLayerToView(m_pane, t);
-            }
+            m_document->addLayerToView(m_pane, t);
             m_reAnalysisCandidates.push_back(t);
         }
     }
+
+    if (!all.empty()) {
+        bool show = m_candidatesVisible;
+        m_candidatesVisible = !show; // to ensure the following takes effect
+        showPitchCandidates(show);
+    }
+
+    CommandHistory::getInstance()->endCompoundOperation();
 
     emit layersChanged();
 }
@@ -459,19 +472,30 @@ Analyser::deletePitches(Selection sel)
 }
 
 void
-Analyser::clearReAnalysis(Selection sel)
+Analyser::abandonReAnalysis(Selection sel)
 {
-    showPitchCandidates(false);
-
-    m_reAnalysisCandidates.clear();
-    m_reAnalysingSelection = Selection();
-    m_currentCandidate = -1;
+    discardPitchCandidates();
 
     Layer *myLayer = m_layers[PitchTrack];
     if (!myLayer) return;
     myLayer->deleteSelection(sel);
     myLayer->paste(m_pane, m_preAnalysis, 0, false);
 }    
+
+void
+Analyser::discardPitchCandidates()
+{
+    foreach (Layer *layer, m_reAnalysisCandidates) {
+        // This will cause the layer to be deleted later (ownership is
+        // transferred to the remove command)
+        m_document->removeLayerFromView(m_pane, layer);
+    }
+
+    m_reAnalysisCandidates.clear();
+    m_currentCandidate = -1;
+    m_reAnalysingSelection = Selection();
+    m_candidatesVisible = false;
+}
 
 void
 Analyser::takePitchTrackFrom(Layer *otherLayer)
