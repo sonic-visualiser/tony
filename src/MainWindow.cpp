@@ -870,7 +870,9 @@ MainWindow::setupToolbars()
     m_rightButtonPlaybackMenu->addAction(slowAction);
     m_rightButtonPlaybackMenu->addAction(normalAction);
 
-    toolbar = addToolBar(tr("Playback Controls"));
+    toolbar = new QToolBar(tr("Playback Controls"));
+    addToolBar(Qt::BottomToolBarArea, toolbar);
+
     toolbar->addWidget(m_playSpeed);
     toolbar->addWidget(m_fader);
 
