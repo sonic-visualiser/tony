@@ -17,8 +17,8 @@
 #define _MAIN_WINDOW_H_
 
 #include "framework/MainWindowBase.h"
+#include "Analyser.h"
 
-class Analyser;
 class VersionTester;
 
 class MainWindow : public MainWindowBase
@@ -156,7 +156,8 @@ protected slots:
     virtual void about();
     virtual void keyReference();
 
-    virtual void selectionChanged();
+    virtual void selectionChangedByUser();
+    virtual void regionOutlined(QRect);
 
 protected:
     Analyser      *m_analyser;
@@ -202,6 +203,8 @@ protected:
     
     KeyReference  *m_keyReference;
     VersionTester *m_versionTester;
+
+    Analyser::FrequencyRange m_pendingConstraint;
 
     QString exportToSVL(QString path, Layer *layer);
     FileOpenStatus importPitchLayer(FileSource source);

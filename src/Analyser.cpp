@@ -74,11 +74,6 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
-    disconnect(m_pane, SIGNAL(regionOutlined(QRect)),
-               m_pane, SLOT(zoomToRegion(QRect)));
-    connect(m_pane, SIGNAL(regionOutlined(QRect)),
-            this, SLOT(regionOutlined(QRect)));
-
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
@@ -255,14 +250,8 @@ Analyser::addAnalyses()
     return "";
 }
 
-void
-Analyser::regionOutlined(QRect r)
-{
-    cerr << "regionOutlined(" << r.x() << "," << r.y() << "," << r.width() << "," << r.height() << ")" << endl;
-}
-
 QString
-Analyser::reAnalyseSelection(Selection sel)
+Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
     if (sel == m_reAnalysingSelection) return "";
 
@@ -276,6 +265,11 @@ Analyser::reAnalyseSelection(Selection sel)
     QString base = "vamp:pyin:localcandidatepyin:";
     QString out = "pitchtrackcandidates";
 
+    if (range.isConstrained()) {
+        base = "vamp:pyin:yinfc:";
+        out = "f0";
+    }
+
     Transforms transforms;
 
     QString notFound = tr("Transform \"%1\" not found. Unable to perform interactive analysis.<br><br>Is the %2 Vamp plugin correctly installed?");
@@ -287,6 +281,11 @@ Analyser::reAnalyseSelection(Selection sel)
         (base + out, m_fileModel->getSampleRate());
     t.setStepSize(256);
     t.setBlockSize(2048);
+
+    if (range.isConstrained()) {
+        t.setParameter("minfreq", range.min);
+        t.setParameter("maxfreq", range.max);
+    }
 
     RealTime start = RealTime::frame2RealTime
         (round(sel.getStartFrame()*1.0/256) * 256 - 2*256, m_fileModel->getSampleRate());

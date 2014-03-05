@@ -84,12 +84,22 @@ public:
 
     void getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1);
 
+    struct FrequencyRange {
+        FrequencyRange() : min(0), max(0) { }
+        FrequencyRange(float min_, float max_) : min(min_), max(max_) { }
+        bool isConstrained() const { return min != max; }
+        float min;
+        float max;
+    };
+
     /**
      * Analyse the selection and schedule asynchronous adds of
      * candidate layers for the region it contains. Returns "" on
-     * success or a user-readable error string on failure.
+     * success or a user-readable error string on failure. If the
+     * frequency range isConstrained(), analysis will be constrained
+     * to that range.
      */
-    QString reAnalyseSelection(Selection sel);
+    QString reAnalyseSelection(Selection sel, FrequencyRange range);
 
     /**
      * Return true if the analysed pitch candidates are currently
@@ -149,9 +159,6 @@ public:
 
 signals:
     void layersChanged();
-
-protected slots:
-    void regionOutlined(QRect);
 
 protected:
     Document *m_document;

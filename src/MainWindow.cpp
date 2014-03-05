@@ -34,6 +34,7 @@
 #include "layer/WaveformLayer.h"
 #include "layer/TimeInstantLayer.h"
 #include "layer/TimeValueLayer.h"
+#include "layer/SpectrogramLayer.h"
 #include "widgets/Fader.h"
 #include "view/Overview.h"
 #include "widgets/AudioDial.h"
@@ -150,8 +151,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_viewManager->setShowCentreLine(false);
     m_viewManager->setOverlayMode(ViewManager::MinimalOverlays);
 
-    connect(m_viewManager, SIGNAL(selectionChanged()),
-	    this, SLOT(selectionChanged()));
+    connect(m_viewManager, SIGNAL(selectionChangedByUser()),
+	    this, SLOT(selectionChangedByUser()));
 
     QFrame *frame = new QFrame;
     setCentralWidget(frame);
@@ -1783,24 +1784,65 @@ MainWindow::clearSelection()
 }
 
 void
-MainWindow::selectionChanged()
+MainWindow::selectionChangedByUser()
 {
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
-    cerr << "MainWindow::selectionChanged" << endl;
+    cerr << "MainWindow::selectionChangedByUser" << endl;
 
-    m_analyser->showPitchCandidates(false);
+    m_analyser->showPitchCandidates(m_pendingConstraint.isConstrained());
 
     if (!selections.empty()) {
         Selection sel = *selections.begin();
-        cerr << "MainWindow::selectionChanged: have selection" << endl;
-        QString error = m_analyser->reAnalyseSelection(sel);
+        cerr << "MainWindow::selectionChangedByUser: have selection" << endl;
+        QString error = m_analyser->reAnalyseSelection
+            (sel, m_pendingConstraint);
         if (error != "") {
             QMessageBox::critical
                 (this, tr("Failed to analyse selection"),
                  tr("<b>Analysis failed</b><p>%2</p>").arg(error));
         }
     }
+
+    m_pendingConstraint = Analyser::FrequencyRange();
+}
+
+void
+MainWindow::regionOutlined(QRect r)
+{
+    cerr << "MainWindow::regionOutlined(" << r.x() << "," << r.y() << "," << r.width() << "," << r.height() << ")" << endl;
+
+    Pane *pane = qobject_cast<Pane *>(sender());
+    if (!pane) {
+        cerr << "MainWindow::regionOutlined: not sent by pane, ignoring" << endl;
+        return;
+    }
+
+    if (!m_analyser) {
+        cerr << "MainWindow::regionOutlined: no analyser, ignoring" << endl;
+        return;
+    }
+
+    SpectrogramLayer *spectrogram = qobject_cast<SpectrogramLayer *>
+        (m_analyser->getLayer(Analyser::Spectrogram));
+    if (!spectrogram) {
+        cerr << "MainWindow::regionOutlined: no spectrogram layer, ignoring" << endl;
+        return;
+    }
+
+    int f0 = pane->getFrameForX(r.x());
+    int f1 = pane->getFrameForX(r.x() + r.width());
+    
+    float v0 = spectrogram->getFrequencyForY(pane, r.y() + r.height());
+    float v1 = spectrogram->getFrequencyForY(pane, r.y());
+
+    cerr << "MainWindow::regionOutlined: frame " << f0 << " -> " << f1 
+         << ", frequency " << v0 << " -> " << v1 << endl;
+
+    m_pendingConstraint = Analyser::FrequencyRange(v0, v1);
+
+    Selection sel(f0, f1);
+    m_viewManager->setSelection(sel);
 }
 
 void
@@ -2355,6 +2397,12 @@ MainWindow::mainModelChanged(WaveFileModel *model)
             }
 
             if (pane) {
+
+                disconnect(pane, SIGNAL(regionOutlined(QRect)),
+                           pane, SLOT(zoomToRegion(QRect)));
+                connect(pane, SIGNAL(regionOutlined(QRect)),
+                        this, SLOT(regionOutlined(QRect)));
+
                 QString error = m_analyser->newFileLoaded
                     (m_document, getMainModel(), m_paneStack, pane);
                 if (error != "") {
