@@ -254,7 +254,7 @@ Analyser::addAnalyses()
 QString
 Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
-    if (sel == m_reAnalysingSelection) return "";
+    if (sel == m_reAnalysingSelection || sel.isEmpty()) return "";
 
     discardPitchCandidates();
 
@@ -306,6 +306,13 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
         duration = end - start;
     }
 
+    cerr << "Analyser::reAnalyseSelection: start " << start << " end " << end << " original selection start " << sel.getStartFrame() << " end " << sel.getEndFrame() << " duration " << duration << endl;
+
+    if (duration <= RealTime::zeroTime) {
+        cerr << "Analyser::reAnalyseSelection: duration <= 0, not analysing" << endl;
+        return "";
+    }
+    
     t.setStartTime(start);
     t.setDuration(duration);
 
