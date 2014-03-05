@@ -414,10 +414,6 @@ Analyser::shiftOctave(Selection sel, bool up)
     Layer *pitchTrack = m_layers[PitchTrack];
     if (pitchTrack) actOn.push_back(pitchTrack);
 
-    foreach (Layer *c, m_reAnalysisCandidates) {
-        actOn.push_back(c);
-    }
-
     foreach (Layer *layer, actOn) {
         
         Clipboard clip;
