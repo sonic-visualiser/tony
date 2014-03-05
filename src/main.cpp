@@ -146,8 +146,14 @@ main(int argc, char **argv)
 
     TonyApplication application(argc, argv);
 
-//    QStringList args = application.arguments();
+    // For some weird reason, Mac builds are crashing on startup when
+    // this line is present. Eliminate it on that platform for now.
+#ifndef Q_OS_MAC
+    QStringList args = application.arguments();
+#else
+    cerr << "NOTE: Command-line arguments are currently disabled on Mac, see comments in main.cpp" << endl;
     QStringList args;
+#endif
 
     signal(SIGINT,  signalHandler);
     signal(SIGTERM, signalHandler);
@@ -284,6 +290,10 @@ void TonyApplication::handleFilepathArgument(QString path,
     if (!m_mainWindow) return;
 
     MainWindow::FileOpenStatus status = MainWindow::FileOpenFailed;
+
+#ifdef Q_OS_WIN32
+    path.replace("\\", "/");
+#endif
 
     if (path.endsWith("ton")) {
         if (!haveSession) {
