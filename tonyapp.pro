@@ -6,6 +6,10 @@ exists(config.pri) {
 }
 
 !exists(config.pri) {
+
+    CONFIG += release
+    DEFINES += NDEBUG BUILD_RELEASE NO_TIMING
+
     win32-g++ {
         INCLUDEPATH += sv-dependency-builds/win32-mingw/include
         LIBS += -Lsv-dependency-builds/win32-mingw/lib

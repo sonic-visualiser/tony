@@ -4,6 +4,7 @@ exists(config.pri) {
 }
 
 !exists(config.pri) {
+    CONFIG += release
     win32-g++ {
         INCLUDEPATH += ../sv-dependency-builds/win32-mingw/include
         LIBS += -L../sv-dependency-builds/win32-mingw/lib
