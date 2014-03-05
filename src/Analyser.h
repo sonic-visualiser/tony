@@ -24,6 +24,7 @@
 
 #include "framework/Document.h"
 #include "base/Selection.h"
+#include "base/Clipboard.h"
 
 class WaveFileModel;
 class Pane;
@@ -108,6 +109,8 @@ public:
      * independent of whether any pitch candidates actually exist --
      * it's possible they might be shown but not have been created yet
      * because creation (through reAnalyseSelection) is asynchronous.
+     *
+     *!!! this interface is not right
      */
     bool arePitchCandidatesShown() const;
 
@@ -116,6 +119,8 @@ public:
      * arePitchCandidatesShown, this is independent of whether the
      * candidate layers actually exist. Call reAnalyseSelection to
      * schedule creation of those layers.
+     *
+     *!!! this interface is not right
      */
     void showPitchCandidates(bool shown);
 
@@ -139,9 +144,12 @@ public:
     void shiftOctave(Selection sel, bool up);
 
     /**
-     * Remove any re-analysis layers.
+     * Remove any re-analysis layers (equivalent to
+     * showPitchCandidates(false)) and also reset the pitch track in
+     * the given selection to its state prior to the last re-analysis,
+     * abandoning any changes made since then.
      */
-    void clearReAnalysis();
+    void clearReAnalysis(Selection sel);
 
     /**
      * Import the pitch track from the given layer into our
@@ -168,6 +176,7 @@ protected:
 
     mutable std::map<Component, Layer *> m_layers;
 
+    Clipboard m_preAnalysis;
     Selection m_reAnalysingSelection;
     std::vector<Layer *> m_reAnalysisCandidates;
     int m_currentCandidate;

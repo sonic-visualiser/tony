@@ -255,9 +255,16 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
     if (sel == m_reAnalysingSelection) return "";
 
-    clearReAnalysis();
-
+    showPitchCandidates(false);
+    m_reAnalysisCandidates.clear();
+    m_currentCandidate = -1;
     m_reAnalysingSelection = sel;
+
+    m_preAnalysis = Clipboard();
+    Layer *myLayer = m_layers[PitchTrack];
+    if (myLayer) {
+        myLayer->copy(m_pane, sel, m_preAnalysis);
+    }
 
     TransformFactory *tf = TransformFactory::getInstance();
     
@@ -441,15 +448,18 @@ Analyser::deletePitches(Selection sel)
 }
 
 void
-Analyser::clearReAnalysis()
+Analyser::clearReAnalysis(Selection sel)
 {
-    foreach (Layer *layer, m_reAnalysisCandidates) {
-        m_document->removeLayerFromView(m_pane, layer);
-        m_document->deleteLayer(layer); // also releases its model
-    }
+    showPitchCandidates(false);
+
     m_reAnalysisCandidates.clear();
     m_reAnalysingSelection = Selection();
     m_currentCandidate = -1;
+
+    Layer *myLayer = m_layers[PitchTrack];
+    if (!myLayer) return;
+    myLayer->deleteSelection(sel);
+    myLayer->paste(m_pane, m_preAnalysis, 0, false);
 }    
 
 void

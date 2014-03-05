@@ -69,7 +69,7 @@ protected slots:
     virtual void playNotesToggled();
 
     virtual void doubleClickSelectInvoked(size_t);
-    virtual void clearSelection();
+    virtual void abandonSelection();
 
     virtual void paneAdded(Pane *);
     virtual void paneHidden(Pane *);

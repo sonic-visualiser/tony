@@ -528,7 +528,7 @@ MainWindow::setupEditMenu()
     action = new QAction(tr("C&lear Selection"), this);
     action->setShortcut(tr("Esc"));
     action->setStatusTip(tr("Clear the selection"));
-    connect(action, SIGNAL(triggered()), this, SLOT(clearSelection()));
+    connect(action, SIGNAL(triggered()), this, SLOT(abandonSelection()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
@@ -1771,13 +1771,23 @@ MainWindow::doubleClickSelectInvoked(size_t frame)
 }
 
 void
-MainWindow::clearSelection()
+MainWindow::abandonSelection()
 {
-    cerr << "MainWindow::clearSelection()" << endl;
+    // Named abandonSelection rather than clearSelection to indicate
+    // that this is an active operation -- it restores the original
+    // content of the pitch track in the selected region rather than
+    // simply un-selecting.
+
+    cerr << "MainWindow::abandonSelection()" << endl;
 
     CommandHistory::getInstance()->startCompoundOperation(tr("Clear Selection"), true);
 
-    m_analyser->clearReAnalysis();
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+    if (!selections.empty()) {
+        Selection sel = *selections.begin();
+        m_analyser->clearReAnalysis(sel);
+    }
+
     MainWindowBase::clearSelection();
 
     CommandHistory::getInstance()->endCompoundOperation();
