@@ -36,17 +36,17 @@
                 Id="pyinlib"
                 Name="pyin.dll"
                 DiskId="1"
-                Source="..\pyin.dll"/>
+                Source="pyin\release\pyin.dll"/>
             <File
                 Id="pyincat"
                 Name="pyin.cat"
                 DiskId="1"
-                Source="..\pyin\pyin.cat"/>
+                Source="pyin\pyin.cat"/>
             <File
                 Id="pyinrdf"
                 Name="pyin.n3"
                 DiskId="1"
-                Source="..\pyin\pyin.n3"/>
+                Source="pyin\pyin.n3"/>
           </Component>
         </Directory>
 
