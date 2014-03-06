@@ -30,11 +30,6 @@ public:
                bool withOSCSupport = true);
     virtual ~MainWindow();
 
-signals:
-    virtual void canChangePitchCandidate(bool);
-    virtual void canChangeToHigherCandidate(bool);
-    virtual void canChangeToLowerCandidate(bool);
-
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
 
@@ -55,8 +50,6 @@ protected slots:
     virtual void toolFreeEditSelected();
 
     virtual void clearPitches();
-    virtual void octaveShiftUp();
-    virtual void octaveShiftDown();
     virtual void togglePitchCandidates();
     virtual void switchPitchUp();
     virtual void switchPitchDown();

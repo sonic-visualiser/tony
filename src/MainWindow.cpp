@@ -532,11 +532,14 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("C&lear Selection"), this);
-    action->setShortcut(tr("Esc"));
-    action->setStatusTip(tr("Clear the selection"));
+    action->setShortcuts(QList<QKeySequence>()
+                         << QKeySequence(tr("Esc"))
+                         << QKeySequence(tr("Ctrl+Esc")));
+    action->setStatusTip(tr("Clear the selection and abandon any pending pitch choices in it"));
     connect(action, SIGNAL(triggered()), this, SLOT(abandonSelection()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
+    m_keyReference->registerAlternativeShortcut(action, QKeySequence(tr("Ctrl+Esc")));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
 
@@ -544,6 +547,24 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addSeparator();
     
     m_keyReference->setCategory(tr("Pitch Track"));
+    
+    action = new QAction(tr("Choose Higher Pitch"), this);
+    action->setShortcut(tr("Ctrl+Up"));
+    action->setStatusTip(tr("Move pitches up an octave, or to the next higher pitch candidate"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+    
+    action = new QAction(tr("Choose Lower Pitch"), this);
+    action->setShortcut(tr("Ctrl+Down"));
+    action->setStatusTip(tr("Move pitches down an octave, or to the next lower pitch candidate"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
+    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
 
     m_showCandidatesAction = new QAction(tr("Show Pitch Candidates"), this);
     m_showCandidatesAction->setShortcut(tr("Ctrl+Return"));
@@ -554,51 +575,9 @@ MainWindow::setupEditMenu()
     menu->addAction(m_showCandidatesAction);
     m_rightButtonMenu->addAction(m_showCandidatesAction);
     
-    action = new QAction(tr("Pick Higher Pitch Candidate"), this);
-    action->setShortcut(tr("Ctrl+Up"));
-    action->setStatusTip(tr("Switch to the next higher pitch candidate in the selected region"));
-    m_keyReference->registerShortcut(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchUp()));
-    connect(this, SIGNAL(canChangeToHigherCandidate(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    m_rightButtonMenu->addAction(action);
-    
-    action = new QAction(tr("Pick Lower Pitch Candidate"), this);
-    action->setShortcut(tr("Ctrl+Down"));
-    action->setStatusTip(tr("Switch to the next lower pitch candidate in the selected region"));
-    m_keyReference->registerShortcut(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(switchPitchDown()));
-    connect(this, SIGNAL(canChangeToLowerCandidate(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    m_rightButtonMenu->addAction(action);
-    
-    menu->addSeparator();
-    m_rightButtonMenu->addSeparator();
-    
-    action = new QAction(tr("Octave Shift Up"), this);
-    action->setShortcut(tr("PgUp"));
-    action->setStatusTip(tr("Move all pitches up an octave in the selected region"));    
-    m_keyReference->registerShortcut(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftUp()));
-    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    m_rightButtonMenu->addAction(action);
-
-    action = new QAction(tr("Octave Shift Down"), this);
-    action->setShortcut(tr("PgDown"));
-    action->setStatusTip(tr("Move all pitches down an octave in the selected region"));    
-    m_keyReference->registerShortcut(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(octaveShiftDown()));
-    connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    m_rightButtonMenu->addAction(action);
-
-    menu->addSeparator();
-    m_rightButtonMenu->addSeparator();
-    
     action = new QAction(tr("Remove Pitches"), this);
     action->setShortcut(tr("Ctrl+Backspace"));
-    action->setStatusTip(tr("Remove all pitch estimates within the selected region (converting it to unvoiced)"));
+    action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
@@ -1070,10 +1049,6 @@ MainWindow::updateMenuStates()
     int v = m_playSpeed->value();
     emit canSpeedUpPlayback(v < m_playSpeed->maximum());
     emit canSlowDownPlayback(v > m_playSpeed->minimum());
-
-    emit canChangePitchCandidate(pitchCandidatesVisible && haveSelection);
-    emit canChangeToHigherCandidate(pitchCandidatesVisible && haveSelection && haveHigher);
-    emit canChangeToLowerCandidate(pitchCandidatesVisible && haveSelection && haveLower);
 
     if (pitchCandidatesVisible) {
         m_showCandidatesAction->setText(tr("Hide Pitch Candidates"));
@@ -1885,23 +1860,12 @@ MainWindow::clearPitches()
 }
 
 void
-MainWindow::octaveShiftUp()
-{
-    octaveShift(true);
-}
-
-void
-MainWindow::octaveShiftDown()
-{
-    octaveShift(false);
-}
-
-void
 MainWindow::octaveShift(bool up)
 {
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
-    CommandHistory::getInstance()->startCompoundOperation(tr("Octave Shift"), true);
+    CommandHistory::getInstance()->startCompoundOperation
+        (up ? tr("Choose Higher Octave") : tr("Choose Lower Octave"), true);
 
     for (MultiSelection::SelectionList::iterator k = selections.begin();
          k != selections.end(); ++k) {
@@ -1927,33 +1891,48 @@ MainWindow::togglePitchCandidates()
 void
 MainWindow::switchPitchUp()
 {
-    CommandHistory::getInstance()->startCompoundOperation
-        (tr("Switch Pitch Candidate"), true);
+    if (m_analyser->arePitchCandidatesShown()) {
+        if (m_analyser->haveHigherPitchCandidate()) {
 
-    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+            CommandHistory::getInstance()->startCompoundOperation
+                (tr("Choose Higher Pitch Candidate"), true);
 
-    for (MultiSelection::SelectionList::iterator k = selections.begin();
-         k != selections.end(); ++k) {
-        m_analyser->switchPitchCandidate(*k, true);
+            MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+            for (MultiSelection::SelectionList::iterator k = selections.begin();
+                 k != selections.end(); ++k) {
+                m_analyser->switchPitchCandidate(*k, true);
+            }
+
+            CommandHistory::getInstance()->endCompoundOperation();
+
+        }
+    } else {
+        octaveShift(true);
     }
-
-    CommandHistory::getInstance()->endCompoundOperation();
 }
 
 void
 MainWindow::switchPitchDown()
 {
-    CommandHistory::getInstance()->startCompoundOperation
-        (tr("Switch Pitch Candidate"), true);
+    if (m_analyser->arePitchCandidatesShown()) {
+        if (m_analyser->haveLowerPitchCandidate()) {
 
-    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+            CommandHistory::getInstance()->startCompoundOperation
+                (tr("Choose Lower Pitch Candidate"), true);
 
-    for (MultiSelection::SelectionList::iterator k = selections.begin();
-         k != selections.end(); ++k) {
-        m_analyser->switchPitchCandidate(*k, false);
+            MultiSelection::SelectionList selections = m_viewManager->getSelections();
+            
+            for (MultiSelection::SelectionList::iterator k = selections.begin();
+                 k != selections.end(); ++k) {
+                m_analyser->switchPitchCandidate(*k, false);
+            }
+
+            CommandHistory::getInstance()->endCompoundOperation();
+        }
+    } else {
+        octaveShift(false);
     }
-
-    CommandHistory::getInstance()->endCompoundOperation();
 }
 
 void
