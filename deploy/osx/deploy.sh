@@ -36,10 +36,10 @@ else
 fi
 
 echo
-echo "Copying in plugin from ../pyin/pyin.dylib."
+echo "Copying in plugin from pyin/pyin.dylib."
 echo "(make sure it's present, up-to-date and compiled with suitable optimisations!)"
 
-cp ../pyin/pyin.{dylib,cat,n3} "$source/Contents/Resources/"
+cp pyin/pyin.{dylib,cat,n3} "$source/Contents/Resources/"
 
 echo
 echo "Fixing up paths."
