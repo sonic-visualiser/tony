@@ -36,7 +36,7 @@
                 Id="pyinlib"
                 Name="pyin.dll"
                 DiskId="1"
-                Source="pyin\release\pyin.dll"/>
+                Source="pyin\win32-build\release\pyin.dll"/>
             <File
                 Id="pyincat"
                 Name="pyin.cat"
