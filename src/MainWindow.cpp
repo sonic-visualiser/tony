@@ -2563,11 +2563,12 @@ MainWindow::about()
     aboutText += tr("<p>%1 : %2 configuration</p>")
         .arg(version)
         .arg(debug ? tr("Debug") : tr("Release"));
-    aboutText += tr("<p>Using Qt version %1</p>")
+    aboutText += tr("<p>Using Qt framework version %1.</p>")
         .arg(QT_VERSION_STR);
 
     aboutText += 
-        "<p>Copyright &copy; 2005&ndash;2013 Chris Cannam, Matthias Mauch, George Fazekas, and Queen Mary University of London.</p>"
+        "<p>Copyright &copy; 2005&ndash;2013 Chris Cannam, Queen Mary University of London, and the Tony project authors: Matthias Mauch, George Fazekas, Justin Salamon, and Rachel Bittner.</p>"
+        "<p>pYIN analysis plugin written by Matthias Mauch.</p>"
         "<p>This program is free software; you can redistribute it and/or "
         "modify it under the terms of the GNU General Public License as "
         "published by the Free Software Foundation; either version 2 of the "
