@@ -101,6 +101,12 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 {
     setWindowTitle(QApplication::applicationName());
 
+#ifdef Q_OS_MAC
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+    setUnifiedTitleAndToolBarOnMac(true);
+#endif
+#endif
+
     UnitDatabase *udb = UnitDatabase::getInstance();
     udb->registerUnit("Hz");
     udb->registerUnit("dB");
@@ -2578,6 +2584,8 @@ MainWindow::about()
     aboutText += tr("<p>%1 : %2 configuration</p>")
         .arg(version)
         .arg(debug ? tr("Debug") : tr("Release"));
+    aboutText += tr("<p>Using Qt version %1</p>")
+        .arg(QT_VERSION_STR);
 
     aboutText += 
         "<p>Copyright &copy; 2005&ndash;2013 Chris Cannam, Matthias Mauch, George Fazekas, and Queen Mary University of London.</p>"
