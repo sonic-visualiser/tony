@@ -65,10 +65,6 @@ public:
         m_mainWindow(0),
         m_readyForFiles(false)
     {
-        cerr << "Library paths:" << endl;
-        foreach (QString s, libraryPaths()) {
-            cerr << s << endl;
-        }
     }
     virtual ~TonyApplication() {
     }
