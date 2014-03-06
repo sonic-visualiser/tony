@@ -231,6 +231,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_gainAudio->setMaximum(50);
     m_gainAudio->setValue(0);
     m_gainAudio->setDefaultValue(0);
+    //m_gainAudio->setFixedWidth(40);
     m_gainAudio->setFixedWidth(24);
     m_gainAudio->setFixedHeight(24);
     m_gainAudio->setNotchesVisible(true);
@@ -285,6 +286,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_panAudio->setValue(-100);
     m_panAudio->setDefaultValue(-100);
     m_panAudio->setFixedWidth(24);
+    //m_panAudio->setFixedWidth(40);
     m_panAudio->setFixedHeight(24);
     m_panAudio->setNotchesVisible(true);
     m_panAudio->setPageStep(10);
@@ -913,13 +915,16 @@ MainWindow::setupToolbars()
     */
 
     // Audio
+    /*
     QLabel *icon_audio = new QLabel;
     icon_audio->setFixedWidth(40);
     icon_audio->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     icon_audio->setPixmap(il.loadPixmap("waveform"));
     toolbar->addWidget(icon_audio);
+    */
 
-    m_showAudio = toolbar->addAction(il.load("eye"), tr("Show Audio"));
+    //m_showAudio = toolbar->addAction(il.load("eye"), tr("Show Audio"))
+    m_showAudio = toolbar->addAction(il.load("waveform"), tr("Show Audio"));
     m_showAudio->setCheckable(true);
     connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
@@ -936,10 +941,11 @@ MainWindow::setupToolbars()
     QLabel *icon_pitch = new QLabel;
     icon_pitch->setFixedWidth(40);
     icon_pitch->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    icon_pitch->setPixmap(il.loadPixmap("values"));
+    //icon_pitch->setPixmap(il.loadPixmap("values"));
     toolbar->addWidget(icon_pitch);
 
-    m_showPitch = toolbar->addAction(il.load("eye"), tr("Show Pitch Track"));
+    // m_showPitch = toolbar->addAction(il.load("eye"), tr("Show Pitch Track"));
+    m_showPitch = toolbar->addAction(il.load("values"), tr("Show Pitch Track"));
     m_showPitch->setCheckable(true);
     connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
@@ -956,10 +962,12 @@ MainWindow::setupToolbars()
     QLabel *icon_notes = new QLabel;
     icon_notes->setFixedWidth(40);
     icon_notes->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    icon_notes->setPixmap(il.loadPixmap("notes"));
+    //icon_notes->setPixmap(il.loadPixmap("notes"));
     toolbar->addWidget(icon_notes);
 
-    m_showNotes = toolbar->addAction(il.load("eye"), tr("Show Notes"));
+
+    //m_showNotes = toolbar->addAction(il.load("eye"), tr("Show Notes"));
+    m_showNotes = toolbar->addAction(il.load("notes"), tr("Show Notes"));
     m_showNotes->setCheckable(true);
     connect(m_showNotes, SIGNAL(triggered()), this, SLOT(showNotesToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
@@ -976,10 +984,11 @@ MainWindow::setupToolbars()
     QLabel *icon_spectrogram = new QLabel;
     icon_spectrogram->setFixedWidth(40);
     icon_spectrogram->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    icon_spectrogram->setPixmap(il.loadPixmap("spectrogram"));
+    //icon_spectrogram->setPixmap(il.loadPixmap("spectrogram"));
     toolbar->addWidget(icon_spectrogram);
 
-    m_showSpect = toolbar->addAction(il.load("eye"), tr("Show Spectrogram"));
+    //m_showSpect = toolbar->addAction(il.load("eye"), tr("Show Spectrogram"));
+    m_showSpect = toolbar->addAction(il.load("spectrogram"), tr("Show Spectrogram"));
     m_showSpect->setCheckable(true);
     connect(m_showSpect, SIGNAL(triggered()), this, SLOT(showSpectToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showSpect, SLOT(setEnabled(bool)));
@@ -1082,6 +1091,18 @@ void
 MainWindow::showAudioToggled()
 {
     m_analyser->toggleVisible(Analyser::Audio);
+
+    // JTEST
+    if (!m_analyser->isVisible(Analyser::Audio))
+    {
+        m_analyser->setAudible(Analyser::Audio,false);
+        m_playAudio->setChecked(false);
+        m_playAudio->setEnabled(false);
+    }
+    else
+    {
+        m_playAudio->setEnabled(true);
+    }
 }
 
 void
@@ -1112,6 +1133,18 @@ void
 MainWindow::showNotesToggled()
 {
     m_analyser->toggleVisible(Analyser::Notes);
+
+    // JTEST
+    if (!m_analyser->isVisible(Analyser::Notes))
+    {
+        m_analyser->setAudible(Analyser::Notes,false);
+        m_playNotes->setChecked(false);
+        m_playNotes->setEnabled(false);
+    }
+    else
+    {
+        m_playNotes->setEnabled(true);
+    }
 }
 
 void
