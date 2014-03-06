@@ -30,13 +30,14 @@ else
     echo
     echo "Moving aside executable, adding script."
 
-    mv "$source/Contents/MacOS/$app" "$source/Contents/Resources/" || exit 1
+    mv "$source/Contents/MacOS/$app" "$source/Contents/MacOS/$app.bin" || exit 1
     cp "deploy/osx/$app.sh" "$source/Contents/MacOS/$app" || exit 1
     chmod +x "$source/Contents/MacOS/$app"
 fi
 
 echo
-echo "Copying in plugin."
+echo "Copying in plugin from ../pyin/pyin.dylib."
+echo "(make sure it's present, up-to-date and compiled with suitable optimisations!)"
 
 cp ../pyin/pyin.{dylib,cat,n3} "$source/Contents/Resources/"
 
@@ -60,6 +61,13 @@ cp -r "$source" "$target"
 
 echo "Done"
 
+echo
+echo "Copying in qt.conf to set local-only plugin paths."
+echo "Make sure all necessary Qt plugins are in $target/Contents/plugins/*"
+echo "You probably want platforms/, accessible/ and imageformats/ subdirectories."
+cp deploy/osx/qt.conf "$target"/Contents/Resources/qt.conf
+
+echo
 echo "Writing version $bundleVersion in to bundle."
 echo "(This should be a three-part number: major.minor.point)"
 
