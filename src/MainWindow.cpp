@@ -155,7 +155,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_viewManager->setIlluminateLocalFeatures(true);
     m_viewManager->setShowWorkTitle(true);
     m_viewManager->setShowCentreLine(false);
-    m_viewManager->setOverlayMode(ViewManager::MinimalOverlays);
+    m_viewManager->setOverlayMode(ViewManager::GlobalOverlays);
 
     connect(m_viewManager, SIGNAL(selectionChangedByUser()),
 	    this, SLOT(selectionChangedByUser()));
