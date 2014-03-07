@@ -295,10 +295,10 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     }
 
     RealTime start = RealTime::frame2RealTime
-        (round(sel.getStartFrame()*1.0/256) * 256 - 2*256, m_fileModel->getSampleRate());
+        (round(sel.getStartFrame()*1.0/256) * 256 - 4*256, m_fileModel->getSampleRate()); // 4*256 is for 4 frames offset due to timestamp shift
 
     RealTime end = RealTime::frame2RealTime
-        (round(sel.getEndFrame()*1.0/256) * 256 + 11*256, m_fileModel->getSampleRate());
+        (round(sel.getEndFrame()*1.0/256) * 256 - 4*256, m_fileModel->getSampleRate());
 
     RealTime duration;
 
