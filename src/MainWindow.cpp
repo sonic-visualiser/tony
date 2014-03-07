@@ -446,13 +446,13 @@ MainWindow::setupFileMenu()
     action = new QAction(tr("Export Pitch Track Data..."), this);
     action->setStatusTip(tr("Export pitch-track data to a file"));
     connect(action, SIGNAL(triggered()), this, SLOT(exportPitchLayer()));
-    connect(this, SIGNAL(canExportLayer(bool)), action, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canExportPitchTrack(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 
     action = new QAction(tr("Export Note Data..."), this);
     action->setStatusTip(tr("Export note data to a file"));
     connect(action, SIGNAL(triggered()), this, SLOT(exportNoteLayer()));
-    connect(this, SIGNAL(canExportLayer(bool)), action, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canExportNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 
     menu->addSeparator();
@@ -1058,6 +1058,11 @@ MainWindow::updateMenuStates()
     int v = m_playSpeed->value();
     emit canSpeedUpPlayback(v < m_playSpeed->maximum());
     emit canSlowDownPlayback(v > m_playSpeed->minimum());
+
+    emit canExportPitchTrack(m_analyser->isVisible(Analyser::PitchTrack) &&
+                             m_analyser->getLayer(Analyser::PitchTrack));
+    emit canExportNotes(m_analyser->isVisible(Analyser::Notes) &&
+                        m_analyser->getLayer(Analyser::Notes));
 
     if (pitchCandidatesVisible) {
         m_showCandidatesAction->setText(tr("Hide Pitch Candidates"));

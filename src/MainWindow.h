@@ -30,6 +30,10 @@ public:
                bool withOSCSupport = true);
     virtual ~MainWindow();
 
+signals:
+    virtual void canExportPitchTrack(bool);
+    virtual void canExportNotes(bool);
+
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
 
