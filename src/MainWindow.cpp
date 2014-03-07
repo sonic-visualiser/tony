@@ -1818,6 +1818,11 @@ MainWindow::abandonSelection()
 void
 MainWindow::selectionChangedByUser()
 {
+    if (!m_document) {
+        // we're exiting, most likely
+        return;
+    }
+
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
     cerr << "MainWindow::selectionChangedByUser" << endl;
