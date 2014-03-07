@@ -268,20 +268,22 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 
     TransformFactory *tf = TransformFactory::getInstance();
     
-    QString plugname = "pYIN";
+    QString plugname1 = "pYIN";
+    QString plugname2 = "CHP";
+
     QString base = "vamp:pyin:localcandidatepyin:";
     QString out = "pitchtrackcandidates";
 
     if (range.isConstrained()) {
-        base = "vamp:pyin:yinfc:";
-        out = "f0";
+        base = "vamp:chp:constrainedharmonicpeak:";
+        out = "peak";
     }
 
     Transforms transforms;
 
-    QString notFound = tr("Transform \"%1\" not found. Unable to perform interactive analysis.<br><br>Is the %2 Vamp plugin correctly installed?");
+    QString notFound = tr("Transform \"%1\" not found. Unable to perform interactive analysis.<br><br>Are the %2 and %3 Vamp plugins correctly installed?");
     if (!tf->haveTransform(base + out)) {
-	return notFound.arg(base + out).arg(plugname);
+	return notFound.arg(base + out).arg(plugname1).arg(plugname2);
     }
 
     Transform t = tf->getDefaultTransformFor
@@ -292,6 +294,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     if (range.isConstrained()) {
         t.setParameter("minfreq", range.min);
         t.setParameter("maxfreq", range.max);
+        t.setBlockSize(4096);
     }
 
     RealTime start = RealTime::frame2RealTime
