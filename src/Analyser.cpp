@@ -106,6 +106,16 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     return warning;
 }
 
+void
+Analyser::fileClosed()
+{
+    cerr << "Analyser::fileClosed" << endl;
+    m_layers.clear();
+    m_reAnalysisCandidates.clear();
+    m_currentCandidate = -1;
+    m_reAnalysingSelection = Selection();
+}
+
 QString
 Analyser::addVisualisations()
 {
@@ -358,6 +368,21 @@ Analyser::layersCreated(vector<Layer *> primary,
 {
     //!!! how do we know these came from the right selection? user
     //!!! might have made another one since this request was issued
+
+    if (m_reAnalysingSelection == Selection()) {
+        // We don't want these (actually, as above, this should check
+        // that the selection is the same as the one requested -- but
+        // all we're doing here is checking that the selection exists
+        // at all, so hasn't been cleared or the document deleted or
+        // whatever)
+        for (int i = 0; i < (int)primary.size(); ++i) {
+            m_document->deleteLayer(primary[i]);
+        }
+        for (int i = 0; i < (int)additional.size(); ++i) {
+            m_document->deleteLayer(additional[i]);
+        }
+        return;
+    }
 
     CommandHistory::getInstance()->startCompoundOperation
         (tr("Re-Analyse Selection"), true);

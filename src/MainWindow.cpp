@@ -1230,6 +1230,8 @@ MainWindow::closeSession()
 {
     if (!checkSaveModified()) return;
 
+    m_analyser->fileClosed();
+
     while (m_paneStack->getPaneCount() > 0) {
 
         Pane *pane = m_paneStack->getPane(m_paneStack->getPaneCount() - 1);

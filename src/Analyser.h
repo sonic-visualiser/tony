@@ -45,6 +45,9 @@ public:
     // Process new main model, add derived layers; return "" on success or error string on failure
     QString newFileLoaded(Document *newDocument, WaveFileModel *model,
                           PaneStack *paneStack, Pane *pane);
+
+    // Discard any layers etc associated with the current document
+    void fileClosed();
 		       
     void setIntelligentActions(bool);
 
