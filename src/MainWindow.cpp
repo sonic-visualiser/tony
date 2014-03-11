@@ -2667,4 +2667,21 @@ MainWindow::keyReference()
     m_keyReference->show();
 }
 
+void
+MainWindow::newerVersionAvailable(QString version)
+{
+    //!!! nicer URL would be nicer
+    QSettings settings;
+    settings.beginGroup("NewerVersionWarning");
+    QString tag = QString("version-%1-available-show").arg(version);
+    if (settings.value(tag, true).toBool()) {
+        QString title(tr("Newer version available"));
+        QString text(tr("<h3>Newer version available</h3><p>You are using version %1 of Tony, but version %2 is now available.</p><p>Please see the <a href=\"http://code.soundsoftware.ac.uk/projects/tony/\">Tony website</a> for more information.</p>").arg(TONY_VERSION).arg(version));
+        QMessageBox::information(this, title, text);
+        settings.setValue(tag, false);
+    }
+    settings.endGroup();
+}
+
+
 

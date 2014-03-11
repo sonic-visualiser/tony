@@ -157,6 +157,8 @@ protected slots:
     virtual void about();
     virtual void keyReference();
 
+    virtual void newerVersionAvailable(QString);
+
     virtual void selectionChangedByUser();
     virtual void regionOutlined(QRect);
 
