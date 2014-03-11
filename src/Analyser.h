@@ -51,6 +51,9 @@ public:
 		       
     void setIntelligentActions(bool);
 
+    bool getDisplayFrequencyExtents(float &min, float &max);
+    bool setDisplayFrequencyExtents(float min, float max);
+
     enum Component {
         Audio,
         PitchTrack,

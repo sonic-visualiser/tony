@@ -55,6 +55,8 @@
 #include "data/fileio/MIDIFileWriter.h"
 #include "rdf/RDFExporter.h"
 
+#include "widgets/RangeInputDialog.h"
+
 // For version information
 #include "vamp/vamp.h"
 #include "vamp-sdk/PluginBase.h"
@@ -668,6 +670,13 @@ MainWindow::setupViewMenu()
     connect(this, SIGNAL(canZoom(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
+
+    menu->addSeparator();
+    
+    action = new QAction(tr("Set Displayed Fre&quency Range..."), this);
+    action->setStatusTip(tr("Set the minimum and maximum frequencies in the visible display"));
+    connect(action, SIGNAL(triggered()), this, SLOT(editDisplayExtents()));
+    menu->addAction(action);
 }
 
 void
@@ -1180,6 +1189,35 @@ MainWindow::updateLayerStatuses()
     m_playAudio->setChecked(m_analyser->isAudible(Analyser::Audio));
     m_playPitch->setChecked(m_analyser->isAudible(Analyser::PitchTrack));
     m_playNotes->setChecked(m_analyser->isAudible(Analyser::Notes));
+}
+
+void
+MainWindow::editDisplayExtents()
+{
+    float min, max;
+    float vmin = 0;
+    float vmax = getMainModel()->getSampleRate() /2;
+    
+    if (!m_analyser->getDisplayFrequencyExtents(min, max)) {
+        //!!!
+        return;
+    }
+
+    RangeInputDialog dialog(tr("Set frequency range"),
+                            tr("Enter new frequency range, from %1 to %2 Hz.\nThese values will be rounded to the nearest spectrogram bin.")
+                            .arg(vmin).arg(vmax),
+                            "Hz", vmin, vmax, this);
+    dialog.setRange(min, max);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        dialog.getRange(min, max);
+        if (min > max) {
+            float tmp = max;
+            max = min;
+            min = tmp;
+        }
+        m_analyser->setDisplayFrequencyExtents(min, max);
+    }
 }
 
 void

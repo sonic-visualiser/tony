@@ -116,18 +116,34 @@ Analyser::fileClosed()
     m_reAnalysingSelection = Selection();
 }
 
+bool
+Analyser::getDisplayFrequencyExtents(float &min, float &max)
+{
+    if (!m_layers[Spectrogram]) return false;
+    return m_layers[Spectrogram]->getDisplayExtents(min, max);
+}
+
+bool
+Analyser::setDisplayFrequencyExtents(float min, float max)
+{
+    if (!m_layers[Spectrogram]) return false;
+    m_layers[Spectrogram]->setDisplayExtents(min, max);
+}
+
 QString
 Analyser::addVisualisations()
 {
-/*
+    // A spectrogram, off by default. Must go at the back because it's
+    // opaque
+
+/* This is roughly what we'd do for a constant-Q spectrogram, but it
+   currently has issues with y-axis alignment
+  
     TransformFactory *tf = TransformFactory::getInstance();
 
     QString name = "Constant-Q";
     QString base = "vamp:cqvamp:cqvamp:";
     QString out = "constantq";
-
-    // A spectrogram, off by default. Must go at the back because it's
-    // opaque
 
     QString notFound = tr("Transform \"%1\" not found, spectrogram will not be enabled.<br><br>Is the %2 Vamp plugin correctly installed?");
     if (!tf->haveTransform(base + out)) {
@@ -149,9 +165,6 @@ Analyser::addVisualisations()
 
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
     spectrogram->setNormalizeHybrid(true);
-//    spectrogram->setSmooth(true);
-//    spectrogram->setGain(0.5); //!!! arbitrary at this point
-    spectrogram->setMinFrequency(15);
     spectrogram->setGain(100);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);

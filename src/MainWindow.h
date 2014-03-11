@@ -67,6 +67,8 @@ protected slots:
     virtual void playPitchToggled();
     virtual void playNotesToggled();
 
+    virtual void editDisplayExtents();
+
     virtual void doubleClickSelectInvoked(size_t);
     virtual void abandonSelection();
 
