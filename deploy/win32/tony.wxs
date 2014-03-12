@@ -5,7 +5,7 @@
       Id="*"
       Language="1033"
       Codepage="1252" 
-      Version="0.1" 
+      Version="0.4"
       UpgradeCode="3F073027-A65B-4688-906C-5F64597C5BB1"
       Manufacturer="Queen Mary, University of London">
     
@@ -47,6 +47,15 @@
                 Name="pyin.n3"
                 DiskId="1"
                 Source="pyin\pyin.n3"/>
+          </Component>
+          <Component
+              Id="CHP"
+              Guid="3567639C-BFA5-46EC-BA2D-C4899508B0D0">
+            <File
+                Id="chplib"
+                Name="chp.dll"
+                DiskId="1"
+                Source="chp\win32-build\release\chp.dll"/>
           </Component>
         </Directory>
 
@@ -214,6 +223,7 @@
       ConfigurableDirectory="APPLICATIONFOLDER"
       Level="1">
       <ComponentRef Id="pYin"/>
+      <ComponentRef Id="CHP"/>
       <ComponentRef Id="MainExecutable"/>
       <ComponentRef Id="Qt5"/>
       <ComponentRef Id="Qt5PlatformPlugins"/>
