@@ -591,17 +591,16 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     m_rightButtonMenu->addSeparator();
     
-    action = new QAction(tr("Split Notes at Selection Boundaries"), this);
+    action = new QAction(tr("Split Note"), this);
     action->setShortcut(tr("Ctrl+/"));
-    action->setStatusTip(tr("If any notes overlap the start or end of the selected region, split them at those points"));
+    action->setStatusTip(tr("Split the note at the current playback position into two"));
     m_keyReference->registerShortcut(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(splitNotesAtSelection()));
-    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    connect(action, SIGNAL(triggered()), this, SLOT(splitNote()));
+    connect(this, SIGNAL(canExportNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("Merge Notes"), this);
-    action->setShortcut(tr("Ctrl+."));
     action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
@@ -609,6 +608,14 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
     
+    action = new QAction(tr("Form Note from Selection"), this);
+    action->setStatusTip(tr("Form a note spanning the selected region, splitting any existing notes at its boundaries"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(formNoteFromSelection()));
+    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+/*    
     action = new QAction(tr("Snap Notes to Pitch Track"), this);
     action->setShortcut(tr("Ctrl+="));
     action->setStatusTip(tr("Set notes within the selected region to the median frequency of their underlying pitches, or remove them if there are no underlying pitches"));
@@ -617,7 +624,7 @@ MainWindow::setupEditMenu()
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
-    
+*/    
 }
 
 void
@@ -2097,27 +2104,13 @@ MainWindow::auxSnapNotes(Selection s)
 }    
 
 void
-MainWindow::splitNotesAtSelection()
+MainWindow::splitNote()
 {
     FlexiNoteLayer *layer =
         qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
     if (!layer) return;
 
-    MultiSelection::SelectionList selections = m_viewManager->getSelections();
-
-    if (!selections.empty()) {
-
-        CommandHistory::getInstance()->startCompoundOperation
-            (tr("Split Notes at Selection Boundaries"), true);
-                
-        for (MultiSelection::SelectionList::iterator k = selections.begin();
-             k != selections.end(); ++k) {
-            layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
-            layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
-        }
-        
-        CommandHistory::getInstance()->endCompoundOperation();
-    }
+    layer->splitNotesAt(m_analyser->getPane(), m_viewManager->getPlaybackFrame());
 }
 
 void
@@ -2136,9 +2129,34 @@ MainWindow::mergeNotes()
                 
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            layer->mergeNotes(m_analyser->getPane(), *k);
+            layer->mergeNotes(m_analyser->getPane(), *k, true);
         }
         
+        CommandHistory::getInstance()->endCompoundOperation();
+    }
+}
+
+void
+MainWindow::formNoteFromSelection()
+{
+    FlexiNoteLayer *layer =
+        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    if (!layer) return;
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    if (!selections.empty()) {
+    
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Form Note from Selection"), true);
+                
+        for (MultiSelection::SelectionList::iterator k = selections.begin();
+             k != selections.end(); ++k) {
+            layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
+            layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
+            layer->mergeNotes(m_analyser->getPane(), *k, false);
+        }
+
         CommandHistory::getInstance()->endCompoundOperation();
     }
 }
