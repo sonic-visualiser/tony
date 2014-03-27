@@ -587,6 +587,27 @@ MainWindow::setupEditMenu()
     connect(this, SIGNAL(canClearSelection(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
+
+    menu->addSeparator();
+    m_rightButtonMenu->addSeparator();
+    
+    action = new QAction(tr("Snap Notes to Pitch Track"), this);
+    action->setShortcut(tr("Ctrl+="));
+    action->setStatusTip(tr("Set all notes within the selected region to have the median frequency of their underlying pitches"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(snapNotesToPitches()));
+    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+    
+    action = new QAction(tr("Split Notes at Selection Boundaries"), this);
+    action->setShortcut(tr("Ctrl+/"));
+    action->setStatusTip(tr("If any notes overlap the start or end of the selected region, split them at those points"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(splitNotesAtSelection()));
+    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
 }
 
 void
@@ -1068,10 +1089,17 @@ MainWindow::updateMenuStates()
     emit canSpeedUpPlayback(v < m_playSpeed->maximum());
     emit canSlowDownPlayback(v > m_playSpeed->minimum());
 
-    emit canExportPitchTrack(m_analyser->isVisible(Analyser::PitchTrack) &&
-                             m_analyser->getLayer(Analyser::PitchTrack));
-    emit canExportNotes(m_analyser->isVisible(Analyser::Notes) &&
-                        m_analyser->getLayer(Analyser::Notes));
+    bool havePitchTrack = 
+        m_analyser->isVisible(Analyser::PitchTrack) &&
+        m_analyser->getLayer(Analyser::PitchTrack);
+
+    bool haveNotes = 
+        m_analyser->isVisible(Analyser::Notes) &&
+        m_analyser->getLayer(Analyser::Notes);
+
+    emit canExportPitchTrack(havePitchTrack);
+    emit canExportNotes(haveNotes);
+    emit canSnapNotes(haveSelection && haveNotes);
 
     if (pitchCandidatesVisible) {
         m_showCandidatesAction->setText(tr("Hide Pitch Candidates"));
@@ -2015,6 +2043,53 @@ MainWindow::switchPitchDown()
         }
     } else {
         octaveShift(false);
+    }
+}
+
+void
+MainWindow::snapNotesToPitches()
+{
+    FlexiNoteLayer *layer =
+        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    if (!layer) return;
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    if (!selections.empty()) {
+
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Snap Notes to Pitches"), true);
+                
+        for (MultiSelection::SelectionList::iterator k = selections.begin();
+             k != selections.end(); ++k) {
+            layer->snapSelectedNotesToPitchTrack(m_analyser->getPane(), *k);
+        }
+        
+        CommandHistory::getInstance()->endCompoundOperation();
+    }
+}
+
+void
+MainWindow::splitNotesAtSelection()
+{
+    FlexiNoteLayer *layer =
+        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    if (!layer) return;
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    if (!selections.empty()) {
+
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Split Notes at Selection Boundaries"), true);
+                
+        for (MultiSelection::SelectionList::iterator k = selections.begin();
+             k != selections.end(); ++k) {
+            layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
+            layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
+        }
+        
+        CommandHistory::getInstance()->endCompoundOperation();
     }
 }
 

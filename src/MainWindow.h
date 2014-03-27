@@ -33,6 +33,7 @@ public:
 signals:
     virtual void canExportPitchTrack(bool);
     virtual void canExportNotes(bool);
+    virtual void canSnapNotes(bool);
 
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
@@ -57,6 +58,9 @@ protected slots:
     virtual void togglePitchCandidates();
     virtual void switchPitchUp();
     virtual void switchPitchDown();
+
+    virtual void snapNotesToPitches();
+    virtual void splitNotesAtSelection();
 
     virtual void showAudioToggled();
     virtual void showSpectToggled();
