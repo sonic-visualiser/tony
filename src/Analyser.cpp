@@ -417,6 +417,7 @@ Analyser::layersCreated(vector<Layer *> primary,
             }
             t->setBaseColour
                 (ColourDatabase::getInstance()->getColourIndex(tr("Bright Orange")));
+            t->setPresentationName("candidate");
             m_document->addLayerToView(m_pane, t);
             m_reAnalysisCandidates.push_back(t);
         }

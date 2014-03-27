@@ -1896,6 +1896,10 @@ MainWindow::abandonSelection()
     MainWindowBase::clearSelection();
 
     CommandHistory::getInstance()->endCompoundOperation();
+
+    if (!selections.empty()) {
+        auxSnapNotes(*selections.begin());
+    }
 }
 
 void
@@ -1978,6 +1982,8 @@ MainWindow::clearPitches()
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
+
+    snapNotesToPitches();
 }
 
 void
@@ -1995,6 +2001,8 @@ MainWindow::octaveShift(bool up)
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
+
+    snapNotesToPitches();
 }
 
 void
@@ -2027,6 +2035,7 @@ MainWindow::switchPitchUp()
 
             CommandHistory::getInstance()->endCompoundOperation();
 
+            snapNotesToPitches();
         }
     } else {
         octaveShift(true);
@@ -2050,6 +2059,8 @@ MainWindow::switchPitchDown()
             }
 
             CommandHistory::getInstance()->endCompoundOperation();
+
+            snapNotesToPitches();
         }
     } else {
         octaveShift(false);
@@ -2059,10 +2070,6 @@ MainWindow::switchPitchDown()
 void
 MainWindow::snapNotesToPitches()
 {
-    FlexiNoteLayer *layer =
-        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
-    if (!layer) return;
-
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
     if (!selections.empty()) {
@@ -2072,12 +2079,22 @@ MainWindow::snapNotesToPitches()
                 
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            layer->snapSelectedNotesToPitchTrack(m_analyser->getPane(), *k);
+            auxSnapNotes(*k);
         }
         
         CommandHistory::getInstance()->endCompoundOperation();
     }
 }
+
+void
+MainWindow::auxSnapNotes(Selection s)
+{
+    FlexiNoteLayer *layer =
+        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    if (!layer) return;
+
+    layer->snapSelectedNotesToPitchTrack(m_analyser->getPane(), s);
+}    
 
 void
 MainWindow::splitNotesAtSelection()

@@ -226,6 +226,8 @@ protected:
 
     virtual void octaveShift(bool up);
 
+    virtual void auxSnapNotes(Selection s);
+
     virtual void closeEvent(QCloseEvent *e);
     bool checkSaveModified();
 
