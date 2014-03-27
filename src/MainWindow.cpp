@@ -591,15 +591,6 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     m_rightButtonMenu->addSeparator();
     
-    action = new QAction(tr("Snap Notes to Pitch Track"), this);
-    action->setShortcut(tr("Ctrl+="));
-    action->setStatusTip(tr("Set all notes within the selected region to have the median frequency of their underlying pitches"));
-    m_keyReference->registerShortcut(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(snapNotesToPitches()));
-    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
-    menu->addAction(action);
-    m_rightButtonMenu->addAction(action);
-    
     action = new QAction(tr("Split Notes at Selection Boundaries"), this);
     action->setShortcut(tr("Ctrl+/"));
     action->setStatusTip(tr("If any notes overlap the start or end of the selected region, split them at those points"));
@@ -608,6 +599,25 @@ MainWindow::setupEditMenu()
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
+
+    action = new QAction(tr("Merge Notes"), this);
+    action->setShortcut(tr("Ctrl+."));
+    action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
+    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+    
+    action = new QAction(tr("Snap Notes to Pitch Track"), this);
+    action->setShortcut(tr("Ctrl+="));
+    action->setStatusTip(tr("Set notes within the selected region to the median frequency of their underlying pitches, or remove them if there are no underlying pitches"));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(snapNotesToPitches()));
+    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
+    
 }
 
 void
@@ -2087,6 +2097,29 @@ MainWindow::splitNotesAtSelection()
              k != selections.end(); ++k) {
             layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
             layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
+        }
+        
+        CommandHistory::getInstance()->endCompoundOperation();
+    }
+}
+
+void
+MainWindow::mergeNotes()
+{
+    FlexiNoteLayer *layer =
+        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    if (!layer) return;
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    if (!selections.empty()) {
+
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Merge Notes"), true);
+                
+        for (MultiSelection::SelectionList::iterator k = selections.begin();
+             k != selections.end(); ++k) {
+            layer->mergeNotes(m_analyser->getPane(), *k);
         }
         
         CommandHistory::getInstance()->endCompoundOperation();

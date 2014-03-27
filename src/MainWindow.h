@@ -61,6 +61,7 @@ protected slots:
 
     virtual void snapNotesToPitches();
     virtual void splitNotesAtSelection();
+    virtual void mergeNotes();
 
     virtual void showAudioToggled();
     virtual void showSpectToggled();
