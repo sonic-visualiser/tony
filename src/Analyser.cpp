@@ -404,6 +404,8 @@ Analyser::layersCreated(vector<Layer *> primary,
     CommandHistory::getInstance()->startCompoundOperation
         (tr("Re-Analyse Selection"), true);
 
+    m_reAnalysisCandidates.clear();
+
     vector<Layer *> all;
     for (int i = 0; i < (int)primary.size(); ++i) {
         all.push_back(primary[i]);
