@@ -75,6 +75,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
+    connect(doc, SIGNAL(layerAboutToBeDeleted(Layer *)),
+            this, SLOT(layerAboutToBeDeleted(Layer *)));
+
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
@@ -128,6 +131,7 @@ Analyser::setDisplayFrequencyExtents(float min, float max)
 {
     if (!m_layers[Spectrogram]) return false;
     m_layers[Spectrogram]->setDisplayExtents(min, max);
+    return true;
 }
 
 QString
@@ -534,16 +538,40 @@ Analyser::abandonReAnalysis(Selection sel)
 void
 Analyser::discardPitchCandidates()
 {
-    foreach (Layer *layer, m_reAnalysisCandidates) {
-        // This will cause the layer to be deleted later (ownership is
-        // transferred to the remove command)
-        m_document->removeLayerFromView(m_pane, layer);
+    if (!m_reAnalysisCandidates.empty()) {
+
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Discard Previous Candidates"), true);
+
+        foreach (Layer *layer, m_reAnalysisCandidates) {
+            // This will cause the layer to be deleted later (ownership is
+            // transferred to the remove command)
+            m_document->removeLayerFromView(m_pane, layer);
+        }
+
+        CommandHistory::getInstance()->endCompoundOperation();
     }
 
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
     m_reAnalysingSelection = Selection();
     m_candidatesVisible = false;
+}
+
+void
+Analyser::layerAboutToBeDeleted(Layer *doomed)
+{
+    cerr << "Analyser::layerAboutToBeDeleted(" << doomed << ")" << endl;
+    
+    vector<Layer *> notDoomed;
+
+    foreach (Layer *layer, m_reAnalysisCandidates) {
+        if (layer != doomed) {
+            notDoomed.push_back(layer);
+        }
+    }
+
+    m_reAnalysisCandidates = notDoomed;
 }
 
 void

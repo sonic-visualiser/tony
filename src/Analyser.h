@@ -55,10 +55,10 @@ public:
     bool setDisplayFrequencyExtents(float min, float max);
 
     enum Component {
-        Audio,
-        PitchTrack,
-        Notes,
-        Spectrogram,
+        Audio = 0,
+        PitchTrack = 1,
+        Notes = 2,
+        Spectrogram = 3,
     };
 
     bool isVisible(Component c) const;
@@ -191,6 +191,9 @@ public:
 
 signals:
     void layersChanged();
+
+protected slots:
+    void layerAboutToBeDeleted(Layer *);
 
 protected:
     Document *m_document;
