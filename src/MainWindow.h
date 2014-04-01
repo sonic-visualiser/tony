@@ -20,6 +20,7 @@
 #include "Analyser.h"
 
 class VersionTester;
+class ActivityLog;
 
 class MainWindow : public MainWindowBase
 {
@@ -31,9 +32,9 @@ public:
     virtual ~MainWindow();
 
 signals:
-    virtual void canExportPitchTrack(bool);
-    virtual void canExportNotes(bool);
-    virtual void canSnapNotes(bool);
+    void canExportPitchTrack(bool);
+    void canExportNotes(bool);
+    void canSnapNotes(bool);
 
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
@@ -131,6 +132,7 @@ protected slots:
 
     virtual void documentModified();
     virtual void documentRestored();
+    virtual void documentReplaced();
 
     virtual void updateMenuStates();
     virtual void updateDescriptionLabel();
@@ -210,6 +212,7 @@ protected:
     QLabel        *m_pitchStatus;
     QLabel        *m_notesStatus;
     
+    ActivityLog   *m_activityLog;
     KeyReference  *m_keyReference;
     VersionTester *m_versionTester;
 

@@ -56,6 +56,7 @@
 #include "rdf/RDFExporter.h"
 
 #include "widgets/RangeInputDialog.h"
+#include "widgets/ActivityLog.h"
 
 // For version information
 #include "vamp/vamp.h"
@@ -99,6 +100,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_ffwdAction(0),
     m_rwdAction(0),
     m_intelligentActionOn(true), //GF: !!! temporary
+    m_activityLog(new ActivityLog()),
     m_keyReference(new KeyReference())
 {
     setWindowTitle(QApplication::applicationName());
@@ -354,6 +356,17 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     setupHelpMenu();
 
     statusBar();
+
+    connect(m_viewManager, SIGNAL(activity(QString)),
+            m_activityLog, SLOT(activityHappened(QString)));
+    connect(m_playSource, SIGNAL(activity(QString)),
+            m_activityLog, SLOT(activityHappened(QString)));
+    connect(CommandHistory::getInstance(), SIGNAL(activity(QString)),
+            m_activityLog, SLOT(activityHappened(QString)));
+    connect(this, SIGNAL(activity(QString)),
+            m_activityLog, SLOT(activityHappened(QString)));
+    connect(this, SIGNAL(replacedDocument()), this, SLOT(documentReplaced()));
+    m_activityLog->hide();
 
     newSession();
 
@@ -1306,6 +1319,15 @@ MainWindow::newSession()
     CommandHistory::getInstance()->documentSaved();
     documentRestored();
     updateMenuStates();
+}
+
+void
+MainWindow::documentReplaced()
+{
+    if (m_document) {
+        connect(m_document, SIGNAL(activity(QString)),
+                m_activityLog, SLOT(activityHappened(QString)));
+    }
 }
 
 void
