@@ -549,10 +549,10 @@ Analyser::discardPitchCandidates()
             m_document->removeLayerFromView(m_pane, layer);
         }
 
+        m_reAnalysisCandidates.clear();
         CommandHistory::getInstance()->endCompoundOperation();
     }
 
-    m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
     m_reAnalysingSelection = Selection();
     m_candidatesVisible = false;
