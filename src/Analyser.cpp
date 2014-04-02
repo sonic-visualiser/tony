@@ -283,7 +283,12 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
     if (sel == m_reAnalysingSelection || sel.isEmpty()) return "";
 
-    discardPitchCandidates();
+    if (!m_reAnalysisCandidates.empty()) {
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Discard Previous Candidates"), true);
+        discardPitchCandidates();
+        CommandHistory::getInstance()->endCompoundOperation();
+    }
 
     m_reAnalysingSelection = sel;
 
@@ -529,6 +534,8 @@ Analyser::deletePitches(Selection sel)
 void
 Analyser::abandonReAnalysis(Selection sel)
 {
+    // A compound command is already in progress
+
     discardPitchCandidates();
 
     Layer *myLayer = m_layers[PitchTrack];
@@ -541,18 +548,14 @@ void
 Analyser::discardPitchCandidates()
 {
     if (!m_reAnalysisCandidates.empty()) {
-
-        CommandHistory::getInstance()->startCompoundOperation
-            (tr("Discard Previous Candidates"), true);
-
+        // We don't use a compound command here, because we may be
+        // already in one. Caller bears responsibility for doing that
         foreach (Layer *layer, m_reAnalysisCandidates) {
             // This will cause the layer to be deleted later (ownership is
             // transferred to the remove command)
             m_document->removeLayerFromView(m_pane, layer);
         }
-
         m_reAnalysisCandidates.clear();
-        CommandHistory::getInstance()->endCompoundOperation();
     }
 
     m_currentCandidate = -1;

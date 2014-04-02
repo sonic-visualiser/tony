@@ -1946,15 +1946,12 @@ MainWindow::abandonSelection()
     if (!selections.empty()) {
         Selection sel = *selections.begin();
         m_analyser->abandonReAnalysis(sel);
+        auxSnapNotes(sel);
     }
 
     MainWindowBase::clearSelection();
 
     CommandHistory::getInstance()->endCompoundOperation();
-
-    if (!selections.empty()) {
-        auxSnapNotes(*selections.begin());
-    }
 }
 
 void
@@ -2034,11 +2031,10 @@ MainWindow::clearPitches()
     for (MultiSelection::SelectionList::iterator k = selections.begin();
          k != selections.end(); ++k) {
         m_analyser->deletePitches(*k);
+        auxSnapNotes(*k);
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
-
-    snapNotesToPitches();
 }
 
 void
@@ -2053,11 +2049,10 @@ MainWindow::octaveShift(bool up)
          k != selections.end(); ++k) {
 
         m_analyser->shiftOctave(*k, up);
+        auxSnapNotes(*k);
     }
 
     CommandHistory::getInstance()->endCompoundOperation();
-
-    snapNotesToPitches();
 }
 
 void
@@ -2086,11 +2081,10 @@ MainWindow::switchPitchUp()
             for (MultiSelection::SelectionList::iterator k = selections.begin();
                  k != selections.end(); ++k) {
                 m_analyser->switchPitchCandidate(*k, true);
+                auxSnapNotes(*k);
             }
 
             CommandHistory::getInstance()->endCompoundOperation();
-
-            snapNotesToPitches();
         }
     } else {
         octaveShift(true);
@@ -2111,11 +2105,10 @@ MainWindow::switchPitchDown()
             for (MultiSelection::SelectionList::iterator k = selections.begin();
                  k != selections.end(); ++k) {
                 m_analyser->switchPitchCandidate(*k, false);
+                auxSnapNotes(*k);
             }
 
             CommandHistory::getInstance()->endCompoundOperation();
-
-            snapNotesToPitches();
         }
     } else {
         octaveShift(false);
