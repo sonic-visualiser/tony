@@ -170,6 +170,8 @@ protected slots:
     virtual void selectionChangedByUser();
     virtual void regionOutlined(QRect);
 
+    virtual void analyseNewMainModel();
+
 protected:
     Analyser      *m_analyser;
 
@@ -234,8 +236,6 @@ protected:
 
     virtual void closeEvent(QCloseEvent *e);
     bool checkSaveModified();
-
-    void analyseNewMainModel();
 
     virtual void updateVisibleRangeDisplay(Pane *p) const;
     virtual void updatePositionStatusDisplays() const;

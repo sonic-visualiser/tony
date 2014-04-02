@@ -366,6 +366,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(this, SIGNAL(activity(QString)),
             m_activityLog, SLOT(activityHappened(QString)));
     connect(this, SIGNAL(replacedDocument()), this, SLOT(documentReplaced()));
+    connect(this, SIGNAL(sessionLoaded()), this, SLOT(analyseNewMainModel()));
+    connect(this, SIGNAL(audioFileLoaded()), this, SLOT(analyseNewMainModel()));
     m_activityLog->hide();
 
     newSession();
@@ -2597,12 +2599,6 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
             .arg(startStr).arg(endStr).arg(durationStr);
     }
     
-    // scale Y axis
-    FlexiNoteLayer *fnl = dynamic_cast<FlexiNoteLayer *>(p->getLayer(2));
-    if (fnl) {
-        fnl->setVerticalRangeToNoteRange(p);
-    }
-    
     statusBar()->showMessage(m_myStatusMessage);
 }
 
@@ -2685,36 +2681,43 @@ MainWindow::mainModelChanged(WaveFileModel *model)
         connect(m_fader, SIGNAL(valueChanged(float)),
                 m_playTarget, SLOT(setOutputGain(float)));
     }
-    
-    analyseNewMainModel();
 }
 
 void
 MainWindow::analyseNewMainModel()
 {
     WaveFileModel *model = getMainModel();
+
+    cerr << "MainWindow::analyseNewMainModel: main model is " << model << endl;
+
+    cerr << "(document is " << m_document << ", it says main model is " << m_document->getMainModel() << ")" << endl;
     
     if (model) {
+        cerr << "pane stack is " << m_paneStack << " with " << m_paneStack->getPaneCount() << " panes" << endl;
+
         if (m_paneStack) {
 
             int pc = m_paneStack->getPaneCount();
             Pane *pane = 0;
+            Pane *selectionStrip = 0;
 
-            if (pc < 1) {
+            if (pc < 2) {
                 pane = m_paneStack->addPane();
-
-                Pane *selectionStrip = m_paneStack->addPane();
-                selectionStrip->setFixedHeight(26);
+                selectionStrip = m_paneStack->addPane();
                 m_document->addLayerToView
                     (selectionStrip,
                      m_document->createMainModelLayer(LayerFactory::TimeRuler));
-                m_paneStack->sizePanesEqually();
+            } else {
+                pane = m_paneStack->getPane(0);
+                selectionStrip = m_paneStack->getPane(1);
+            }
 
+            if (selectionStrip) {
+                selectionStrip->setFixedHeight(26);
+                m_paneStack->sizePanesEqually();
                 m_viewManager->clearToolModeOverrides();
                 m_viewManager->setToolModeFor(selectionStrip,
                                               ViewManager::SelectMode);
-            } else {
-                pane = m_paneStack->getPane(0);
             }
 
             if (pane) {

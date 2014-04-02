@@ -83,6 +83,10 @@ public:
         }
     }
 
+    WaveFileModel *getMainModel() const {
+        return m_fileModel;
+    }
+
     float getGain(Component c) const;
     void setGain(Component c, float gain);
 
@@ -214,6 +218,8 @@ protected:
     QString addAnalyses();
 
     void discardPitchCandidates();
+
+    void stackLayers();
     
     // Document::LayerCreationHandler method
     void layersCreated(std::vector<Layer *>, std::vector<Layer *>);

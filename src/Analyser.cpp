@@ -89,6 +89,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
 
     QString warning, error;
 
+    cerr << "Analyser::newFileLoaded: about to check visualisations etc" << endl;
+
     // This isn't fatal -- we can proceed without
     // visualisations. Other failures are fatal though.
     warning = addVisualisations();
@@ -103,6 +105,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     loadState(PitchTrack);
     loadState(Notes);
     loadState(Spectrogram);
+
+    stackLayers();
 
     emit layersChanged();
 
@@ -164,6 +168,21 @@ Analyser::addVisualisations()
     if (!spectrogram) return tr("Transform \"%1\" did not run correctly (no layer or wrong layer type returned)").arg(base + out);
 */    
 
+    // As with all the visualisation layers, if we already have one in
+    // the pane we do not create another, just record its
+    // existence. (We create a new one when loading a new audio file,
+    // but just note the existing one when loading a complete session.)
+
+    for (int i = 0; i < m_pane->getLayerCount(); ++i) {
+        SpectrogramLayer *existing = qobject_cast<SpectrogramLayer *>
+            (m_pane->getLayer(i));
+        if (existing) {
+            cerr << "recording existing spectrogram layer" << endl;
+            m_layers[Spectrogram] = existing;
+            return "";
+        }
+    }
+
     SpectrogramLayer *spectrogram = qobject_cast<SpectrogramLayer *>
         (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
 
@@ -182,7 +201,19 @@ QString
 Analyser::addWaveform()
 {
     // Our waveform layer is just a shadow, light grey and taking up
-    // little space at the bottom
+    // little space at the bottom.
+
+    // As with the spectrogram above, if one exists already we just
+    // use it
+    for (int i = 0; i < m_pane->getLayerCount(); ++i) {
+        WaveformLayer *existing = qobject_cast<WaveformLayer *>
+            (m_pane->getLayer(i));
+        if (existing) {
+            cerr << "recording existing waveform layer" << endl;
+            m_layers[Audio] = existing;
+            return "";
+        }
+    }
 
     WaveformLayer *waveform = qobject_cast<WaveformLayer *>
         (m_document->createMainModelLayer(LayerFactory::Waveform));
@@ -203,6 +234,27 @@ Analyser::addWaveform()
 QString
 Analyser::addAnalyses()
 {
+    // As with the spectrogram above, if these layers exist we use
+    // them
+    TimeValueLayer *existingPitch = 0;
+    FlexiNoteLayer *existingNotes = 0;
+    for (int i = 0; i < m_pane->getLayerCount(); ++i) {
+        if (!existingPitch) {
+            existingPitch = qobject_cast<TimeValueLayer *>(m_pane->getLayer(i));
+        }
+        if (!existingNotes) {
+            existingNotes = qobject_cast<FlexiNoteLayer *>(m_pane->getLayer(i));
+        }
+    }
+    if (existingPitch && existingNotes) {
+        cerr << "recording existing pitch and notes layers" << endl;
+        m_layers[PitchTrack] = existingPitch;
+        m_layers[Notes] = existingNotes;
+        return "";
+    } else if (existingPitch || existingNotes) {
+        return "One (but not both) of pitch and note track found in session";
+    }
+
     TransformFactory *tf = TransformFactory::getInstance();
     
     QString plugname = "pYIN";
@@ -484,9 +536,15 @@ Analyser::switchPitchCandidate(Selection sel, bool up)
     pitchTrack->deleteSelection(sel);
     m_reAnalysisCandidates[m_currentCandidate]->copy(m_pane, sel, clip);
     pitchTrack->paste(m_pane, clip, 0, false);
+}
 
+void
+Analyser::stackLayers()
+{
     // raise the pitch track, then notes on top (if present)
-    m_paneStack->setCurrentLayer(m_pane, m_layers[PitchTrack]);
+    if (m_layers[PitchTrack]) {
+        m_paneStack->setCurrentLayer(m_pane, m_layers[PitchTrack]);
+    }
     if (m_layers[Notes] && !m_layers[Notes]->isLayerDormant(m_pane)) {
         m_paneStack->setCurrentLayer(m_pane, m_layers[Notes]);
     }
