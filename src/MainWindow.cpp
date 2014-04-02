@@ -493,12 +493,11 @@ MainWindow::setupEditMenu()
     
     CommandHistory::getInstance()->registerToolbar(toolbar);
 
-    m_keyReference->setCategory(tr("Tool Selection"));
-
     QActionGroup *group = new QActionGroup(this);
 
     IconLoader il;
 
+    m_keyReference->setCategory(tr("Tool Selection"));
     QAction *action = toolbar->addAction(il.load("navigate"),
                                          tr("Navigate"));
     action->setCheckable(true);
@@ -511,6 +510,19 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_keyReference->registerShortcut(action);
 
+    m_keyReference->setCategory
+        (tr("Navigate Tool Mouse Actions"));
+    m_keyReference->registerShortcut
+        (tr("Navigate"), tr("Left"), 
+         tr("Click left button and drag to move around"));
+    m_keyReference->registerShortcut
+        (tr("Re-Analyse Area"), tr("Shift+Left"), 
+         tr("Shift-click left button and drag to define a specific pitch and time range to re-analyse"));
+    m_keyReference->registerShortcut
+        (tr("Edit"), tr("Double-Click Left"), 
+         tr("Double-click left button on an item to edit it"));
+
+    m_keyReference->setCategory(tr("Tool Selection"));
     action = toolbar->addAction(il.load("move"),
 				tr("Edit"));
     action->setCheckable(true);
@@ -522,8 +534,25 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_keyReference->registerShortcut(action);
 
+    m_keyReference->setCategory
+        (tr("Note Edit Tool Mouse Actions"));
+    m_keyReference->registerShortcut
+        (tr("Adjust Pitch"), tr("Left"), 
+        tr("Click left button on the main part of a note and drag to move it up or down"));
+    m_keyReference->registerShortcut
+        (tr("Split"), tr("Left"), 
+        tr("Click left button on the bottom edge of a note to split it at the click point"));
+    m_keyReference->registerShortcut
+        (tr("Resize"), tr("Left"), 
+        tr("Click left button on the left or right edge of a note and drag to change the time or duration of the note"));
+    m_keyReference->registerShortcut
+        (tr("Erase"), tr("Shift+Left"), 
+        tr("Shift-click left button on a note to remove it"));
+
+
 /* Remove for now...
 
+    m_keyReference->setCategory(tr("Tool Selection"));
     action = toolbar->addAction(il.load("notes"),
 				tr("Free Edit"));
     action->setCheckable(true);
