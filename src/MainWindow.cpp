@@ -986,7 +986,8 @@ MainWindow::setupToolbars()
     toolbar->addWidget(m_fader);
 
     toolbar = addToolBar(tr("Show and Play"));
-
+    addToolBar(Qt::BottomToolBarArea, toolbar);
+    
     /* ORIGINAL DESIGN
     QLabel *eye = new QLabel;
     eye->setFixedWidth(40);
