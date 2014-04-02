@@ -489,6 +489,18 @@ MainWindow::setupEditMenu()
     CommandHistory::getInstance()->registerMenu(menu);
     menu->addSeparator();
 
+    m_keyReference->setCategory
+        (tr("Selection Strip Mouse Actions"));
+    m_keyReference->registerShortcut
+        (tr("Jump"), tr("Left"), 
+         tr("Click left button to move the playback position to a time"));
+    m_keyReference->registerShortcut
+        (tr("Select"), tr("Left"), 
+         tr("Click left button and drag to select a region of time"));
+    m_keyReference->registerShortcut
+        (tr("Select Note Duration"), tr("Double-Click Left"), 
+         tr("Double-click left button to select the region of time corresponding to a note"));
+
     QToolBar *toolbar = addToolBar(tr("Tools Toolbar"));
     
     CommandHistory::getInstance()->registerToolbar(toolbar);
