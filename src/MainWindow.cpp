@@ -653,7 +653,7 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("Merge Notes"), this);
-    action->setShortcut(tr("Ctrl+="));
+    action->setShortcut(tr("Ctrl+\\"));
     action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
@@ -662,6 +662,7 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
     
     action = new QAction(tr("Form Note from Selection"), this);
+    action->setShortcut(tr("Ctrl+="));
     action->setStatusTip(tr("Form a note spanning the selected region, splitting any existing notes at its boundaries"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(formNoteFromSelection()));
