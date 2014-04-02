@@ -21,6 +21,7 @@
 #include "base/PropertyContainer.h"
 #include "base/Preferences.h"
 #include "widgets/TipDialog.h"
+#include "widgets/InteractiveFileFinder.h"
 #include "transform/TransformFactory.h"
 
 #include <QMetaType>
@@ -160,6 +161,8 @@ main(int argc, char **argv)
     QApplication::setOrganizationName("QMUL");
     QApplication::setOrganizationDomain("qmul.ac.uk");
     QApplication::setApplicationName("Tony");
+
+    InteractiveFileFinder::getInstance()->setApplicationSessionExtension("ton");
 
     QSplashScreen *splash = 0;
     // If we had a splash screen, we would show it here

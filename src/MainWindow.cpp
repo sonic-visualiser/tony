@@ -2685,7 +2685,15 @@ MainWindow::mainModelChanged(WaveFileModel *model)
         connect(m_fader, SIGNAL(valueChanged(float)),
                 m_playTarget, SLOT(setOutputGain(float)));
     }
+    
+    analyseNewMainModel();
+}
 
+void
+MainWindow::analyseNewMainModel()
+{
+    WaveFileModel *model = getMainModel();
+    
     if (model) {
         if (m_paneStack) {
 
