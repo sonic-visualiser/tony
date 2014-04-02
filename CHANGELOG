@@ -1,4 +1,24 @@
 
+Changes in Tony 0.5 since the previous release 0.4:
+
+ * The start and end of the recording are now shaded in grey so you
+   can see where they are
+
+ * The note edit tool (which was largely broken in 0.4 after lots of
+   work on pitch track editing) now works again
+
+ * New note editing menu actions: split note, merge notes, form note
+   from selection, snap notes to pitch track
+
+ * Editing the pitch track (when notes are present) causes the notes
+   to be automatically updated to the new pitch track
+
+ * The Key and Mouse Reference help window has been updated so as to
+   show Tony-specific actions properly
+
+ * The undo/redo command bundling has been tidied up and some related
+   crashes fixed
+	
 Changes in Tony 0.4 since the previous release 0.3:
 
  * The main pitch tracker (pYIN) now uses a non-FFT Yin method in

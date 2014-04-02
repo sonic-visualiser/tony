@@ -432,7 +432,7 @@ MainWindow::setupFileMenu()
     icon.addPixmap(il.loadPixmap("fileopen-22"));
     action = new QAction(icon, tr("&Open..."), this);
     action->setShortcut(tr("Ctrl+O"));
-    action->setStatusTip(tr("Open a file"));
+    action->setStatusTip(tr("Open a session or audio file"));
     connect(action, SIGNAL(triggered()), this, SLOT(openFile()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
@@ -452,6 +452,29 @@ MainWindow::setupFileMenu()
             this, SLOT(setupRecentFilesMenu()));
 
     menu->addSeparator();
+
+    icon = il.load("filesave");
+    icon.addPixmap(il.loadPixmap("filesave-22"));
+    action = new QAction(icon, tr("&Save Session"), this);
+    action->setShortcut(tr("Ctrl+S"));
+    action->setStatusTip(tr("Save the current session into a %1 session file").arg(QApplication::applicationName()));
+    connect(action, SIGNAL(triggered()), this, SLOT(saveSession()));
+    connect(this, SIGNAL(canSave(bool)), action, SLOT(setEnabled(bool)));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+    toolbar->addAction(action);
+	
+    icon = il.load("filesaveas");
+    icon.addPixmap(il.loadPixmap("filesaveas-22"));
+    action = new QAction(icon, tr("Save Session &As..."), this);
+    action->setShortcut(tr("Ctrl+Shift+S"));
+    action->setStatusTip(tr("Save the current session into a new %1 session file").arg(QApplication::applicationName()));
+    connect(action, SIGNAL(triggered()), this, SLOT(saveSessionAs()));
+    menu->addAction(action);
+    toolbar->addAction(action);
+
+    menu->addSeparator();
+
     action = new QAction(tr("I&mport Pitch Track Data..."), this);
     action->setStatusTip(tr("Import pitch-track data from a CSV, RDF, or layer XML file"));
     connect(action, SIGNAL(triggered()), this, SLOT(importPitchLayer()));
@@ -1558,14 +1581,14 @@ MainWindow::closeEvent(QCloseEvent *e)
 
     if (m_openingAudioFile) {
 //        cerr << "Busy - ignoring close event" << endl;
-    e->ignore();
-    return;
+        e->ignore();
+        return;
     }
 
     if (!m_abandoning && !checkSaveModified()) {
 //        cerr << "Ignoring close event" << endl;
-    e->ignore();
-    return;
+        e->ignore();
+        return;
     }
 
     QSettings settings;
@@ -1634,22 +1657,22 @@ MainWindow::checkSaveModified()
     if (!m_documentModified) return true;
 
     int button = 
-    QMessageBox::warning(this,
-                 tr("Session modified"),
-                 tr("The current session has been modified.\nDo you want to save it?"),
-                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::warning(this,
+                             tr("Session modified"),
+                             tr("The current session has been modified.\nDo you want to save it?"),
+                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                              QMessageBox::Yes);
 
     if (button == QMessageBox::Yes) {
-    saveSession();
-    if (m_documentModified) { // save failed -- don't proceed!
-        return false;
-    } else {
+        saveSession();
+        if (m_documentModified) { // save failed -- don't proceed!
+            return false;
+        } else {
             return true; // saved, so it's safe to continue now
         }
     } else if (button == QMessageBox::No) {
-    m_documentModified = false; // so we know to abandon it
-    return true;
+        m_documentModified = false; // so we know to abandon it
+        return true;
     }
 
     // else cancel
@@ -1660,15 +1683,16 @@ void
 MainWindow::saveSession()
 {
     if (m_sessionFile != "") {
-    if (!saveSessionFile(m_sessionFile)) {
-        QMessageBox::critical(this, tr("Failed to save file"),
-                  tr("Session file \"%1\" could not be saved.").arg(m_sessionFile));
+        if (!saveSessionFile(m_sessionFile)) {
+            QMessageBox::critical
+                (this, tr("Failed to save file"),
+                 tr("Session file \"%1\" could not be saved.").arg(m_sessionFile));
+        } else {
+            CommandHistory::getInstance()->documentSaved();
+            documentRestored();
+        }
     } else {
-        CommandHistory::getInstance()->documentSaved();
-        documentRestored();
-    }
-    } else {
-    saveSessionAs();
+        saveSessionAs();
     }
 }
 
