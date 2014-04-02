@@ -452,20 +452,20 @@ MainWindow::setupFileMenu()
             this, SLOT(setupRecentFilesMenu()));
 
     menu->addSeparator();
-    action = new QAction(tr("Import Pitch Track Data..."), this);
-    action->setStatusTip(tr("Import pitch-track data from a file"));
+    action = new QAction(tr("I&mport Pitch Track Data..."), this);
+    action->setStatusTip(tr("Import pitch-track data from a CSV, RDF, or layer XML file"));
     connect(action, SIGNAL(triggered()), this, SLOT(importPitchLayer()));
     connect(this, SIGNAL(canImportLayer(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 
-    action = new QAction(tr("Export Pitch Track Data..."), this);
-    action->setStatusTip(tr("Export pitch-track data to a file"));
+    action = new QAction(tr("E&xport Pitch Track Data..."), this);
+    action->setStatusTip(tr("Export pitch-track data to a CSV, RDF, or layer XML file"));
     connect(action, SIGNAL(triggered()), this, SLOT(exportPitchLayer()));
     connect(this, SIGNAL(canExportPitchTrack(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 
-    action = new QAction(tr("Export Note Data..."), this);
-    action->setStatusTip(tr("Export note data to a file"));
+    action = new QAction(tr("&Export Note Data..."), this);
+    action->setStatusTip(tr("Export note data to a CSV, RDF, layer XML, or MIDI file"));
     connect(action, SIGNAL(triggered()), this, SLOT(exportNoteLayer()));
     connect(this, SIGNAL(canExportNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
