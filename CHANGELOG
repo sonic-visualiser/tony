@@ -4,6 +4,9 @@ Changes in Tony 0.5 since the previous release 0.4:
  * The start and end of the recording are now shaded in grey so you
    can see where they are
 
+ * There are new save/open session functions on the File menu; the
+   session file extension is .ton, and save/open session should work
+
  * The note edit tool (which was largely broken in 0.4 after lots of
    work on pitch track editing) now works again
 
