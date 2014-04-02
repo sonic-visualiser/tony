@@ -529,7 +529,6 @@ MainWindow::setupEditMenu()
     action->setShortcut(tr("2"));
     action->setStatusTip(tr("Edit with Note Intelligence"));
     connect(action, SIGNAL(triggered()), this, SLOT(toolEditSelected()));
-    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
     group->addAction(action);
     menu->addAction(action);
     m_keyReference->registerShortcut(action);
@@ -559,7 +558,6 @@ MainWindow::setupEditMenu()
     action->setShortcut(tr("3"));
     action->setStatusTip(tr("Free Edit"));
     connect(action, SIGNAL(triggered()), this, SLOT(toolFreeEditSelected()));
-    connect(this, SIGNAL(canEditLayer(bool)), action, SLOT(setEnabled(bool)));
     group->addAction(action);
     m_keyReference->registerShortcut(action);
 */
