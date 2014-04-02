@@ -614,6 +614,7 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("Merge Notes"), this);
+    action->setShortcut(tr("Ctrl+="));
     action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
@@ -628,16 +629,14 @@ MainWindow::setupEditMenu()
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
-/*    
+
     action = new QAction(tr("Snap Notes to Pitch Track"), this);
-    action->setShortcut(tr("Ctrl+="));
     action->setStatusTip(tr("Set notes within the selected region to the median frequency of their underlying pitches, or remove them if there are no underlying pitches"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(snapNotesToPitches()));
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
-*/    
 }
 
 void
