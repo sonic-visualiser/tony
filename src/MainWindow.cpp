@@ -1707,6 +1707,11 @@ MainWindow::saveSession()
 void
 MainWindow::saveSessionAs()
 {
+    // We do not want to save mid-analysis regions -- that would cause
+    // confusion on reloading
+    m_analyser->clearReAnalysis();
+    clearSelection();
+
     QString orig = m_audioFile;
     if (orig == "") orig = ".";
     else orig = QFileInfo(orig).absoluteDir().canonicalPath();
