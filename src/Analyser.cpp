@@ -536,6 +536,8 @@ Analyser::switchPitchCandidate(Selection sel, bool up)
     pitchTrack->deleteSelection(sel);
     m_reAnalysisCandidates[m_currentCandidate]->copy(m_pane, sel, clip);
     pitchTrack->paste(m_pane, clip, 0, false);
+
+    stackLayers();
 }
 
 void
