@@ -1685,6 +1685,11 @@ MainWindow::checkSaveModified()
 void
 MainWindow::saveSession()
 {
+    // We do not want to save mid-analysis regions -- that would cause
+    // confusion on reloading
+    m_analyser->clearReAnalysis();
+    clearSelection();
+
     if (m_sessionFile != "") {
         if (!saveSessionFile(m_sessionFile)) {
             QMessageBox::critical

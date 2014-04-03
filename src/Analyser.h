@@ -180,6 +180,14 @@ public:
     void abandonReAnalysis(Selection sel);
 
     /**
+     * Remove any re-analysis layers, without any expectation of
+     * adding them later, unlike showPitchCandidates(false), and
+     * without changing the current pitch track, unlike
+     * abandonReAnalysis().
+     */
+    void clearReAnalysis();
+
+    /**
      * Import the pitch track from the given layer into our
      * pitch-track layer.
      */

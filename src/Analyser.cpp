@@ -605,6 +605,12 @@ Analyser::abandonReAnalysis(Selection sel)
 }    
 
 void
+Analyser::clearReAnalysis()
+{
+    discardPitchCandidates();
+}
+
+void
 Analyser::discardPitchCandidates()
 {
     if (!m_reAnalysisCandidates.empty()) {
