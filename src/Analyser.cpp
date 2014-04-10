@@ -381,11 +381,17 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
         t.setBlockSize(4096);
     }
 
-    RealTime start = RealTime::frame2RealTime
-        (round(sel.getStartFrame()*1.0/256) * 256 - 4*256, m_fileModel->getSampleRate()); // 4*256 is for 4 frames offset due to timestamp shift
-
-    RealTime end = RealTime::frame2RealTime
-        (round(sel.getEndFrame()*1.0/256) * 256 - 4*256, m_fileModel->getSampleRate());
+    // get time stamps that align with the 256-sample grid of the original extraction
+    int startSample = ceil(sel.getStartFrame()*1.0/256) * 256;
+    int endSample   = ceil(sel.getEndFrame()*1.0/256) * 256;
+    if (!range.isConstrained()) {
+        startSample -= 4*256; // 4*256 is for 4 frames offset due to timestamp shift
+        endSample   -= 4*256;
+    } else {
+        endSample   -= 9*256; // MM says: not sure what the CHP plugin does there
+    }
+    RealTime start = RealTime::frame2RealTime(startSample, m_fileModel->getSampleRate()); 
+    RealTime end = RealTime::frame2RealTime(endSample, m_fileModel->getSampleRate());
 
     RealTime duration;
 
