@@ -2168,6 +2168,7 @@ MainWindow::switchPitchDown()
 void
 MainWindow::snapNotesToPitches()
 {
+    cerr << "in snapNotesToPitches" << endl;
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
     if (!selections.empty()) {
@@ -2187,6 +2188,7 @@ MainWindow::snapNotesToPitches()
 void
 MainWindow::auxSnapNotes(Selection s)
 {
+    cerr << "in auxSnapNotes" << endl;
     FlexiNoteLayer *layer =
         qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
     if (!layer) return;
