@@ -89,7 +89,7 @@ using std::vector;
 
 
 MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
-    MainWindowBase(withAudioOutput, withOSCSupport, false),
+    MainWindowBase(withAudioOutput, false),
     m_overview(0),
     m_mainMenusCreated(false),
     m_playbackMenu(0),
