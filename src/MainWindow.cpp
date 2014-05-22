@@ -656,8 +656,10 @@ MainWindow::setupEditMenu()
     menu->addAction(m_showCandidatesAction);
     m_rightButtonMenu->addAction(m_showCandidatesAction);
     
-    action = new QAction(tr("Remove Pitches"), this);
-    action->setShortcut(tr("Ctrl+Backspace"));
+
+    // action = new QAction(tr("Remove Pitches"), this);
+    action = toolbar->addAction(il.load("navigate"), tr("Navigate"));
+    action->setShortcut(tr("Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
@@ -733,18 +735,18 @@ MainWindow::setupViewMenu()
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
     
-    action = new QAction(tr("&Jump Left"), this);
+    action = new QAction(tr("&One Note Left"), this);
     action->setShortcut(tr("Ctrl+Left"));
-    action->setStatusTip(tr("Scroll the current pane a big step to the left"));
-    connect(action, SIGNAL(triggered()), this, SLOT(jumpLeft()));
+    action->setStatusTip(tr("Move cursor to the preceding note (or silence) onset."));
+    connect(action, SIGNAL(triggered()), this, SLOT(moveOneNoteLeft()));
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
     
-    action = new QAction(tr("J&ump Right"), this);
+    action = new QAction(tr("O&ne Note Right"), this);
     action->setShortcut(tr("Ctrl+Right"));
-    action->setStatusTip(tr("Scroll the current pane a big step to the right"));
-    connect(action, SIGNAL(triggered()), this, SLOT(jumpRight()));
+    action->setStatusTip(tr("Move cursor to the succeeding note (or silence)."));
+    connect(action, SIGNAL(triggered()), this, SLOT(moveOneNoteRight()));
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
@@ -1119,6 +1121,64 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showSpect, SLOT(setEnabled(bool)));
 
     Pane::registerShortcuts(*m_keyReference);
+}
+
+
+void
+MainWindow::moveOneNoteRight()
+{
+    // cerr << "MainWindow::moveOneNoteRight" << endl;
+    moveByOneNote(true);
+}
+
+void
+MainWindow::moveOneNoteLeft()
+{
+    // cerr << "MainWindow::moveOneNoteLeft" << endl;
+    moveByOneNote(false);
+}
+
+void
+MainWindow::moveByOneNote(bool right)
+{
+    // cerr << "MainWindow::moveByOneNote" << endl;
+    int frame = m_viewManager->getPlaybackFrame();
+    
+    Pane *p = m_analyser->getPane();
+
+    Layer *layer = m_analyser->getLayer(Analyser::Notes);
+    if (!layer) return;
+
+    FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer->getModel());
+    if (!model) return;
+
+    FlexiNoteModel::PointList points = model->getPoints();
+    if (points.empty()) return;
+
+    FlexiNoteModel::PointList::iterator i = points.begin();
+    std::set<int> snapFrames;
+    snapFrames.insert(0);
+    while (i != points.end()) {
+        snapFrames.insert(i->frame);
+        snapFrames.insert(i->frame + i->duration + 1);
+        ++i;
+    }
+    std::set<int>::iterator i2;
+    if (snapFrames.find(frame) == snapFrames.end())
+    {
+        // we're not on an existing snap point, so go to previous
+        snapFrames.insert(frame);
+    }
+    i2 = snapFrames.find(frame);
+    if (right)
+    {
+        i2++;
+        if (i2 == snapFrames.end()) i2--;
+    } else {
+        if (i2 != snapFrames.begin()) i2--;
+    }
+    frame = *i2;
+    m_viewManager->setPlaybackFrame(frame);
 }
 
 void

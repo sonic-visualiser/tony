@@ -172,6 +172,9 @@ protected slots:
 
     virtual void analyseNewMainModel();
 
+    void moveOneNoteRight();
+    void moveOneNoteLeft();
+
 protected:
     Analyser      *m_analyser;
 
@@ -239,6 +242,8 @@ protected:
 
     virtual void updateVisibleRangeDisplay(Pane *p) const;
     virtual void updatePositionStatusDisplays() const;
+
+    void moveByOneNote(bool right);
 };
 
 
