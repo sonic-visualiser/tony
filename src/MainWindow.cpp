@@ -612,7 +612,8 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
 
-    action = new QAction(tr("C&lear Selection"), this);
+    // action = new QAction(tr("C&lear Selection"), this);
+    action = toolbar->addAction(il.load("blank-16"), tr("Esc"));
     action->setShortcuts(QList<QKeySequence>()
                          << QKeySequence(tr("Esc"))
                          << QKeySequence(tr("Ctrl+Esc")));
@@ -658,7 +659,7 @@ MainWindow::setupEditMenu()
     
 
     // action = new QAction(tr("Remove Pitches"), this);
-    action = toolbar->addAction(il.load("blank-16"), tr("Remove Pitches"));
+    action = toolbar->addAction(il.load("blank-16"), tr("Del"));
     action->setShortcut(tr("Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
@@ -670,8 +671,9 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     m_rightButtonMenu->addSeparator();
     
-    action = new QAction(tr("Split Note"), this);
-    action->setShortcut(tr("Ctrl+/"));
+    // action = new QAction(tr("Split Note"), this);
+    action = toolbar->addAction(il.load("blank-16"), tr("Split"));
+    action->setShortcut(tr("/"));
     action->setStatusTip(tr("Split the note at the current playback position into two"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(splitNote()));
@@ -679,8 +681,9 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
 
-    action = new QAction(tr("Merge Notes"), this);
-    action->setShortcut(tr("Ctrl+\\"));
+    // action = new QAction(tr("Merge Notes"), this);
+    action = toolbar->addAction(il.load("blank-16"), tr("Merge"));
+    action->setShortcut(tr("\\"));
     action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
@@ -747,6 +750,22 @@ MainWindow::setupViewMenu()
     action->setShortcut(tr("Ctrl+Right"));
     action->setStatusTip(tr("Move cursor to the succeeding note (or silence)."));
     connect(action, SIGNAL(triggered()), this, SLOT(moveOneNoteRight()));
+    connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+
+    action = new QAction(tr("&Select One Note Left"), this);
+    action->setShortcut(tr("Ctrl+Shift+Left"));
+    action->setStatusTip(tr("Select to the preceding note (or silence) onset."));
+    connect(action, SIGNAL(triggered()), this, SLOT(selectOneNoteLeft()));
+    connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+    
+    action = new QAction(tr("S&elect One Note Right"), this);
+    action->setShortcut(tr("Ctrl+Shift+Right"));
+    action->setStatusTip(tr("Select to the succeeding note (or silence)."));
+    connect(action, SIGNAL(triggered()), this, SLOT(selectOneNoteRight()));
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
@@ -1137,6 +1156,39 @@ MainWindow::moveOneNoteLeft()
     // cerr << "MainWindow::moveOneNoteLeft" << endl;
     moveByOneNote(false);
 }
+
+void
+MainWindow::selectOneNoteRight()
+{
+    int frame0 = m_viewManager->getPlaybackFrame();
+    Selection origSel = *(m_viewManager->getSelections().begin());
+    if (origSel.getEndFrame() == frame0)
+    {
+        frame0 = origSel.getStartFrame(); // extending origSel
+    }
+    moveByOneNote(true);
+    int frame1 = m_viewManager->getPlaybackFrame();
+    Selection sel(frame0, frame1);
+    if (sel.isEmpty()) return;
+    m_viewManager->setSelection(sel);
+}
+
+void
+MainWindow::selectOneNoteLeft()
+{
+    int frame1 = m_viewManager->getPlaybackFrame();
+    Selection origSel = *(m_viewManager->getSelections().begin());
+    if (origSel.getStartFrame() == frame1)
+    {
+        frame1 = origSel.getEndFrame(); // extending origSel
+    }
+    moveByOneNote(false);
+    int frame0 = m_viewManager->getPlaybackFrame();
+    Selection sel(frame0, frame1);
+    if (sel.isEmpty()) return;
+    m_viewManager->setSelection(sel);
+}
+
 
 void
 MainWindow::moveByOneNote(bool right)
