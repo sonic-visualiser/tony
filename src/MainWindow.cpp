@@ -658,7 +658,7 @@ MainWindow::setupEditMenu()
     
 
     // action = new QAction(tr("Remove Pitches"), this);
-    action = toolbar->addAction(il.load("navigate"), tr("Navigate"));
+    action = toolbar->addAction(il.load("blank-16"), tr("Remove Pitches"));
     action->setShortcut(tr("Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
