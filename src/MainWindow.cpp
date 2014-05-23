@@ -1160,33 +1160,17 @@ MainWindow::moveOneNoteLeft()
 void
 MainWindow::selectOneNoteRight()
 {
-    int frame0 = m_viewManager->getPlaybackFrame();
-    Selection origSel = *(m_viewManager->getSelections().begin());
-    if (origSel.getEndFrame() == frame0)
-    {
-        frame0 = origSel.getStartFrame(); // extending origSel
-    }
-    moveByOneNote(true);
-    int frame1 = m_viewManager->getPlaybackFrame();
-    Selection sel(frame0, frame1);
-    if (sel.isEmpty()) return;
-    m_viewManager->setSelection(sel);
+    int left = m_viewManager->getPlaybackFrame();
+    moveByOneNote(false);
+    int right = m_viewManager->getPlaybackFrame();    
 }
 
 void
 MainWindow::selectOneNoteLeft()
 {
-    int frame1 = m_viewManager->getPlaybackFrame();
-    Selection origSel = *(m_viewManager->getSelections().begin());
-    if (origSel.getStartFrame() == frame1)
-    {
-        frame1 = origSel.getEndFrame(); // extending origSel
-    }
+    int right = m_viewManager->getPlaybackFrame();
     moveByOneNote(false);
-    int frame0 = m_viewManager->getPlaybackFrame();
-    Selection sel(frame0, frame1);
-    if (sel.isEmpty()) return;
-    m_viewManager->setSelection(sel);
+    int left = m_viewManager->getPlaybackFrame();
 }
 
 
