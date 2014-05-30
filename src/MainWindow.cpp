@@ -612,8 +612,7 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
 
-    // action = new QAction(tr("C&lear Selection"), this);
-    action = toolbar->addAction(il.load("blank-16"), tr("Esc"));
+    action = new QAction(tr("C&lear Selection"), this);
     action->setShortcuts(QList<QKeySequence>()
                          << QKeySequence(tr("Esc"))
                          << QKeySequence(tr("Ctrl+Esc")));
@@ -657,9 +656,11 @@ MainWindow::setupEditMenu()
     menu->addAction(m_showCandidatesAction);
     m_rightButtonMenu->addAction(m_showCandidatesAction);
     
-
-    // action = new QAction(tr("Remove Pitches"), this);
-    action = toolbar->addAction(il.load("blank-16"), tr("Del"));
+    action = new QAction(tr("Remove Pitches"), this);
+    //!!! NB this keyboard shortcut does not work with Qt5 on OS/X
+    //!!! (none of the single-key shortcuts do). But it does work if
+    //!!! the action is added to a toolbar button:
+    // action = toolbar->addAction(il.load("editdelete"), tr("Remove Pitches"));
     action->setShortcut(tr("Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
@@ -671,9 +672,8 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     m_rightButtonMenu->addSeparator();
     
-    // action = new QAction(tr("Split Note"), this);
-    action = toolbar->addAction(il.load("blank-16"), tr("Split"));
-    action->setShortcut(tr("/"));
+    action = new QAction(tr("Split Note"), this);
+    action->setShortcut(tr("Ctrl+/"));
     action->setStatusTip(tr("Split the note at the current playback position into two"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(splitNote()));
@@ -681,9 +681,8 @@ MainWindow::setupEditMenu()
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
 
-    // action = new QAction(tr("Merge Notes"), this);
-    action = toolbar->addAction(il.load("blank-16"), tr("Merge"));
-    action->setShortcut(tr("\\"));
+    action = new QAction(tr("Merge Notes"), this);
+    action->setShortcut(tr("Ctrl+\\"));
     action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
