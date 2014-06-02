@@ -357,6 +357,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     statusBar();
 
+    finaliseMenus();
+
     connect(m_viewManager, SIGNAL(activity(QString)),
             m_activityLog, SLOT(activityHappened(QString)));
     connect(m_playSource, SIGNAL(activity(QString)),
