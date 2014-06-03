@@ -1020,7 +1020,7 @@ MainWindow::setupToolbars()
     m_playAudio = toolbar->addAction(il.load("speaker"), tr("Play Audio"));
     m_playAudio->setCheckable(true);
     connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
-    connect(this, SIGNAL(canPlay(bool)), m_playAudio, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canPlayWaveform(bool)), m_playAudio, SLOT(setEnabled(bool)));
 
     toolbar->addWidget(m_gainAudio);
     toolbar->addWidget(m_panAudio);
@@ -1038,7 +1038,7 @@ MainWindow::setupToolbars()
     m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
     m_playPitch->setCheckable(true);
     connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
-    connect(this, SIGNAL(canPlay(bool)), m_playPitch, SLOT(setEnabled(bool))); // JTEST: this resets the enabled state of m_playPitch.
+    connect(this, SIGNAL(canPlayPitch(bool)), m_playPitch, SLOT(setEnabled(bool)));
 
     toolbar->addWidget(m_gainPitch);
     toolbar->addWidget(m_panPitch);
@@ -1056,7 +1056,7 @@ MainWindow::setupToolbars()
     m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
     m_playNotes->setCheckable(true);
     connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
-    connect(this, SIGNAL(canPlay(bool)), m_playNotes, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canPlayNotes(bool)), m_playNotes, SLOT(setEnabled(bool)));
 
     toolbar->addWidget(m_gainNotes);
     toolbar->addWidget(m_panNotes);
@@ -1183,6 +1183,10 @@ MainWindow::updateMenuStates()
     if (m_paneStack) currentPane = m_paneStack->getCurrentPane();
     if (currentPane) currentLayer = currentPane->getSelectedLayer();
 
+    bool haveMainModel =
+	(getMainModel() != 0);
+    bool havePlayTarget =
+	(m_playTarget != 0);
     bool haveCurrentPane =
         (currentPane != 0);
     bool haveCurrentLayer =
@@ -1212,6 +1216,10 @@ MainWindow::updateMenuStates()
     emit canSpeedUpPlayback(v < m_playSpeed->maximum());
     emit canSlowDownPlayback(v > m_playSpeed->minimum());
 
+    bool haveWaveform =
+        m_analyser->isVisible(Analyser::Audio) &&
+        m_analyser->getLayer(Analyser::Audio);
+
     bool havePitchTrack = 
         m_analyser->isVisible(Analyser::PitchTrack) &&
         m_analyser->getLayer(Analyser::PitchTrack);
@@ -1223,6 +1231,10 @@ MainWindow::updateMenuStates()
     emit canExportPitchTrack(havePitchTrack);
     emit canExportNotes(haveNotes);
     emit canSnapNotes(haveSelection && haveNotes);
+
+    emit canPlayWaveform(haveWaveform && haveMainModel && havePlayTarget);
+    emit canPlayPitch(havePitchTrack && haveMainModel && havePlayTarget);
+    emit canPlayNotes(haveNotes && haveMainModel && havePlayTarget);
 
     if (pitchCandidatesVisible) {
         m_showCandidatesAction->setText(tr("Hide Pitch Candidates"));
@@ -1257,17 +1269,22 @@ MainWindow::showAudioToggled()
 {
     m_analyser->toggleVisible(Analyser::Audio);
 
-    // JTEST
-    if (!m_analyser->isVisible(Analyser::Audio))
-    {
-        m_analyser->setAudible(Analyser::Audio,false);
-        m_playAudio->setChecked(false);
-        m_playAudio->setEnabled(false);
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    bool playOn = false;
+    if (m_analyser->isVisible(Analyser::Audio)) {
+        // just switched layer on; check whether playback was also on previously
+        playOn = settings.value("playaudiowas", true).toBool();
+    } else {
+        settings.setValue("playaudiowas", m_playAudio->isChecked());
     }
-    else
-    {
-        m_playAudio->setEnabled(true);
-    }
+    m_analyser->setAudible(Analyser::Audio, playOn);
+    m_playAudio->setChecked(playOn);
+
+    settings.endGroup();
+
+    updateMenuStates();
 }
 
 void
@@ -1275,17 +1292,22 @@ MainWindow::showPitchToggled()
 {
     m_analyser->toggleVisible(Analyser::PitchTrack);
 
-    // JTEST
-    if (!m_analyser->isVisible(Analyser::PitchTrack))
-    {
-        m_analyser->setAudible(Analyser::PitchTrack,false);
-        m_playPitch->setChecked(false);
-        m_playPitch->setEnabled(false);
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    bool playOn = false;
+    if (m_analyser->isVisible(Analyser::PitchTrack)) {
+        // just switched layer on; check whether playback was also on previously
+        playOn = settings.value("playpitchwas", true).toBool();
+    } else {
+        settings.setValue("playpitchwas", m_playPitch->isChecked());
     }
-    else
-    {
-        m_playPitch->setEnabled(true);
-    }
+    m_analyser->setAudible(Analyser::PitchTrack, playOn);
+    m_playPitch->setChecked(playOn);
+
+    settings.endGroup();
+
+    updateMenuStates();
 }
 
 void
@@ -1299,17 +1321,22 @@ MainWindow::showNotesToggled()
 {
     m_analyser->toggleVisible(Analyser::Notes);
 
-    // JTEST
-    if (!m_analyser->isVisible(Analyser::Notes))
-    {
-        m_analyser->setAudible(Analyser::Notes,false);
-        m_playNotes->setChecked(false);
-        m_playNotes->setEnabled(false);
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    bool playOn = false;
+    if (m_analyser->isVisible(Analyser::Notes)) {
+        // just switched layer on; check whether playback was also on previously
+        playOn = settings.value("playnoteswas", true).toBool();
+    } else {
+        settings.setValue("playnoteswas", m_playNotes->isChecked());
     }
-    else
-    {
-        m_playNotes->setEnabled(true);
-    }
+    m_analyser->setAudible(Analyser::Notes, playOn);
+    m_playNotes->setChecked(playOn);
+
+    settings.endGroup();
+
+    updateMenuStates();
 }
 
 void

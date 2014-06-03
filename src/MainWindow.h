@@ -35,6 +35,9 @@ signals:
     void canExportPitchTrack(bool);
     void canExportNotes(bool);
     void canSnapNotes(bool);
+    void canPlayWaveform(bool);
+    void canPlayPitch(bool);
+    void canPlayNotes(bool);
 
 public slots:
     virtual bool commitData(bool mayAskUser); // on session shutdown
@@ -214,10 +217,6 @@ protected:
     AudioDial     *m_panAudio;
     AudioDial     *m_panPitch;
     AudioDial     *m_panNotes;
-
-    QLabel        *m_waveformStatus;
-    QLabel        *m_pitchStatus;
-    QLabel        *m_notesStatus;
     
     ActivityLog   *m_activityLog;
     KeyReference  *m_keyReference;
