@@ -691,6 +691,15 @@ MainWindow::setupEditMenu()
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     m_rightButtonMenu->addAction(action);
+
+    action = new QAction(tr("Delete Notes"), this);
+    action->setShortcut(tr("Ctrl+d"));
+    action->setStatusTip(tr("Delete all notes within the selected region="));
+    m_keyReference->registerShortcut(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(deleteNotes()));
+    connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+    m_rightButtonMenu->addAction(action);
     
     action = new QAction(tr("Form Note from Selection"), this);
     action->setShortcut(tr("Ctrl+="));
@@ -2283,6 +2292,30 @@ MainWindow::mergeNotes()
         CommandHistory::getInstance()->endCompoundOperation();
     }
 }
+
+void
+MainWindow::deleteNotes()
+{
+    FlexiNoteLayer *layer =
+        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    if (!layer) return;
+
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+
+    if (!selections.empty()) {
+
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Delete Notes"), true);
+                
+        for (MultiSelection::SelectionList::iterator k = selections.begin();
+             k != selections.end(); ++k) {
+            layer->deleteSelection(*k);
+        }
+        
+        CommandHistory::getInstance()->endCompoundOperation();
+    }
+}
+
 
 void
 MainWindow::formNoteFromSelection()
