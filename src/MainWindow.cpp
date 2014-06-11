@@ -1168,6 +1168,7 @@ MainWindow::toolNavigateSelected()
 void
 MainWindow::toolEditSelected()
 {
+    cerr << "MainWindow::toolEditSelected" << endl;
     m_viewManager->setToolMode(ViewManager::NoteEditMode);
     m_intelligentActionOn = true;
     m_analyser->setIntelligentActions(m_intelligentActionOn);
@@ -2309,7 +2310,7 @@ MainWindow::deleteNotes()
                 
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            layer->deleteSelection(*k);
+            layer->deleteSelectionInclusive(*k);
         }
         
         CommandHistory::getInstance()->endCompoundOperation();
