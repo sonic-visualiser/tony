@@ -2320,6 +2320,9 @@ MainWindow::deleteNotes()
 void
 MainWindow::formNoteFromSelection()
 {
+    Layer *layer0 = m_analyser->getLayer(Analyser::Notes);
+    FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer0->getModel());
+
     FlexiNoteLayer *layer =
         qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
     if (!layer) return;
@@ -2330,15 +2333,20 @@ MainWindow::formNoteFromSelection()
     
         CommandHistory::getInstance()->startCompoundOperation
             (tr("Form Note from Selection"), true);
-                
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
-            layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
-            layer->mergeNotes(m_analyser->getPane(), *k, false);
+            if (!model->getNotes(k->getStartFrame(), k->getEndFrame()).empty()) {
+                layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
+                layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
+                layer->mergeNotes(m_analyser->getPane(), *k, false);
+            } else {
+                layer->addNoteOn(k->getStartFrame(), 100, 100);
+                layer->addNoteOff(k->getEndFrame(), 100);
+                layer->mergeNotes(m_analyser->getPane(), *k, false); // only so the note adapts in case of exisitng pitch track
+            }
         }
 
-        CommandHistory::getInstance()->endCompoundOperation();
+        CommandHistory::getInstance()->endCompoundOperation();     
     }
 }
 
