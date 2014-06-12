@@ -1800,13 +1800,11 @@ MainWindow::saveSessionAs()
     m_analyser->clearReAnalysis();
     clearSelection();
 
-    QString orig = m_audioFile;
-    if (orig == "") orig = ".";
-    else orig = QFileInfo(orig).absoluteDir().canonicalPath();
-
     QString path = getSaveFileName(FileFinder::SessionFile);
 
-    if (path == "") return;
+    if (path == "") {
+        return;
+    }
 
     if (!saveSessionFile(path)) {
         QMessageBox::critical(this, tr("Failed to save file"),
