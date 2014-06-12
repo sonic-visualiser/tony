@@ -47,6 +47,7 @@ protected slots:
     virtual void openLocation();
     virtual void openRecentFile();
     virtual void saveSession();
+    virtual void saveSessionInAudioPath();
     virtual void saveSessionAs();
     virtual void exportPitchLayer();
     virtual void exportNoteLayer();

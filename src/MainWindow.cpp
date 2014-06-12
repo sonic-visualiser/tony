@@ -478,6 +478,15 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
     toolbar->addAction(action);
 
+    icon = il.load("filesaveas");
+    icon.addPixmap(il.loadPixmap("filesaveas-22"));
+    action = new QAction(icon, tr("Save Session In &Audio Path"), this);
+    action->setShortcut(tr("Ctrl+Alt+S"));
+    action->setStatusTip(tr("Save the current session into a %1 session file with the same path and filename but .ton extension.").arg(QApplication::applicationName()));
+    connect(action, SIGNAL(triggered()), this, SLOT(saveSessionInAudioPath()));
+    menu->addAction(action);
+    toolbar->addAction(action);
+
     menu->addSeparator();
 
     action = new QAction(tr("I&mport Pitch Track Data..."), this);
@@ -1789,6 +1798,35 @@ MainWindow::saveSession()
         }
     } else {
         saveSessionAs();
+    }
+}
+
+void
+MainWindow::saveSessionInAudioPath()
+{
+    // We do not want to save mid-analysis regions -- that would cause
+    // confusion on reloading
+    m_analyser->clearReAnalysis();
+    clearSelection();
+
+    QString filepath = QFileInfo(m_audioFile).absoluteDir().canonicalPath();
+    QString basename = QFileInfo(m_audioFile).completeBaseName();
+
+    QString path = QDir(filepath).filePath(basename + ".ton");
+
+    cerr << path << endl;
+
+    if (!saveSessionFile(path)) {
+        QMessageBox::critical(this, tr("Failed to save file"),
+                              tr("Session file \"%1\" could not be saved.").arg(path));
+    } else {
+        setWindowTitle(tr("%1: %2")
+                       .arg(QApplication::applicationName())
+                       .arg(QFileInfo(path).fileName()));
+        m_sessionFile = path;
+        CommandHistory::getInstance()->documentSaved();
+        documentRestored();
+        m_recentFiles.addFile(path);
     }
 }
 
