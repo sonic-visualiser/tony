@@ -660,10 +660,6 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(m_showCandidatesAction);
     
     action = new QAction(tr("Remove Pitches"), this);
-    //!!! NB this keyboard shortcut does not work with Qt5 on OS/X
-    //!!! (none of the single-key shortcuts do). But it does work if
-    //!!! the action is added to a toolbar button:
-    // action = toolbar->addAction(il.load("editdelete"), tr("Remove Pitches"));
     action->setShortcut(tr("Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
