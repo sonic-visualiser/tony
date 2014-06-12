@@ -223,6 +223,8 @@ protected:
     KeyReference  *m_keyReference;
     VersionTester *m_versionTester;
 
+    int m_selectionAnchor;
+
     Analyser::FrequencyRange m_pendingConstraint;
 
     QString exportToSVL(QString path, Layer *layer);
@@ -245,7 +247,7 @@ protected:
     virtual void updateVisibleRangeDisplay(Pane *p) const;
     virtual void updatePositionStatusDisplays() const;
 
-    void moveByOneNote(bool right);
+    void moveByOneNote(bool right, bool doSelect);
 };
 
 

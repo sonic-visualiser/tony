@@ -101,7 +101,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     m_rwdAction(0),
     m_intelligentActionOn(true), //GF: !!! temporary
     m_activityLog(new ActivityLog()),
-    m_keyReference(new KeyReference())
+    m_keyReference(new KeyReference()),
+    m_selectionAnchor(0)
 {
     setWindowTitle(QApplication::applicationName());
 
@@ -1088,40 +1089,40 @@ void
 MainWindow::moveOneNoteRight()
 {
     // cerr << "MainWindow::moveOneNoteRight" << endl;
-    moveByOneNote(true);
+    moveByOneNote(true, false);
 }
 
 void
 MainWindow::moveOneNoteLeft()
 {
     // cerr << "MainWindow::moveOneNoteLeft" << endl;
-    moveByOneNote(false);
+    moveByOneNote(false, false);
 }
 
 void
 MainWindow::selectOneNoteRight()
 {
-    int left = m_viewManager->getPlaybackFrame();
-    moveByOneNote(false);
-    int right = m_viewManager->getPlaybackFrame();    
+    moveByOneNote(true, true);
 }
 
 void
 MainWindow::selectOneNoteLeft()
 {
-    int right = m_viewManager->getPlaybackFrame();
-    moveByOneNote(false);
-    int left = m_viewManager->getPlaybackFrame();
+    moveByOneNote(false, true);
 }
 
 
 void
-MainWindow::moveByOneNote(bool right)
+MainWindow::moveByOneNote(bool right, bool doSelect)
 {
     // cerr << "MainWindow::moveByOneNote" << endl;
     int frame = m_viewManager->getPlaybackFrame();
     
     Pane *p = m_analyser->getPane();
+
+    if (!doSelect) {
+        m_selectionAnchor = frame;
+    }
 
     Layer *layer = m_analyser->getLayer(Analyser::Notes);
     if (!layer) return;
@@ -1156,6 +1157,15 @@ MainWindow::moveByOneNote(bool right)
     }
     frame = *i2;
     m_viewManager->setPlaybackFrame(frame);
+    if (doSelect) {
+        Selection sel;
+        if (frame > m_selectionAnchor) {
+            sel = Selection(m_selectionAnchor, frame);
+        } else {
+            sel = Selection(frame, m_selectionAnchor);
+        }
+        m_viewManager->setSelection(sel);
+    }
 }
 
 void
