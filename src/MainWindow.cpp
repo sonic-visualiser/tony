@@ -1115,8 +1115,8 @@ MainWindow::selectOneNoteLeft()
 void
 MainWindow::moveByOneNote(bool right, bool doSelect)
 {
-    // cerr << "MainWindow::moveByOneNote" << endl;
     int frame = m_viewManager->getPlaybackFrame();
+    cerr << "MainWindow::moveByOneNote startframe: " << frame << endl;
     
     Pane *p = m_analyser->getPane();
 
@@ -1166,6 +1166,7 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
         }
         m_viewManager->setSelection(sel);
     }
+    cerr << "MainWindow::moveByOneNote endframe: " << frame << endl;
 }
 
 void
