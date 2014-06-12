@@ -1126,7 +1126,13 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     
     Pane *p = m_analyser->getPane();
 
-    if (!doSelect) {
+    bool isAtSelectionBoundary = false;
+    MultiSelection::SelectionList selections = m_viewManager->getSelections();
+    if (!selections.empty()) {
+        Selection sel = *selections.begin();
+        isAtSelectionBoundary = (frame == sel.getStartFrame()) || (frame == sel.getEndFrame());
+    }
+    if (!doSelect || !isAtSelectionBoundary) {
         m_selectionAnchor = frame;
     }
 
