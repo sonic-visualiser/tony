@@ -660,10 +660,6 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(m_showCandidatesAction);
     
     action = new QAction(tr("Remove Pitches"), this);
-    //!!! NB this keyboard shortcut does not work with Qt5 on OS/X
-    //!!! (none of the single-key shortcuts do). But it does work if
-    //!!! the action is added to a toolbar button:
-    // action = toolbar->addAction(il.load("editdelete"), tr("Remove Pitches"));
     action->setShortcut(tr("Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
@@ -733,50 +729,18 @@ MainWindow::setupViewMenu()
 
     QMenu *menu = menuBar()->addMenu(tr("&View"));
     menu->setTearOffEnabled(true);
-    action = new QAction(tr("Scroll &Left"), this);
-    action->setShortcut(tr("Left"));
-    action->setStatusTip(tr("Scroll the current pane to the left"));
+    action = new QAction(tr("Peek &Left"), this);
+    action->setShortcut(tr("Alt+Left"));
+    action->setStatusTip(tr("Scroll the current pane to the left without changing the play position"));
     connect(action, SIGNAL(triggered()), this, SLOT(scrollLeft()));
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
     
-    action = new QAction(tr("Scroll &Right"), this);
-    action->setShortcut(tr("Right"));
-    action->setStatusTip(tr("Scroll the current pane to the right"));
+    action = new QAction(tr("Peek &Right"), this);
+    action->setShortcut(tr("Alt+Right"));
+    action->setStatusTip(tr("Scroll the current pane to the right without changing the play position"));
     connect(action, SIGNAL(triggered()), this, SLOT(scrollRight()));
-    connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-    
-    action = new QAction(tr("&One Note Left"), this);
-    action->setShortcut(tr("Ctrl+Left"));
-    action->setStatusTip(tr("Move cursor to the preceding note (or silence) onset."));
-    connect(action, SIGNAL(triggered()), this, SLOT(moveOneNoteLeft()));
-    connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-    
-    action = new QAction(tr("O&ne Note Right"), this);
-    action->setShortcut(tr("Ctrl+Right"));
-    action->setStatusTip(tr("Move cursor to the succeeding note (or silence)."));
-    connect(action, SIGNAL(triggered()), this, SLOT(moveOneNoteRight()));
-    connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-
-    action = new QAction(tr("&Select One Note Left"), this);
-    action->setShortcut(tr("Ctrl+Shift+Left"));
-    action->setStatusTip(tr("Select to the preceding note (or silence) onset."));
-    connect(action, SIGNAL(triggered()), this, SLOT(selectOneNoteLeft()));
-    connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-    
-    action = new QAction(tr("S&elect One Note Right"), this);
-    action->setShortcut(tr("Ctrl+Shift+Right"));
-    action->setStatusTip(tr("Select to the succeeding note (or silence)."));
-    connect(action, SIGNAL(triggered()), this, SLOT(selectOneNoteRight()));
     connect(this, SIGNAL(canScroll(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
@@ -906,9 +870,12 @@ MainWindow::setupToolbars()
 
     QAction *m_rwdAction = toolbar->addAction(il.load("rewind"),
                                               tr("Rewind"));
-    m_rwdAction->setStatusTip(tr("Rewind to the previous time instant or time ruler notch"));
+    m_rwdAction->setShortcut(tr("Left"));
+    m_rwdAction->setStatusTip(tr("Rewind to the previous one-second boundary"));
     connect(m_rwdAction, SIGNAL(triggered()), this, SLOT(rewind()));
     connect(this, SIGNAL(canRewind(bool)), m_rwdAction, SLOT(setEnabled(bool)));
+
+    setDefaultFfwdRwdStep(RealTime(1, 0));
 
     QAction *playAction = toolbar->addAction(il.load("playpause"),
                                              tr("Play / Pause"));
@@ -922,7 +889,8 @@ MainWindow::setupToolbars()
 
     m_ffwdAction = toolbar->addAction(il.load("ffwd"),
                                               tr("Fast Forward"));
-    m_ffwdAction->setStatusTip(tr("Fast-forward to the next time instant or time ruler notch"));
+    m_ffwdAction->setShortcut(tr("Right"));
+    m_ffwdAction->setStatusTip(tr("Fast-forward to the next one-second boundary"));
     connect(m_ffwdAction, SIGNAL(triggered()), this, SLOT(ffwd()));
     connect(this, SIGNAL(canFfwd(bool)), m_ffwdAction, SLOT(setEnabled(bool)));
 
@@ -957,6 +925,30 @@ MainWindow::setupToolbars()
     connect(plAction, SIGNAL(triggered()), this, SLOT(playLoopToggled()));
     connect(this, SIGNAL(canPlay(bool)), plAction, SLOT(setEnabled(bool)));
 
+    QAction *oneLeftAction = new QAction(tr("&One Note Left"), this);
+    oneLeftAction->setShortcut(tr("Ctrl+Left"));
+    oneLeftAction->setStatusTip(tr("Move cursor to the preceding note (or silence) onset."));
+    connect(oneLeftAction, SIGNAL(triggered()), this, SLOT(moveOneNoteLeft()));
+    connect(this, SIGNAL(canScroll(bool)), oneLeftAction, SLOT(setEnabled(bool)));
+    
+    QAction *oneRightAction = new QAction(tr("O&ne Note Right"), this);
+    oneRightAction->setShortcut(tr("Ctrl+Right"));
+    oneRightAction->setStatusTip(tr("Move cursor to the succeeding note (or silence)."));
+    connect(oneRightAction, SIGNAL(triggered()), this, SLOT(moveOneNoteRight()));
+    connect(this, SIGNAL(canScroll(bool)), oneRightAction, SLOT(setEnabled(bool)));
+
+    QAction *selectOneLeftAction = new QAction(tr("&Select One Note Left"), this);
+    selectOneLeftAction->setShortcut(tr("Ctrl+Shift+Left"));
+    selectOneLeftAction->setStatusTip(tr("Select to the preceding note (or silence) onset."));
+    connect(selectOneLeftAction, SIGNAL(triggered()), this, SLOT(selectOneNoteLeft()));
+    connect(this, SIGNAL(canScroll(bool)), selectOneLeftAction, SLOT(setEnabled(bool)));
+    
+    QAction *selectOneRightAction = new QAction(tr("S&elect One Note Right"), this);
+    selectOneRightAction->setShortcut(tr("Ctrl+Shift+Right"));
+    selectOneRightAction->setStatusTip(tr("Select to the succeeding note (or silence)."));
+    connect(selectOneRightAction, SIGNAL(triggered()), this, SLOT(selectOneNoteRight()));
+    connect(this, SIGNAL(canScroll(bool)), selectOneRightAction, SLOT(setEnabled(bool)));
+
     m_keyReference->registerShortcut(psAction);
     m_keyReference->registerShortcut(plAction);
     m_keyReference->registerShortcut(playAction);
@@ -964,6 +956,10 @@ MainWindow::setupToolbars()
     m_keyReference->registerShortcut(m_ffwdAction);
     m_keyReference->registerShortcut(rwdStartAction);
     m_keyReference->registerShortcut(ffwdEndAction);
+    m_keyReference->registerShortcut(oneLeftAction);
+    m_keyReference->registerShortcut(oneRightAction);
+    m_keyReference->registerShortcut(selectOneLeftAction);
+    m_keyReference->registerShortcut(selectOneRightAction);
 
     menu->addAction(playAction);
     menu->addAction(psAction);
@@ -975,6 +971,11 @@ MainWindow::setupToolbars()
     menu->addAction(rwdStartAction);
     menu->addAction(ffwdEndAction);
     menu->addSeparator();
+    menu->addAction(oneLeftAction);
+    menu->addAction(oneRightAction);
+    menu->addAction(selectOneLeftAction);
+    menu->addAction(selectOneRightAction);
+    menu->addSeparator();
 
     m_rightButtonPlaybackMenu->addAction(playAction);
     m_rightButtonPlaybackMenu->addAction(psAction);
@@ -985,6 +986,11 @@ MainWindow::setupToolbars()
     m_rightButtonPlaybackMenu->addSeparator();
     m_rightButtonPlaybackMenu->addAction(rwdStartAction);
     m_rightButtonPlaybackMenu->addAction(ffwdEndAction);
+    m_rightButtonPlaybackMenu->addSeparator();
+    m_rightButtonPlaybackMenu->addAction(oneLeftAction);
+    m_rightButtonPlaybackMenu->addAction(oneRightAction);
+    m_rightButtonPlaybackMenu->addAction(selectOneLeftAction);
+    m_rightButtonPlaybackMenu->addAction(selectOneRightAction);
     m_rightButtonPlaybackMenu->addSeparator();
 
     QAction *fastAction = menu->addAction(tr("Speed Up"));
