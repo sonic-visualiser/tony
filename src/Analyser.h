@@ -229,7 +229,7 @@ protected:
     int m_currentCandidate;
     bool m_candidatesVisible;
 
-    QString doAllAnalyses();
+    QString doAllAnalyses(bool withPitchTrack);
 
     QString addVisualisations();
     QString addWaveform();

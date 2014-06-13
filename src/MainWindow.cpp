@@ -869,7 +869,7 @@ MainWindow::precisionAnalysisToggled()
     settings.setValue("precision-analysis", set);
     settings.endGroup();
 
-    analyseNow();
+    // don't run analyseNow() automatically -- it's a destructive operation
 }
 
 void

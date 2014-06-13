@@ -78,7 +78,12 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     connect(doc, SIGNAL(layerAboutToBeDeleted(Layer *)),
             this, SLOT(layerAboutToBeDeleted(Layer *)));
 
-    return doAllAnalyses();
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
+    settings.endGroup();
+
+    return doAllAnalyses(autoAnalyse);
 }
 
 QString
@@ -97,11 +102,11 @@ Analyser::analyseExistingFile()
         m_layers[Notes] = 0;
     }
 
-    return doAllAnalyses();
+    return doAllAnalyses(true);
 }
 
 QString
-Analyser::doAllAnalyses()
+Analyser::doAllAnalyses(bool withPitchTrack)
 {
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
@@ -123,8 +128,10 @@ Analyser::doAllAnalyses()
     error = addWaveform();
     if (error != "") return error;
 
-    error = addAnalyses();
-    if (error != "") return error;
+    if (withPitchTrack) {
+        error = addAnalyses();
+        if (error != "") return error;
+    }
 
     loadState(Audio);
     loadState(PitchTrack);
@@ -301,8 +308,15 @@ Analyser::addAnalyses()
         m_layers[PitchTrack] = existingPitch;
         m_layers[Notes] = existingNotes;
         return "";
-    } else if (existingPitch || existingNotes) {
-        return "One (but not both) of pitch and note track found in session";
+    } else {
+        if (existingPitch) {
+            m_document->removeLayerFromView(m_pane, existingPitch);
+            m_layers[PitchTrack] = 0;
+        }
+        if (existingNotes) {
+            m_document->removeLayerFromView(m_pane, existingNotes);
+            m_layers[Notes] = 0;
+        }
     }
 
     TransformFactory *tf = TransformFactory::getInstance();
@@ -334,10 +348,23 @@ Analyser::addAnalyses()
 	return notFound.arg(base + noteout).arg(plugname);
     }
 
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    bool precise = settings.value("precision-analysis", false).toBool();
+    settings.endGroup();
+
     Transform t = tf->getDefaultTransformFor
         (base + f0out, m_fileModel->getSampleRate());
     t.setStepSize(256);
     t.setBlockSize(2048);
+
+    if (precise) {
+        cerr << "setting parameters for precise mode" << endl;
+        t.setParameter("precisetime", 1);
+    } else {
+        cerr << "setting parameters for vague mode" << endl;
+        t.setParameter("precisetime", 0);
+    }
 
     transforms.push_back(t);
 
