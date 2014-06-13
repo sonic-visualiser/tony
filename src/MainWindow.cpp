@@ -1256,9 +1256,9 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     if (doSelect) {
         Selection sel;
         if (frame > m_selectionAnchor) {
-            sel = Selection(m_selectionAnchor, frame);
+            sel = Selection(m_selectionAnchor, frame-1);
         } else {
-            sel = Selection(frame, m_selectionAnchor);
+            sel = Selection(frame, m_selectionAnchor-1);
         }
         m_viewManager->setSelection(sel);
     }
