@@ -133,6 +133,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     cdb->setUseDarkBackground(cdb->addColour(QColor(255, 188, 80), tr("Bright Orange")), true);
 
     Preferences::getInstance()->setResampleOnLoad(true);
+    Preferences::getInstance()->setFixedSampleRate(44100);
     Preferences::getInstance()->setSpectrogramSmoothing
         (Preferences::SpectrogramInterpolated);
 
@@ -414,6 +415,7 @@ MainWindow::setupMenus()
     setupFileMenu();
     setupEditMenu();
     setupViewMenu();
+    setupAnalysisMenu();
 
     m_mainMenusCreated = true;
 }
@@ -479,9 +481,7 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
     toolbar->addAction(action);
 
-    icon = il.load("filesave");
-    icon.addPixmap(il.loadPixmap("filesave-22"));
-    action = new QAction(icon, tr("Save Session to Audio &Path"), this);
+    action = new QAction(tr("Save Session to Audio &Path"), this);
     action->setShortcut(tr("Ctrl+Alt+S"));
     action->setStatusTip(tr("Save the current session into a %1 session file with the same filename as the audio but a .ton extension.").arg(QApplication::applicationName()));
     connect(action, SIGNAL(triggered()), this, SLOT(saveSessionInAudioPath()));
@@ -798,6 +798,41 @@ MainWindow::setupViewMenu()
     action->setStatusTip(tr("Set the minimum and maximum frequencies in the visible display"));
     connect(action, SIGNAL(triggered()), this, SLOT(editDisplayExtents()));
     menu->addAction(action);
+}
+
+void
+MainWindow::setupAnalysisMenu()
+{
+    if (m_mainMenusCreated) return;
+
+    IconLoader il;
+
+    QAction *action = 0;
+
+    QMenu *menu = menuBar()->addMenu(tr("&Analysis"));
+    menu->setTearOffEnabled(true);
+
+    m_keyReference->setCategory(tr("Analysis"));
+
+    action = new QAction(tr("&Analyse now"), this);
+    action->setShortcut(tr("Ctrl+P"));
+    action->setStatusTip(tr("Analyse audio now to extract pitches and notes. (This will delete all existing pitches and notes.)"));
+    menu->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+    menu->addSeparator();
+
+    action = new QAction(tr("Automatically Analyse &New Audio"), this);
+    action->setCheckable(true);
+    action->setChecked(true);
+    menu->addAction(action);
+
+    action = new QAction(tr("Analyse &Without Frequency-dependent Timing Bias (slow)"), this);
+    action->setCheckable(true);
+    action->setChecked(false);
+    
+    menu->addAction(action);
+
 }
 
 void
