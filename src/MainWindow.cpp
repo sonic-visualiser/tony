@@ -670,7 +670,7 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(m_showCandidatesAction);
     
     action = new QAction(tr("Remove Pitches"), this);
-    action->setShortcut(tr("Backspace"));
+    action->setShortcut(tr("Ctrl+Backspace"));
     action->setStatusTip(tr("Remove all pitch estimates within the selected region, making it unvoiced"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(clearPitches()));
@@ -681,8 +681,10 @@ MainWindow::setupEditMenu()
     menu->addSeparator();
     m_rightButtonMenu->addSeparator();
     
+    m_keyReference->setCategory(tr("Note Track"));
+
     action = new QAction(tr("Split Note"), this);
-    action->setShortcut(tr("Ctrl+/"));
+    action->setShortcut(tr("/"));
     action->setStatusTip(tr("Split the note at the current playback position into two"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(splitNote()));
@@ -691,7 +693,7 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("Merge Notes"), this);
-    action->setShortcut(tr("Ctrl+\\"));
+    action->setShortcut(tr("\\"));
     action->setStatusTip(tr("Merge all notes within the selected region into a single note"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(mergeNotes()));
@@ -700,8 +702,8 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
 
     action = new QAction(tr("Delete Notes"), this);
-    action->setShortcut(tr("Ctrl+d"));
-    action->setStatusTip(tr("Delete all notes within the selected region="));
+    action->setShortcut(tr("Backspace"));
+    action->setStatusTip(tr("Delete all notes within the selected region"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(deleteNotes()));
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
@@ -709,7 +711,7 @@ MainWindow::setupEditMenu()
     m_rightButtonMenu->addAction(action);
     
     action = new QAction(tr("Form Note from Selection"), this);
-    action->setShortcut(tr("Ctrl+="));
+    action->setShortcut(tr("="));
     action->setStatusTip(tr("Form a note spanning the selected region, splitting any existing notes at its boundaries"));
     m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(formNoteFromSelection()));
@@ -719,7 +721,7 @@ MainWindow::setupEditMenu()
 
     action = new QAction(tr("Snap Notes to Pitch Track"), this);
     action->setStatusTip(tr("Set notes within the selected region to the median frequency of their underlying pitches, or remove them if there are no underlying pitches"));
-    m_keyReference->registerShortcut(action);
+    // m_keyReference->registerShortcut(action);
     connect(action, SIGNAL(triggered()), this, SLOT(snapNotesToPitches()));
     connect(this, SIGNAL(canSnapNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
