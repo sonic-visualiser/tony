@@ -235,6 +235,7 @@ protected:
     virtual void setupFileMenu();
     virtual void setupEditMenu();
     virtual void setupViewMenu();
+    virtual void setupAnalysisMenu();
     virtual void setupHelpMenu();
     virtual void setupToolbars();
 

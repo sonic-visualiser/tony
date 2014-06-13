@@ -414,6 +414,7 @@ MainWindow::setupMenus()
     setupFileMenu();
     setupEditMenu();
     setupViewMenu();
+    setupAnalysisMenu();
 
     m_mainMenusCreated = true;
 }
@@ -798,6 +799,41 @@ MainWindow::setupViewMenu()
     action->setStatusTip(tr("Set the minimum and maximum frequencies in the visible display"));
     connect(action, SIGNAL(triggered()), this, SLOT(editDisplayExtents()));
     menu->addAction(action);
+}
+
+void
+MainWindow::setupAnalysisMenu()
+{
+    if (m_mainMenusCreated) return;
+
+    IconLoader il;
+
+    QAction *action = 0;
+
+    QMenu *menu = menuBar()->addMenu(tr("&Analysis"));
+    menu->setTearOffEnabled(true);
+
+    m_keyReference->setCategory(tr("Analysis"));
+
+    action = new QAction(tr("&Analyse now"), this);
+    action->setShortcut(tr("Ctrl+P"));
+    action->setStatusTip(tr("Analyse audio now to extract pitches and notes. (This will delete all existing pitches and notes.)"));
+    menu->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+    menu->addSeparator();
+
+    action = new QAction(tr("Automatically Analyse New Audio"), this);
+    action->setCheckable(true);
+    action->setChecked(true);
+    menu->addAction(action);
+
+    action = new QAction(tr("Analyse Without Frequency-dependent Timing Bias (slow)"), this);
+    action->setCheckable(true);
+    action->setChecked(false);
+    
+    menu->addAction(action);
+
 }
 
 void
