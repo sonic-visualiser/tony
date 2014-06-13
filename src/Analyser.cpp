@@ -138,6 +138,31 @@ Analyser::setDisplayFrequencyExtents(float min, float max)
     return true;
 }
 
+int
+Analyser::getInitialAnalysisCompletion()
+{
+    int completion = 0;
+
+    if (m_layers[PitchTrack]) {
+        completion = m_layers[PitchTrack]->getCompletion(m_pane);
+    }
+
+    if (m_layers[Notes]) {
+        int c = m_layers[Notes]->getCompletion(m_pane);
+        if (c < completion) completion = c;
+    }
+    
+    return completion;
+}
+
+void
+Analyser::layerCompletionChanged()
+{
+    if (getInitialAnalysisCompletion() == 100) {
+        emit initialAnalysisCompleted();
+    }
+}
+
 QString
 Analyser::addVisualisations()
 {
@@ -318,6 +343,8 @@ Analyser::addAnalyses()
         PlayParameters *params = pitchLayer->getPlayParameters();
         if (params) params->setPlayPan(1);
     }
+    connect(pitchLayer, SIGNAL(modelCompletionChanged()),
+            this, SLOT(layerCompletionChanged()));
     
     FlexiNoteLayer *flexiNoteLayer = 
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
@@ -326,6 +353,8 @@ Analyser::addAnalyses()
         PlayParameters *params = flexiNoteLayer->getPlayParameters();
         if (params) params->setPlayPan(1);
     }
+    connect(flexiNoteLayer, SIGNAL(modelCompletionChanged()),
+            this, SLOT(layerCompletionChanged()));
     
     return "";
 }

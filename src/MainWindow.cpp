@@ -1780,6 +1780,34 @@ MainWindow::checkSaveModified()
     return false;
 }
 
+bool
+MainWindow::waitForInitialAnalysis()
+{
+    // Called before saving a session. We can't safely save while the
+    // initial analysis is happening, because then we end up with an
+    // incomplete session on reload. There are certainly theoretically
+    // better ways to handle this...
+    
+    if (!m_analyser || m_analyser->getInitialAnalysisCompletion() >= 100) {
+        return true;
+    }
+
+    QMessageBox mb(QMessageBox::Information,
+                   tr("Waiting for analysis"),
+                   tr("Waiting for initial analysis to complete before saving..."),
+                   QMessageBox::Cancel,
+                   this);
+
+    connect(m_analyser, SIGNAL(initialAnalysisCompleted()), 
+            &mb, SLOT(accept()));
+
+    if (mb.exec() == QDialog::Accepted) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void
 MainWindow::saveSession()
 {
@@ -1806,6 +1834,8 @@ void
 MainWindow::saveSessionInAudioPath()
 {
     if (m_audioFile == "") return;
+
+    if (!waitForInitialAnalysis()) return;
 
     // We do not want to save mid-analysis regions -- that would cause
     // confusion on reloading
@@ -1835,6 +1865,11 @@ MainWindow::saveSessionInAudioPath()
         }
     }
 
+    if (!waitForInitialAnalysis()) {
+        QMessageBox::warning(this, tr("File not saved"),
+                             tr("Wait cancelled: the session has not been saved."));
+    }
+
     if (!saveSessionFile(path)) {
         QMessageBox::critical(this, tr("Failed to save file"),
                               tr("Session file \"%1\" could not be saved.").arg(path));
@@ -1860,6 +1895,12 @@ MainWindow::saveSessionAs()
     QString path = getSaveFileName(FileFinder::SessionFile);
 
     if (path == "") {
+        return;
+    }
+
+    if (!waitForInitialAnalysis()) {
+        QMessageBox::warning(this, tr("File not saved"),
+                             tr("Wait cancelled: the session has not been saved."));
         return;
     }
 

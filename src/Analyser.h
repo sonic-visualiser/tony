@@ -54,6 +54,9 @@ public:
     bool getDisplayFrequencyExtents(float &min, float &max);
     bool setDisplayFrequencyExtents(float min, float max);
 
+    // Return completion %age for initial analysis -- 100 means it's done
+    int getInitialAnalysisCompletion();
+
     enum Component {
         Audio = 0,
         PitchTrack = 1,
@@ -203,9 +206,11 @@ public:
 
 signals:
     void layersChanged();
+    void initialAnalysisCompleted();
 
 protected slots:
     void layerAboutToBeDeleted(Layer *);
+    void layerCompletionChanged();
 
 protected:
     Document *m_document;

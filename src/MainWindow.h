@@ -244,6 +244,7 @@ protected:
 
     virtual void closeEvent(QCloseEvent *e);
     bool checkSaveModified();
+    bool waitForInitialAnalysis();
 
     virtual void updateVisibleRangeDisplay(Pane *p) const;
     virtual void updatePositionStatusDisplays() const;
