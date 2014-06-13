@@ -136,6 +136,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     Preferences::getInstance()->setFixedSampleRate(44100);
     Preferences::getInstance()->setSpectrogramSmoothing
         (Preferences::SpectrogramInterpolated);
+    Preferences::getInstance()->setNormaliseAudio(true);
 
     QSettings settings;
 
