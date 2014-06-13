@@ -822,12 +822,12 @@ MainWindow::setupAnalysisMenu()
 
     menu->addSeparator();
 
-    action = new QAction(tr("Automatically Analyse New Audio"), this);
+    action = new QAction(tr("Automatically Analyse &New Audio"), this);
     action->setCheckable(true);
     action->setChecked(true);
     menu->addAction(action);
 
-    action = new QAction(tr("Analyse Without Frequency-dependent Timing Bias (slow)"), this);
+    action = new QAction(tr("Analyse &Without Frequency-dependent Timing Bias (slow)"), this);
     action->setCheckable(true);
     action->setChecked(false);
     
