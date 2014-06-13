@@ -478,14 +478,14 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
     toolbar->addAction(action);
 
-    icon = il.load("filesaveas");
-    icon.addPixmap(il.loadPixmap("filesaveas-22"));
+    icon = il.load("filesave");
+    icon.addPixmap(il.loadPixmap("filesave-22"));
     action = new QAction(icon, tr("Save Session In &Audio Path"), this);
     action->setShortcut(tr("Ctrl+Alt+S"));
     action->setStatusTip(tr("Save the current session into a %1 session file with the same path and filename but .ton extension.").arg(QApplication::applicationName()));
     connect(action, SIGNAL(triggered()), this, SLOT(saveSessionInAudioPath()));
+    connect(this, SIGNAL(canSave(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
-    toolbar->addAction(action);
 
     menu->addSeparator();
 
