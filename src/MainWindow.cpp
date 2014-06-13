@@ -133,6 +133,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     cdb->setUseDarkBackground(cdb->addColour(QColor(255, 188, 80), tr("Bright Orange")), true);
 
     Preferences::getInstance()->setResampleOnLoad(true);
+    Preferences::getInstance()->setFixedSampleRate(44100);
     Preferences::getInstance()->setSpectrogramSmoothing
         (Preferences::SpectrogramInterpolated);
 
