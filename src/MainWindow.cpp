@@ -1862,6 +1862,15 @@ MainWindow::waitForInitialAnalysis()
     // incomplete session on reload. There are certainly theoretically
     // better ways to handle this...
     
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
+    settings.endGroup();
+
+    if (!autoAnalyse) {
+        return true;
+    }
+
     if (!m_analyser || m_analyser->getInitialAnalysisCompletion() >= 100) {
         return true;
     }
