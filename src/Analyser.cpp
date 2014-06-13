@@ -78,6 +78,31 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     connect(doc, SIGNAL(layerAboutToBeDeleted(Layer *)),
             this, SLOT(layerAboutToBeDeleted(Layer *)));
 
+    return doAllAnalyses();
+}
+
+QString
+Analyser::analyseExistingFile()
+{
+    if (!m_document) return "Internal error: Analyser::analyseExistingFile() called with no document present";
+
+    if (!m_pane) return "Internal error: Analyser::analyseExistingFile() called with no pane present";
+
+    if (m_layers[PitchTrack]) {
+        m_document->removeLayerFromView(m_pane, m_layers[PitchTrack]);
+        m_layers[PitchTrack] = 0;
+    }
+    if (m_layers[Notes]) {
+        m_document->removeLayerFromView(m_pane, m_layers[Notes]);
+        m_layers[Notes] = 0;
+    }
+
+    return doAllAnalyses();
+}
+
+QString
+Analyser::doAllAnalyses()
+{
     m_reAnalysingSelection = Selection();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;

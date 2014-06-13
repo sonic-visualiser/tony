@@ -46,6 +46,9 @@ public:
     QString newFileLoaded(Document *newDocument, WaveFileModel *model,
                           PaneStack *paneStack, Pane *pane);
 
+    // Remove any derived layers, process the main model, add derived layers; return "" on success or error string on failure
+    QString analyseExistingFile();
+
     // Discard any layers etc associated with the current document
     void fileClosed();
 		       
@@ -225,6 +228,8 @@ protected:
     std::vector<Layer *> m_reAnalysisCandidates;
     int m_currentCandidate;
     bool m_candidatesVisible;
+
+    QString doAllAnalyses();
 
     QString addVisualisations();
     QString addWaveform();

@@ -2986,8 +2986,23 @@ MainWindow::mainModelChanged(WaveFileModel *model)
 void
 MainWindow::analyseNow()
 {
-    //!!!
     cerr << "analyseNow called" << endl;
+    if (!m_analyser) return;
+
+    CommandHistory::getInstance()->startCompoundOperation
+        (tr("Analyse Audio"), true);
+
+    QString error = m_analyser->analyseExistingFile();
+
+    CommandHistory::getInstance()->endCompoundOperation();
+
+    if (error != "") {
+        QMessageBox::warning
+            (this,
+             tr("Failed to analyse audio"),
+             tr("<b>Analysis failed</b><p>%1</p>").arg(error),
+             QMessageBox::Ok);
+    }
 }
 
 void
