@@ -2999,51 +2999,54 @@ MainWindow::analyseNewMainModel()
 
     cerr << "(document is " << m_document << ", it says main model is " << m_document->getMainModel() << ")" << endl;
     
-    if (model) {
-        cerr << "pane stack is " << m_paneStack << " with " << m_paneStack->getPaneCount() << " panes" << endl;
+    if (!model) {
+        cerr << "no main model!" << endl;
+        return;
+    }
 
-        if (m_paneStack) {
+    if (!m_paneStack) {
+        cerr << "no pane stack!" << endl;
+        return;
+    }
 
-            int pc = m_paneStack->getPaneCount();
-            Pane *pane = 0;
-            Pane *selectionStrip = 0;
+    int pc = m_paneStack->getPaneCount();
+    Pane *pane = 0;
+    Pane *selectionStrip = 0;
 
-            if (pc < 2) {
-                pane = m_paneStack->addPane();
-                selectionStrip = m_paneStack->addPane();
-                m_document->addLayerToView
-                    (selectionStrip,
-                     m_document->createMainModelLayer(LayerFactory::TimeRuler));
-            } else {
-                pane = m_paneStack->getPane(0);
-                selectionStrip = m_paneStack->getPane(1);
-            }
+    if (pc < 2) {
+        pane = m_paneStack->addPane();
+        selectionStrip = m_paneStack->addPane();
+        m_document->addLayerToView
+            (selectionStrip,
+             m_document->createMainModelLayer(LayerFactory::TimeRuler));
+    } else {
+        pane = m_paneStack->getPane(0);
+        selectionStrip = m_paneStack->getPane(1);
+    }
 
-            if (selectionStrip) {
-                selectionStrip->setFixedHeight(26);
-                m_paneStack->sizePanesEqually();
-                m_viewManager->clearToolModeOverrides();
-                m_viewManager->setToolModeFor(selectionStrip,
-                                              ViewManager::SelectMode);
-            }
+    if (selectionStrip) {
+        selectionStrip->setFixedHeight(26);
+        m_paneStack->sizePanesEqually();
+        m_viewManager->clearToolModeOverrides();
+        m_viewManager->setToolModeFor(selectionStrip,
+                                      ViewManager::SelectMode);
+    }
 
-            if (pane) {
+    if (pane) {
 
-                disconnect(pane, SIGNAL(regionOutlined(QRect)),
-                           pane, SLOT(zoomToRegion(QRect)));
-                connect(pane, SIGNAL(regionOutlined(QRect)),
-                        this, SLOT(regionOutlined(QRect)));
+        disconnect(pane, SIGNAL(regionOutlined(QRect)),
+                   pane, SLOT(zoomToRegion(QRect)));
+        connect(pane, SIGNAL(regionOutlined(QRect)),
+                this, SLOT(regionOutlined(QRect)));
 
-                QString error = m_analyser->newFileLoaded
-                    (m_document, getMainModel(), m_paneStack, pane);
-                if (error != "") {
-                    QMessageBox::warning
-                        (this,
-                         tr("Failed to analyse audio"),
-                         tr("<b>Analysis failed</b><p>%1</p>").arg(error),
-                         QMessageBox::Ok);
-                }
-            }
+        QString error = m_analyser->newFileLoaded
+            (m_document, getMainModel(), m_paneStack, pane);
+        if (error != "") {
+            QMessageBox::warning
+                (this,
+                 tr("Failed to analyse audio"),
+                 tr("<b>Analysis failed</b><p>%1</p>").arg(error),
+                 QMessageBox::Ok);
         }
     }
 }
