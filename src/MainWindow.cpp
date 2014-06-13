@@ -1804,6 +1804,9 @@ MainWindow::saveSession()
 void
 MainWindow::saveSessionInAudioPath()
 {
+
+    if (m_audioFile == "") return;
+
     // We do not want to save mid-analysis regions -- that would cause
     // confusion on reloading
     m_analyser->clearReAnalysis();
