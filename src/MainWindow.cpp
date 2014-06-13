@@ -815,11 +815,9 @@ MainWindow::setupAnalysisMenu()
     QMenu *menu = menuBar()->addMenu(tr("&Analysis"));
     menu->setTearOffEnabled(true);
 
-    m_keyReference->setCategory(tr("Analysis"));
 
-    action = new QAction(tr("&Analyse now"), this);
-    action->setShortcut(tr("Ctrl+P"));
-    action->setStatusTip(tr("Analyse audio now to extract pitches and notes. (This will delete all existing pitches and notes.)"));
+    action = new QAction(tr("&Analyse now!"), this);
+    action->setStatusTip(tr("Trigger analysis of pitches and notes. (This will delete all existing pitches and notes.)"));
     connect(action, SIGNAL(triggered()), this, SLOT(analyseNow()));
     menu->addAction(action);
     m_keyReference->registerShortcut(action);
@@ -832,13 +830,15 @@ MainWindow::setupAnalysisMenu()
     bool precise = settings.value("precision-analysis", false).toBool();
     settings.endGroup();
 
-    action = new QAction(tr("Automatically Analyse &New Audio"), this);
+    action = new QAction(tr("Auto-Analyse &New Audio"), this);
+    action->setStatusTip(tr("Automatically trigger analysis upon opening of a new audio file."));
     action->setCheckable(true);
     action->setChecked(autoAnalyse);
     connect(action, SIGNAL(triggered()), this, SLOT(autoAnalysisToggled()));
     menu->addAction(action);
 
-    action = new QAction(tr("Analyse &Without Frequency-dependent Timing Bias (slow)"), this);
+    action = new QAction(tr("&Unbiased Timing (slow)"), this);
+    action->setStatusTip(tr("Use a symmetric window in YIN to remove frequency-dependent timing bias. (This is slow!)"));
     action->setCheckable(true);
     action->setChecked(precise);
     connect(action, SIGNAL(triggered()), this, SLOT(precisionAnalysisToggled()));
