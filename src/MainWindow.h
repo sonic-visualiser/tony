@@ -81,6 +81,10 @@ protected slots:
 
     virtual void editDisplayExtents();
 
+    virtual void analyseNow();
+    virtual void autoAnalysisToggled();
+    virtual void precisionAnalysisToggled();
+
     virtual void doubleClickSelectInvoked(size_t);
     virtual void abandonSelection();
 

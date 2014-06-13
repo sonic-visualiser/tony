@@ -817,22 +817,59 @@ MainWindow::setupAnalysisMenu()
     action = new QAction(tr("&Analyse now"), this);
     action->setShortcut(tr("Ctrl+P"));
     action->setStatusTip(tr("Analyse audio now to extract pitches and notes. (This will delete all existing pitches and notes.)"));
+    connect(action, SIGNAL(triggered()), this, SLOT(analyseNow()));
     menu->addAction(action);
     m_keyReference->registerShortcut(action);
 
     menu->addSeparator();
 
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
+    bool precise = settings.value("precision-analysis", false).toBool();
+    settings.endGroup();
+
     action = new QAction(tr("Automatically Analyse &New Audio"), this);
     action->setCheckable(true);
-    action->setChecked(true);
+    action->setChecked(autoAnalyse);
+    connect(action, SIGNAL(triggered()), this, SLOT(autoAnalysisToggled()));
     menu->addAction(action);
 
     action = new QAction(tr("Analyse &Without Frequency-dependent Timing Bias (slow)"), this);
     action->setCheckable(true);
-    action->setChecked(false);
-    
+    action->setChecked(precise);
+    connect(action, SIGNAL(triggered()), this, SLOT(precisionAnalysisToggled()));
     menu->addAction(action);
+}
 
+void
+MainWindow::autoAnalysisToggled()
+{
+    QAction *a = qobject_cast<QAction *>(sender());
+    if (!a) return;
+
+    bool set = a->isChecked();
+
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue("auto-analysis", set);
+    settings.endGroup();
+}
+
+void
+MainWindow::precisionAnalysisToggled()
+{
+    QAction *a = qobject_cast<QAction *>(sender());
+    if (!a) return;
+
+    bool set = a->isChecked();
+
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue("precision-analysis", set);
+    settings.endGroup();
+
+    analyseNow();
 }
 
 void
@@ -2944,6 +2981,13 @@ MainWindow::mainModelChanged(WaveFileModel *model)
         connect(m_fader, SIGNAL(valueChanged(float)),
                 m_playTarget, SLOT(setOutputGain(float)));
     }
+}
+
+void
+MainWindow::analyseNow()
+{
+    //!!!
+    cerr << "analyseNow called" << endl;
 }
 
 void
