@@ -475,16 +475,17 @@ MainWindow::setupFileMenu()
     action->setShortcut(tr("Ctrl+Shift+S"));
     action->setStatusTip(tr("Save the current session into a new %1 session file").arg(QApplication::applicationName()));
     connect(action, SIGNAL(triggered()), this, SLOT(saveSessionAs()));
+    connect(this, SIGNAL(canSaveAs(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
     toolbar->addAction(action);
 
     icon = il.load("filesave");
     icon.addPixmap(il.loadPixmap("filesave-22"));
-    action = new QAction(icon, tr("Save Session In &Audio Path"), this);
+    action = new QAction(icon, tr("Save Session to Audio &Path"), this);
     action->setShortcut(tr("Ctrl+Alt+S"));
-    action->setStatusTip(tr("Save the current session into a %1 session file with the same path and filename but .ton extension.").arg(QApplication::applicationName()));
+    action->setStatusTip(tr("Save the current session into a %1 session file with the same filename as the audio but a .ton extension.").arg(QApplication::applicationName()));
     connect(action, SIGNAL(triggered()), this, SLOT(saveSessionInAudioPath()));
-    connect(this, SIGNAL(canSave(bool)), action, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(canSaveAs(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 
     menu->addSeparator();
@@ -1804,7 +1805,6 @@ MainWindow::saveSession()
 void
 MainWindow::saveSessionInAudioPath()
 {
-
     if (m_audioFile == "") return;
 
     // We do not want to save mid-analysis regions -- that would cause
@@ -1818,6 +1818,22 @@ MainWindow::saveSessionInAudioPath()
     QString path = QDir(filepath).filePath(basename + ".ton");
 
     cerr << path << endl;
+
+    // We don't want to overwrite an existing .ton file unless we put
+    // it there in the first place
+    bool shouldVerify = true;
+    if (m_sessionFile == path) {
+        shouldVerify = false;
+    }
+
+    if (shouldVerify && QFileInfo(path).exists()) {
+        if (QMessageBox::question(0, tr("File exists"),
+                                  tr("<b>File exists</b><p>The file \"%1\" already exists.\nDo you want to overwrite it?").arg(path),
+                                  QMessageBox::Ok,
+                                  QMessageBox::Cancel) != QMessageBox::Ok) {
+            return;
+        }
+    }
 
     if (!saveSessionFile(path)) {
         QMessageBox::critical(this, tr("Failed to save file"),
