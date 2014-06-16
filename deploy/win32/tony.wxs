@@ -76,6 +76,8 @@
                     Id="TStartEntry"
                     Directory="ProgramMenuDir"
                     Name="Tony"
+		    Icon="winicon.ico"
+		    IconIndex="0"
                     WorkingDirectory="INSTALLDIR"
                     Advertise="yes"/>
 
@@ -83,6 +85,8 @@
                     Id="TDesktop"
                     Directory="DesktopFolder"
                     Name="Tony"
+		    Icon="winicon.ico"
+		    IconIndex="0"
                     WorkingDirectory="INSTALLDIR"
                     Advertise="yes"/>
               </File>
