@@ -1,4 +1,33 @@
 
+Changes in Tony 0.6 since the previous release 0.5:
+
+ * The play pointer no longer tracks to the centre of the main pane
+   when dragging, and is now always visible. Play pointer / playhead
+   behaviour is generally expected to be much more sensible and
+   intuitive in this release than in prior ones
+
+ * Many keyboard shortcuts have been added and improved, including the
+   shortcuts for incremental note-by-note selection and moving the
+   play pointer
+
+ * Audio files are now implicitly normalised to peak == 1.0 when
+   loading
+
+ * Tony now has an Analysis menu which contains various configuration
+   settings that affect pitch analysis
+
+ * There is now an option to save the session directly to the same
+   directory as the original audio file, for rapid saving when
+   annotating many audio files in sequence
+
+ * The extents of the "active" note are now more clearly shown when
+   mousing over the note track
+
+ * There is a new function to delete the notes (without deleting pitch
+   measurements) within the selection
+
+ * Numerous bug fixes
+
 Changes in Tony 0.5 since the previous release 0.4:
 
  * The start and end of the recording are now shaded in grey so you
