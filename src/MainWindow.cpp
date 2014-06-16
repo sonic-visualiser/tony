@@ -216,6 +216,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_fader, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     m_playSpeed = new AudioDial(frame);
+    m_playSpeed->setMeterColor(Qt::darkBlue);
     m_playSpeed->setMinimum(0);
     m_playSpeed->setMaximum(200);
     m_playSpeed->setValue(100);
@@ -234,6 +235,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     // Gain controls
     m_gainAudio = new AudioDial(frame);
+    m_gainAudio->setMeterColor(Qt::darkRed);
     m_gainAudio->setMinimum(-50);
     m_gainAudio->setMaximum(50);
     m_gainAudio->setValue(0);
@@ -252,6 +254,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_gainAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     m_gainPitch = new AudioDial(frame);
+    m_gainPitch->setMeterColor(Qt::darkRed);
     m_gainPitch->setMinimum(-50);
     m_gainPitch->setMaximum(50);
     m_gainPitch->setValue(0);
@@ -269,6 +272,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     m_gainNotes = new AudioDial(frame);
+    m_gainNotes->setMeterColor(Qt::darkRed);
     m_gainNotes->setMinimum(-50);
     m_gainNotes->setMaximum(50);
     m_gainNotes->setValue(0);
@@ -288,6 +292,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
 
     // Pan controls
     m_panAudio = new AudioDial(frame);
+    m_panAudio->setMeterColor(Qt::darkGreen);
     m_panAudio->setMinimum(-100);
     m_panAudio->setMaximum(100);
     m_panAudio->setValue(-100);
@@ -306,6 +311,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_panAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     m_panPitch = new AudioDial(frame);
+    m_panPitch->setMeterColor(Qt::darkGreen);
     m_panPitch->setMinimum(-100);
     m_panPitch->setMaximum(100);
     m_panPitch->setValue(100);
@@ -323,6 +329,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     m_panNotes = new AudioDial(frame);
+    m_panNotes->setMeterColor(Qt::darkGreen);
     m_panNotes->setMinimum(-100);
     m_panNotes->setMaximum(100);
     m_panNotes->setValue(100);
