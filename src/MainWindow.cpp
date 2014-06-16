@@ -1215,7 +1215,7 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
     if (!selections.empty()) {
         Selection sel = *selections.begin();
-        isAtSelectionBoundary = (frame == sel.getStartFrame()) || (frame == sel.getEndFrame()+1);
+        isAtSelectionBoundary = (frame == sel.getStartFrame()) || (frame == sel.getEndFrame());
     }
     if (!doSelect || !isAtSelectionBoundary) {
         m_selectionAnchor = frame;
@@ -1257,9 +1257,9 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     if (doSelect) {
         Selection sel;
         if (frame > m_selectionAnchor) {
-            sel = Selection(m_selectionAnchor, frame-1);
+            sel = Selection(m_selectionAnchor, frame);
         } else {
-            sel = Selection(frame, m_selectionAnchor-1);
+            sel = Selection(frame, m_selectionAnchor);
         }
         m_viewManager->setSelection(sel);
     }
