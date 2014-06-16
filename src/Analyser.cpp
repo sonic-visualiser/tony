@@ -355,6 +355,10 @@ Analyser::addAnalyses()
     bool precise = settings.value("precision-analysis", false).toBool();
     settings.endGroup();
 
+    settings.beginGroup("Analyser");
+    bool lowamp = settings.value("lowamp-analysis", false).toBool();
+    settings.endGroup();
+
     Transform t = tf->getDefaultTransformFor
         (base + f0out, m_fileModel->getSampleRate());
     t.setStepSize(256);
@@ -366,6 +370,14 @@ Analyser::addAnalyses()
     } else {
         cerr << "setting parameters for vague mode" << endl;
         t.setParameter("precisetime", 0);
+    }
+
+    if (lowamp) {
+        cerr << "setting parameters for lowamp suppression" << endl;
+        t.setParameter("lowampsuppression", 0.2f);
+    } else {
+        cerr << "setting parameters for no lowamp suppression" << endl;
+        t.setParameter("lowampsuppression", 0.0f);
     }
 
     transforms.push_back(t);
