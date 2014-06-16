@@ -35,6 +35,7 @@
 #include "layer/ShowLayerCommand.h"
 
 #include <QSettings>
+#include <QMutexLocker>
 
 using std::vector;
 
@@ -44,7 +45,8 @@ Analyser::Analyser() :
     m_paneStack(0),
     m_pane(0),
     m_currentCandidate(-1),
-    m_candidatesVisible(false)
+    m_candidatesVisible(false),
+    m_currentAsyncHandle(0)
 {
     QSettings settings;
     settings.beginGroup("LayerDefaults");
@@ -414,7 +416,13 @@ Analyser::addAnalyses()
 QString
 Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
+    QMutexLocker locker(&m_asyncMutex);
+
     if (sel == m_reAnalysingSelection || sel.isEmpty()) return "";
+
+    if (m_currentAsyncHandle) {
+        m_document->cancelAsyncLayerCreation(m_currentAsyncHandle);
+    }
 
     if (!m_reAnalysisCandidates.empty()) {
         CommandHistory::getInstance()->startCompoundOperation
@@ -491,8 +499,9 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     t.setDuration(duration);
 
     transforms.push_back(t);
-
-    m_document->createDerivedLayersAsync(transforms, m_fileModel, this);
+    
+    m_currentAsyncHandle =
+        m_document->createDerivedLayersAsync(transforms, m_fileModel, this);
 
     return "";
 }
@@ -524,18 +533,15 @@ Analyser::showPitchCandidates(bool shown)
 }
 
 void
-Analyser::layersCreated(vector<Layer *> primary,
+Analyser::layersCreated(Document::LayerCreationAsyncHandle handle,
+                        vector<Layer *> primary,
                         vector<Layer *> additional)
 {
-    //!!! how do we know these came from the right selection? user
-    //!!! might have made another one since this request was issued
+    QMutexLocker locker(&m_asyncMutex);
 
-    if (m_reAnalysingSelection == Selection()) {
-        // We don't want these (actually, as above, this should check
-        // that the selection is the same as the one requested -- but
-        // all we're doing here is checking that the selection exists
-        // at all, so hasn't been cleared or the document deleted or
-        // whatever)
+    if (handle != m_currentAsyncHandle || 
+        m_reAnalysingSelection == Selection()) {
+        // We don't want these!
         for (int i = 0; i < (int)primary.size(); ++i) {
             m_document->deleteLayer(primary[i]);
         }
@@ -544,6 +550,7 @@ Analyser::layersCreated(vector<Layer *> primary,
         }
         return;
     }
+    m_currentAsyncHandle = 0;
 
     CommandHistory::getInstance()->startCompoundOperation
         (tr("Re-Analyse Selection"), true);

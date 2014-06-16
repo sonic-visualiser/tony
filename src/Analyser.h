@@ -18,6 +18,7 @@
 
 #include <QObject>
 #include <QRect>
+#include <QMutex>
 
 #include <map>
 #include <vector>
@@ -228,6 +229,8 @@ protected:
     std::vector<Layer *> m_reAnalysisCandidates;
     int m_currentCandidate;
     bool m_candidatesVisible;
+    Document::LayerCreationAsyncHandle m_currentAsyncHandle;
+    QMutex m_asyncMutex;
 
     QString doAllAnalyses(bool withPitchTrack);
 
@@ -240,7 +243,8 @@ protected:
     void stackLayers();
     
     // Document::LayerCreationHandler method
-    void layersCreated(std::vector<Layer *>, std::vector<Layer *>);
+    void layersCreated(Document::LayerCreationAsyncHandle,
+                       std::vector<Layer *>, std::vector<Layer *>);
 
     void saveState(Component c) const;
     void loadState(Component c);
