@@ -835,6 +835,7 @@ MainWindow::setupAnalysisMenu()
     settings.beginGroup("Analyser");
     bool autoAnalyse = settings.value("auto-analysis", true).toBool();
     bool precise = settings.value("precision-analysis", false).toBool();
+    bool lowamp = settings.value("lowamp-analysis", true).toBool();
     settings.endGroup();
 
     action = new QAction(tr("Auto-Analyse &New Audio"), this);
@@ -850,6 +851,14 @@ MainWindow::setupAnalysisMenu()
     action->setChecked(precise);
     connect(action, SIGNAL(triggered()), this, SLOT(precisionAnalysisToggled()));
     menu->addAction(action);
+
+    action = new QAction(tr("&Penalise Soft Pitches"), this);
+    action->setStatusTip(tr("Reduce the likelihood of detecting a pitch when the signal has low amplitude."));
+    action->setCheckable(true);
+    action->setChecked(lowamp);
+    connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
+    menu->addAction(action);
+
 }
 
 void
@@ -877,6 +886,22 @@ MainWindow::precisionAnalysisToggled()
     QSettings settings;
     settings.beginGroup("Analyser");
     settings.setValue("precision-analysis", set);
+    settings.endGroup();
+
+    // don't run analyseNow() automatically -- it's a destructive operation
+}
+
+void
+MainWindow::lowampAnalysisToggled()
+{
+    QAction *a = qobject_cast<QAction *>(sender());
+    if (!a) return;
+
+    bool set = a->isChecked();
+
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue("lowamp-analysis", set);
     settings.endGroup();
 
     // don't run analyseNow() automatically -- it's a destructive operation

@@ -84,6 +84,7 @@ protected slots:
     virtual void analyseNow();
     virtual void autoAnalysisToggled();
     virtual void precisionAnalysisToggled();
+    virtual void lowampAnalysisToggled();
 
     virtual void doubleClickSelectInvoked(size_t);
     virtual void abandonSelection();
