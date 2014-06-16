@@ -537,56 +537,58 @@ Analyser::layersCreated(Document::LayerCreationAsyncHandle handle,
                         vector<Layer *> primary,
                         vector<Layer *> additional)
 {
-    QMutexLocker locker(&m_asyncMutex);
+    {
+        QMutexLocker locker(&m_asyncMutex);
 
-    if (handle != m_currentAsyncHandle || 
-        m_reAnalysingSelection == Selection()) {
-        // We don't want these!
+        if (handle != m_currentAsyncHandle || 
+            m_reAnalysingSelection == Selection()) {
+            // We don't want these!
+            for (int i = 0; i < (int)primary.size(); ++i) {
+                m_document->deleteLayer(primary[i]);
+            }
+            for (int i = 0; i < (int)additional.size(); ++i) {
+                m_document->deleteLayer(additional[i]);
+            }
+            return;
+        }
+        m_currentAsyncHandle = 0;
+
+        CommandHistory::getInstance()->startCompoundOperation
+            (tr("Re-Analyse Selection"), true);
+
+        m_reAnalysisCandidates.clear();
+
+        vector<Layer *> all;
         for (int i = 0; i < (int)primary.size(); ++i) {
-            m_document->deleteLayer(primary[i]);
+            all.push_back(primary[i]);
         }
         for (int i = 0; i < (int)additional.size(); ++i) {
-            m_document->deleteLayer(additional[i]);
+            all.push_back(additional[i]);
         }
-        return;
-    }
-    m_currentAsyncHandle = 0;
 
-    CommandHistory::getInstance()->startCompoundOperation
-        (tr("Re-Analyse Selection"), true);
-
-    m_reAnalysisCandidates.clear();
-
-    vector<Layer *> all;
-    for (int i = 0; i < (int)primary.size(); ++i) {
-        all.push_back(primary[i]);
-    }
-    for (int i = 0; i < (int)additional.size(); ++i) {
-        all.push_back(additional[i]);
-    }
-
-    for (int i = 0; i < (int)all.size(); ++i) {
-        TimeValueLayer *t = qobject_cast<TimeValueLayer *>(all[i]);
-        if (t) {
-            PlayParameters *params = t->getPlayParameters();
-            if (params) {
-                params->setPlayAudible(false);
+        for (int i = 0; i < (int)all.size(); ++i) {
+            TimeValueLayer *t = qobject_cast<TimeValueLayer *>(all[i]);
+            if (t) {
+                PlayParameters *params = t->getPlayParameters();
+                if (params) {
+                    params->setPlayAudible(false);
+                }
+                t->setBaseColour
+                    (ColourDatabase::getInstance()->getColourIndex(tr("Bright Orange")));
+                t->setPresentationName("candidate");
+                m_document->addLayerToView(m_pane, t);
+                m_reAnalysisCandidates.push_back(t);
             }
-            t->setBaseColour
-                (ColourDatabase::getInstance()->getColourIndex(tr("Bright Orange")));
-            t->setPresentationName("candidate");
-            m_document->addLayerToView(m_pane, t);
-            m_reAnalysisCandidates.push_back(t);
         }
-    }
 
-    if (!all.empty()) {
-        bool show = m_candidatesVisible;
-        m_candidatesVisible = !show; // to ensure the following takes effect
-        showPitchCandidates(show);
-    }
+        if (!all.empty()) {
+            bool show = m_candidatesVisible;
+            m_candidatesVisible = !show; // to ensure the following takes effect
+            showPitchCandidates(show);
+        }
 
-    CommandHistory::getInstance()->endCompoundOperation();
+        CommandHistory::getInstance()->endCompoundOperation();
+    }
 
     emit layersChanged();
 }
