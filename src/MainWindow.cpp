@@ -852,7 +852,7 @@ MainWindow::setupAnalysisMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(precisionAnalysisToggled()));
     menu->addAction(action);
 
-    action = new QAction(tr("&Suppress Detection at Low Amplitude"), this);
+    action = new QAction(tr("&Penalise Pitches at Low Amplitudes"), this);
     action->setStatusTip(tr("Reduce the likelihood of detecting a pitch when the signal has low amplitude."));
     action->setCheckable(true);
     action->setChecked(lowamp);
