@@ -186,6 +186,9 @@ protected slots:
     void selectOneNoteRight();
     void selectOneNoteLeft();
 
+    void ffwd();
+    void rewind();
+
 protected:
     Analyser      *m_analyser;
 
