@@ -3296,9 +3296,9 @@ MainWindow::ffwd()
     size_t sr = getMainModel()->getSampleRate();
 
     // The step is supposed to scale and be as wide as a step of 
-    // m_defaultFfwdRwdStep seconds at zoom level 512 and sr = 44100
+    // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
     size_t framesPerPixel = m_viewManager->getGlobalZoom();
-    size_t defaultZoom = (512 * 44100) / sr;
+    size_t defaultZoom = (720 * 44100) / sr;
 
     float scaler = (framesPerPixel * 1.0f) / defaultZoom;
 
@@ -3336,9 +3336,9 @@ MainWindow::rewind()
     size_t sr = getMainModel()->getSampleRate();
 
     // The step is supposed to scale and be as wide as a step of 
-    // m_defaultFfwdRwdStep seconds at zoom level 512 and sr = 44100
+    // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
     size_t framesPerPixel = m_viewManager->getGlobalZoom();
-    size_t defaultZoom = (512 * 44100) / sr;
+    size_t defaultZoom = (720 * 44100) / sr;
 
     float scaler = (framesPerPixel * 1.0f) / defaultZoom;
     frame = RealTime::realTime2Frame
