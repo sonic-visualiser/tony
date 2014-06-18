@@ -3285,5 +3285,73 @@ MainWindow::newerVersionAvailable(QString version)
     settings.endGroup();
 }
 
+void
+MainWindow::ffwd()
+{
+    if (!getMainModel()) return;
+
+    int frame = m_viewManager->getPlaybackFrame();
+    ++frame;
+
+    size_t sr = getMainModel()->getSampleRate();
+
+    // The step is supposed to scale and be as wide as a step of 
+    // m_defaultFfwdRwdStep seconds at zoom level 512 and sr = 44100
+    size_t framesPerPixel = m_viewManager->getGlobalZoom();
+    size_t defaultZoom = (512 * 44100) / sr;
+
+    float scaler = (framesPerPixel * 1.0f) / defaultZoom;
 
 
+    frame = RealTime::realTime2Frame
+        (RealTime::frame2RealTime(frame, sr) + m_defaultFfwdRwdStep * scaler, sr);
+    if (frame > int(getMainModel()->getEndFrame())) {
+        frame = getMainModel()->getEndFrame();
+    }
+        
+    if (frame < 0) frame = 0;
+
+    if (m_viewManager->getPlaySelectionMode()) {
+        frame = m_viewManager->constrainFrameToSelection(size_t(frame));
+    }
+    
+    m_viewManager->setPlaybackFrame(frame);
+
+    if (frame == (int)getMainModel()->getEndFrame() &&
+        m_playSource &&
+        m_playSource->isPlaying() &&
+        !m_viewManager->getPlayLoopMode()) {
+        stop();
+    }
+}
+
+void
+MainWindow::rewind()
+{
+    if (!getMainModel()) return;
+
+    int frame = m_viewManager->getPlaybackFrame();
+    if (frame > 0) --frame;
+
+    size_t sr = getMainModel()->getSampleRate();
+
+    // The step is supposed to scale and be as wide as a step of 
+    // m_defaultFfwdRwdStep seconds at zoom level 512 and sr = 44100
+    size_t framesPerPixel = m_viewManager->getGlobalZoom();
+    size_t defaultZoom = (512 * 44100) / sr;
+
+    float scaler = (framesPerPixel * 1.0f) / defaultZoom;
+    frame = RealTime::realTime2Frame
+        (RealTime::frame2RealTime(frame, sr) - m_defaultFfwdRwdStep * scaler, sr);
+    if (frame < int(getMainModel()->getStartFrame())) {
+        frame = getMainModel()->getStartFrame();
+    }
+
+    if (frame < 0) frame = 0;
+
+    if (m_viewManager->getPlaySelectionMode()) {
+        frame = m_viewManager->constrainFrameToSelection(size_t(frame));
+    }
+
+    m_viewManager->setPlaybackFrame(frame);
+}
