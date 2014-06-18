@@ -88,7 +88,7 @@
 using std::vector;
 
 
-MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
+MainWindow::MainWindow(bool withAudioOutput) :
     MainWindowBase(withAudioOutput, false),
     m_overview(0),
     m_mainMenusCreated(false),
@@ -182,8 +182,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withOSCSupport) :
     // variable
     m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
     m_paneStack->setShowPaneAccessories(false);
-    connect(m_paneStack, SIGNAL(doubleClickSelectInvoked(size_t)),
-            this, SLOT(doubleClickSelectInvoked(size_t)));
+    connect(m_paneStack, SIGNAL(doubleClickSelectInvoked(int)),
+            this, SLOT(doubleClickSelectInvoked(int)));
     scroll->setWidget(m_paneStack);
 
     m_overview = new Overview(frame);
@@ -1241,8 +1241,6 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     int frame = m_viewManager->getPlaybackFrame();
     cerr << "MainWindow::moveByOneNote startframe: " << frame << endl;
     
-    Pane *p = m_analyser->getPane();
-
     bool isAtSelectionBoundary = false;
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
     if (!selections.empty()) {
@@ -1345,9 +1343,6 @@ MainWindow::updateMenuStates()
     bool haveSelection = 
         (m_viewManager &&
          !m_viewManager->getSelections().empty());
-    bool haveCurrentEditableLayer =
-        (haveCurrentLayer &&
-         currentLayer->isLayerEditable());
     bool haveCurrentTimeInstantsLayer = 
         (haveCurrentLayer &&
          qobject_cast<TimeInstantLayer *>(currentLayer));
@@ -1356,10 +1351,6 @@ MainWindow::updateMenuStates()
          qobject_cast<TimeValueLayer *>(currentLayer));
     bool pitchCandidatesVisible = 
         m_analyser->arePitchCandidatesShown();
-    bool haveHigher =
-        m_analyser->haveHigherPitchCandidate();
-    bool haveLower =
-        m_analyser->haveLowerPitchCandidate();
 
     emit canChangePlaybackSpeed(true);
     int v = m_playSpeed->value();
@@ -2269,9 +2260,9 @@ MainWindow::exportNoteLayer()
 }
 
 void
-MainWindow::doubleClickSelectInvoked(size_t frame)
+MainWindow::doubleClickSelectInvoked(int frame)
 {
-    size_t f0, f1;
+    int f0, f1;
     m_analyser->getEnclosingSelectionScope(frame, f0, f1);
     
     cerr << "MainWindow::doubleClickSelectInvoked(" << frame << "): [" << f0 << "," << f1 << "]" << endl;
@@ -2571,7 +2562,7 @@ MainWindow::formNoteFromSelection()
             (tr("Form Note from Selection"), true);
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            if (!model->getNotes(k->getStartFrame(), k->getEndFrame()).empty()) {
+            if (!model->getNotesWithin(k->getStartFrame(), k->getEndFrame()).empty()) {
                 layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
                 layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
                 layer->mergeNotes(m_analyser->getPane(), *k, false);
@@ -2903,7 +2894,7 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
     }
 
     bool haveSelection = false;
-    size_t startFrame = 0, endFrame = 0;
+    int startFrame = 0, endFrame = 0;
 
     if (m_viewManager && m_viewManager->haveInProgressSelection()) {
 
@@ -2961,8 +2952,9 @@ MainWindow::outputLevelsChanged(float left, float right)
 }
 
 void
-MainWindow::sampleRateMismatch(size_t requested, size_t actual,
-                               bool willResample)
+MainWindow::sampleRateMismatch(int /* requested */,
+                               int /* actual */,
+                               bool /* willResample */)
 {
     updateDescriptionLabel();
 }
@@ -3132,7 +3124,7 @@ MainWindow::modelGenerationFailed(QString transformName, QString message)
 }
 
 void
-MainWindow::modelGenerationWarning(QString transformName, QString message)
+MainWindow::modelGenerationWarning(QString /* transformName */, QString message)
 {
     QMessageBox::warning
         (this, tr("Warning"), message, QMessageBox::Ok);
@@ -3162,7 +3154,8 @@ MainWindow::modelRegenerationFailed(QString layerName,
 
 void
 MainWindow::modelRegenerationWarning(QString layerName,
-                                     QString transformName, QString message)
+                                     QString /* transformName */,
+                                     QString message)
 {
     QMessageBox::warning
         (this, tr("Warning"), tr("<b>Warning when regenerating layer</b><p>When regenerating the derived layer \"%1\" using new data model as input:<p>%2").arg(layerName).arg(message), QMessageBox::Ok);
@@ -3188,7 +3181,7 @@ MainWindow::rightButtonMenuRequested(Pane *pane, QPoint position)
 }
 
 void
-MainWindow::handleOSCMessage(const OSCMessage &message)
+MainWindow::handleOSCMessage(const OSCMessage &)
 {
     cerr << "MainWindow::handleOSCMessage: Not implemented" << endl;
 }
