@@ -100,7 +100,7 @@ public:
     float getPan(Component c) const;
     void setPan(Component c, float pan);
 
-    void getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1);
+    void getEnclosingSelectionScope(int f, int &f0, int &f1);
 
     struct FrequencyRange {
         FrequencyRange() : min(0), max(0) { }

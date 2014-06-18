@@ -773,13 +773,13 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
 }
 
 void
-Analyser::getEnclosingSelectionScope(size_t f, size_t &f0, size_t &f1)
+Analyser::getEnclosingSelectionScope(int f, int &f0, int &f1)
 {
     FlexiNoteLayer *flexiNoteLayer = 
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
 
     int f0i = f, f1i = f;
-    size_t res = 1;
+    int res = 1;
 
     if (!flexiNoteLayer) {
         f0 = f1 = f;

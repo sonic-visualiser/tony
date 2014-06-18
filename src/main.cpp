@@ -100,6 +100,12 @@ protected:
     QStringList m_filepathQueue;
 
     virtual bool event(QEvent *event) {
+
+// Avoid warnings/errors with -Wextra because we aren't explicitly
+// handling all event types (-Wall is OK with this because of the
+// default but the stricter level insists)
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+
         switch (event->type()) {
         case QEvent::FileOpen:
         {
@@ -198,7 +204,7 @@ main(int argc, char **argv)
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<PropertyContainer::PropertyName>("PropertyContainer::PropertyName");
 
-    MainWindow *gui = new MainWindow(audioOutput, false); // no osc support
+    MainWindow *gui = new MainWindow(audioOutput);
     application.setMainWindow(gui);
     if (splash) {
         QObject::connect(gui, SIGNAL(hideSplash()), splash, SLOT(hide()));
