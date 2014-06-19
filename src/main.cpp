@@ -61,7 +61,7 @@ signalHandler(int /* signal */)
 class TonyApplication : public QApplication
 {
 public:
-    TonyApplication(int argc, char **argv) :
+    TonyApplication(int &argc, char **argv) :
         QApplication(argc, argv),
         m_mainWindow(0),
         m_readyForFiles(false)
