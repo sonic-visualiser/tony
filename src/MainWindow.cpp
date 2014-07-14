@@ -281,7 +281,7 @@ MainWindow::MainWindow(bool withAudioOutput) :
     m_gainNotes->setFixedHeight(24);
     m_gainNotes->setNotchesVisible(true);
     m_gainNotes->setPageStep(10);
-    m_gainNotes->setObjectName(tr("Pitch Track Gain"));
+    m_gainNotes->setObjectName(tr("Note Gain"));
     m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
     m_gainNotes->setShowToolTip(true);
     connect(m_gainNotes, SIGNAL(valueChanged(int)),
@@ -338,7 +338,7 @@ MainWindow::MainWindow(bool withAudioOutput) :
     m_panNotes->setFixedHeight(24);
     m_panNotes->setNotchesVisible(true);
     m_panNotes->setPageStep(10);
-    m_panNotes->setObjectName(tr("Notes Track Pan"));
+    m_panNotes->setObjectName(tr("Note Pan"));
     m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
     m_panNotes->setShowToolTip(true);
     connect(m_panNotes, SIGNAL(valueChanged(int)),
