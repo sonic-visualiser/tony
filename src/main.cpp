@@ -153,7 +153,7 @@ main(int argc, char **argv)
 
     if (args.contains("--help") || args.contains("-h") || args.contains("-?")) {
         std::cerr << QApplication::tr(
-            "\nTony is a program for interactive note and pitch analysis and annotation.\n\nUsage:\n\n  %1 [--no-audio] [--no-sonification] [--no-spectrogram] [<file> ...]\n\n  --no-audio: Do not attempt to open an audio output device\n  <file>: One or more Tony (.ton) and audio files may be provided.\n --no-sonification: Disable and hide sonification of pitch tracks and notes.\n --no-spectrogram: Disable spectrogram.").arg(argv[0]).toStdString() << std::endl;
+            "\nTony is a program for interactive note and pitch analysis and annotation.\n\nUsage:\n\n  %1 [--no-audio] [--no-sonification] [--no-spectrogram] [<file> ...]\n\n  --no-audio: Do not attempt to open an audio output device\n  --no-sonification: Disable sonification of pitch tracks and notes and hide their toggles.\n  --no-spectrogram: Disable spectrogram.\n  <file>: One or more Tony (.ton) and audio files may be provided.").arg(argv[0]).toStdString() << std::endl;
         exit(2);
     }
 

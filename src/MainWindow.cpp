@@ -256,41 +256,44 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     connect(m_gainAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_gainAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_gainPitch = new AudioDial(frame);
-    m_gainPitch->setMeterColor(Qt::darkRed);
-    m_gainPitch->setMinimum(-50);
-    m_gainPitch->setMaximum(50);
-    m_gainPitch->setValue(0);
-    m_gainPitch->setDefaultValue(0);
-    m_gainPitch->setFixedWidth(24);
-    m_gainPitch->setFixedHeight(24);
-    m_gainPitch->setNotchesVisible(true);
-    m_gainPitch->setPageStep(10);
-    m_gainPitch->setObjectName(tr("Pitch Track Gain"));
-    m_gainPitch->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-    m_gainPitch->setShowToolTip(true);
-    connect(m_gainPitch, SIGNAL(valueChanged(int)),
-            this, SLOT(pitchGainChanged(int)));
-    connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    if (m_withSonification)
+    {   
+        m_gainPitch = new AudioDial(frame);
+        m_gainPitch->setMeterColor(Qt::darkRed);
+        m_gainPitch->setMinimum(-50);
+        m_gainPitch->setMaximum(50);
+        m_gainPitch->setValue(0);
+        m_gainPitch->setDefaultValue(0);
+        m_gainPitch->setFixedWidth(24);
+        m_gainPitch->setFixedHeight(24);
+        m_gainPitch->setNotchesVisible(true);
+        m_gainPitch->setPageStep(10);
+        m_gainPitch->setObjectName(tr("Pitch Track Gain"));
+        m_gainPitch->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
+        m_gainPitch->setShowToolTip(true);
+        connect(m_gainPitch, SIGNAL(valueChanged(int)),
+                this, SLOT(pitchGainChanged(int)));
+        connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_gainNotes = new AudioDial(frame);
-    m_gainNotes->setMeterColor(Qt::darkRed);
-    m_gainNotes->setMinimum(-50);
-    m_gainNotes->setMaximum(50);
-    m_gainNotes->setValue(0);
-    m_gainNotes->setDefaultValue(0);
-    m_gainNotes->setFixedWidth(24);
-    m_gainNotes->setFixedHeight(24);
-    m_gainNotes->setNotchesVisible(true);
-    m_gainNotes->setPageStep(10);
-    m_gainNotes->setObjectName(tr("Note Gain"));
-    m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-    m_gainNotes->setShowToolTip(true);
-    connect(m_gainNotes, SIGNAL(valueChanged(int)),
-            this, SLOT(notesGainChanged(int)));
-    connect(m_gainNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+        m_gainNotes = new AudioDial(frame);
+        m_gainNotes->setMeterColor(Qt::darkRed);
+        m_gainNotes->setMinimum(-50);
+        m_gainNotes->setMaximum(50);
+        m_gainNotes->setValue(0);
+        m_gainNotes->setDefaultValue(0);
+        m_gainNotes->setFixedWidth(24);
+        m_gainNotes->setFixedHeight(24);
+        m_gainNotes->setNotchesVisible(true);
+        m_gainNotes->setPageStep(10);
+        m_gainNotes->setObjectName(tr("Note Gain"));
+        m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
+        m_gainNotes->setShowToolTip(true);
+        connect(m_gainNotes, SIGNAL(valueChanged(int)),
+                this, SLOT(notesGainChanged(int)));
+        connect(m_gainNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    }
     // End of Gain controls
 
     // Pan controls
@@ -313,41 +316,47 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     connect(m_panAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_panAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_panPitch = new AudioDial(frame);
-    m_panPitch->setMeterColor(Qt::darkGreen);
-    m_panPitch->setMinimum(-100);
-    m_panPitch->setMaximum(100);
-    m_panPitch->setValue(100);
-    m_panPitch->setDefaultValue(100);
-    m_panPitch->setFixedWidth(24);
-    m_panPitch->setFixedHeight(24);
-    m_panPitch->setNotchesVisible(true);
-    m_panPitch->setPageStep(10);
-    m_panPitch->setObjectName(tr("Pitch Track Pan"));
-    m_panPitch->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-    m_panPitch->setShowToolTip(true);
-    connect(m_panPitch, SIGNAL(valueChanged(int)),
-            this, SLOT(pitchPanChanged(int)));
-    connect(m_panPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_panNotes = new AudioDial(frame);
-    m_panNotes->setMeterColor(Qt::darkGreen);
-    m_panNotes->setMinimum(-100);
-    m_panNotes->setMaximum(100);
-    m_panNotes->setValue(100);
-    m_panNotes->setDefaultValue(100);
-    m_panNotes->setFixedWidth(24);
-    m_panNotes->setFixedHeight(24);
-    m_panNotes->setNotchesVisible(true);
-    m_panNotes->setPageStep(10);
-    m_panNotes->setObjectName(tr("Note Pan"));
-    m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-    m_panNotes->setShowToolTip(true);
-    connect(m_panNotes, SIGNAL(valueChanged(int)),
-            this, SLOT(notesPanChanged(int)));
-    connect(m_panNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_panNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+    if (m_withSonification)
+    {   
+        m_panPitch = new AudioDial(frame);
+        m_panPitch->setMeterColor(Qt::darkGreen);
+        m_panPitch->setMinimum(-100);
+        m_panPitch->setMaximum(100);
+        m_panPitch->setValue(100);
+        m_panPitch->setDefaultValue(100);
+        m_panPitch->setFixedWidth(24);
+        m_panPitch->setFixedHeight(24);
+        m_panPitch->setNotchesVisible(true);
+        m_panPitch->setPageStep(10);
+        m_panPitch->setObjectName(tr("Pitch Track Pan"));
+        m_panPitch->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+        m_panPitch->setShowToolTip(true);
+        connect(m_panPitch, SIGNAL(valueChanged(int)),
+                this, SLOT(pitchPanChanged(int)));
+        connect(m_panPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+        m_panNotes = new AudioDial(frame);
+        m_panNotes->setMeterColor(Qt::darkGreen);
+        m_panNotes->setMinimum(-100);
+        m_panNotes->setMaximum(100);
+        m_panNotes->setValue(100);
+        m_panNotes->setDefaultValue(100);
+        m_panNotes->setFixedWidth(24);
+        m_panNotes->setFixedHeight(24);
+        m_panNotes->setNotchesVisible(true);
+        m_panNotes->setPageStep(10);
+        m_panNotes->setObjectName(tr("Note Pan"));
+        m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+        m_panNotes->setShowToolTip(true);
+        connect(m_panNotes, SIGNAL(valueChanged(int)),
+                this, SLOT(notesPanChanged(int)));
+        connect(m_panNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_panNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));    
+    }
+    
     // End of Pan controls
 
     layout->setSpacing(4);
@@ -1171,13 +1180,17 @@ MainWindow::setupToolbars()
     connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
 
-    m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
+    if (!m_withSonification) 
+    {
+        m_playPitch = new QAction(tr("Play Pitch Track"), this);
+    } else {
+        m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
+        toolbar->addWidget(m_gainPitch);
+        toolbar->addWidget(m_panPitch);
+    }
     m_playPitch->setCheckable(true);
     connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
     connect(this, SIGNAL(canPlayPitch(bool)), m_playPitch, SLOT(setEnabled(bool)));
-
-    toolbar->addWidget(m_gainPitch);
-    toolbar->addWidget(m_panPitch);
 
     // Notes
     spacer = new QLabel;
@@ -1189,25 +1202,35 @@ MainWindow::setupToolbars()
     connect(m_showNotes, SIGNAL(triggered()), this, SLOT(showNotesToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
 
-    m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
+    if (!m_withSonification) 
+    {
+        m_playNotes = new QAction(tr("Play Notes"), this);
+    } else {
+        m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
+        toolbar->addWidget(m_gainNotes);
+        toolbar->addWidget(m_panNotes);
+    }
     m_playNotes->setCheckable(true);
     connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
     connect(this, SIGNAL(canPlayNotes(bool)), m_playNotes, SLOT(setEnabled(bool)));
-
-    toolbar->addWidget(m_gainNotes);
-    toolbar->addWidget(m_panNotes);
 
     // Spectrogram
     spacer = new QLabel;
     spacer->setFixedWidth(40);
     toolbar->addWidget(spacer);
 
-    m_showSpect = toolbar->addAction(il.load("spectrogram"), tr("Show Spectrogram"));
+    if (!m_withSpectrogram)
+    {
+        m_showSpect = new QAction(tr("Show Spectrogram"), this);
+    } else {
+        m_showSpect = toolbar->addAction(il.load("spectrogram"), tr("Show Spectrogram"));
+    }
     m_showSpect->setCheckable(true);
     connect(m_showSpect, SIGNAL(triggered()), this, SLOT(showSpectToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showSpect, SLOT(setEnabled(bool)));
 
     Pane::registerShortcuts(*m_keyReference);
+
 }
 
 
@@ -3106,6 +3129,17 @@ MainWindow::analyseNewMainModel()
                  tr("<b>Analysis failed</b><p>%1</p>").arg(error),
                  QMessageBox::Ok);
         }
+    }
+
+    if (!m_withSpectrogram) 
+    {
+        m_analyser->setVisible(Analyser::Spectrogram, false);
+    }
+
+    if (!m_withSonification) 
+    {
+        m_analyser->setAudible(Analyser::PitchTrack, false);
+        m_analyser->setAudible(Analyser::Notes, false);
     }
 }
 
