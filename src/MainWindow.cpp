@@ -930,14 +930,15 @@ MainWindow::setupHelpMenu()
     IconLoader il;
 
     QString name = QApplication::applicationName();
+    QAction *action;
 
-    QAction *action = new QAction(il.load("help"),
-                                  tr("&Help Reference"), this); 
-    action->setShortcut(tr("F1"));
-    action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
-    connect(action, SIGNAL(triggered()), this, SLOT(help()));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
+    // action = new QAction(il.load("help"),
+    //                               tr("&Help Reference"), this); 
+    // action->setShortcut(tr("F1"));
+    // action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
+    // connect(action, SIGNAL(triggered()), this, SLOT(help()));
+    // m_keyReference->registerShortcut(action);
+    // menu->addAction(action);
 
     action = new QAction(tr("&Key and Mouse Reference"), this);
     action->setShortcut(tr("F2"));
