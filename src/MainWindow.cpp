@@ -189,6 +189,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     scroll->setWidget(m_paneStack);
 
     m_overview = new Overview(frame);
+    m_overview->setPlaybackFollow(PlaybackScrollPage);
     m_overview->setViewManager(m_viewManager);
     m_overview->setFixedHeight(40);
 #ifndef _WIN32
@@ -1569,6 +1570,7 @@ MainWindow::newSession()
     m_document->setAutoAlignment(true);
 
     Pane *pane = m_paneStack->addPane();
+    pane->setPlaybackFollow(PlaybackScrollPage);
 
     connect(pane, SIGNAL(contextHelpChanged(const QString &)),
             this, SLOT(contextHelpChanged(const QString &)));
@@ -2936,7 +2938,7 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
             .arg(startStr).arg(endStr).arg(durationStr);
     }
     
-    statusBar()->showMessage(m_myStatusMessage);
+    getStatusLabel()->setText(m_myStatusMessage);
 }
 
 void
@@ -3077,7 +3079,10 @@ MainWindow::analyseNewMainModel()
         selectionStrip = m_paneStack->getPane(1);
     }
 
+    pane->setPlaybackFollow(PlaybackScrollPage);
+
     if (selectionStrip) {
+        selectionStrip->setPlaybackFollow(PlaybackScrollPage);
         selectionStrip->setFixedHeight(26);
         m_paneStack->sizePanesEqually();
         m_viewManager->clearToolModeOverrides();

@@ -289,7 +289,7 @@ void TonyApplication::handleFilepathArgument(QString path,
 
     if (path.endsWith("ton")) {
         if (!haveSession) {
-            status = m_mainWindow->openSessionFile(path);
+            status = m_mainWindow->openSessionPath(path);
             if (status == MainWindow::FileOpenSucceeded) {
                 haveSession = true;
                 haveMainModel = true;
