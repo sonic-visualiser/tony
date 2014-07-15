@@ -88,7 +88,7 @@
 using std::vector;
 
 
-MainWindow::MainWindow(bool withAudioOutput) :
+MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpectrogram) :
     MainWindowBase(withAudioOutput, false),
     m_overview(0),
     m_mainMenusCreated(false),
@@ -102,7 +102,9 @@ MainWindow::MainWindow(bool withAudioOutput) :
     m_intelligentActionOn(true), //GF: !!! temporary
     m_activityLog(new ActivityLog()),
     m_keyReference(new KeyReference()),
-    m_selectionAnchor(0)
+    m_selectionAnchor(0),
+    m_withSonification(withSonification),
+    m_withSpectrogram(withSpectrogram)
 {
     setWindowTitle(QApplication::applicationName());
 

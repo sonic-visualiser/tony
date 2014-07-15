@@ -27,7 +27,7 @@ class MainWindow : public MainWindowBase
     Q_OBJECT
 
 public:
-    MainWindow(bool withAudioOutput = true);
+    MainWindow(bool withAudioOutput = true,  bool withSonification = true, bool withSpectrogram = true);
     virtual ~MainWindow();
 
 signals:
@@ -232,6 +232,9 @@ protected:
     VersionTester *m_versionTester;
 
     int m_selectionAnchor;
+
+    bool m_withSonification;
+    bool m_withSpectrogram;
 
     Analyser::FrequencyRange m_pendingConstraint;
 
