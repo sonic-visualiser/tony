@@ -162,8 +162,9 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     m_viewManager->setToolMode(ViewManager::NavigateMode);
     m_viewManager->setZoomWheelsEnabled(false);
     m_viewManager->setIlluminateLocalFeatures(true);
-    m_viewManager->setShowWorkTitle(true);
+    m_viewManager->setShowWorkTitle(false);
     m_viewManager->setShowCentreLine(false);
+    m_viewManager->setShowDuration(false);
     m_viewManager->setOverlayMode(ViewManager::GlobalOverlays);
 
     connect(m_viewManager, SIGNAL(selectionChangedByUser()),
