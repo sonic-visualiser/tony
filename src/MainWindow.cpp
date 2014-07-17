@@ -933,20 +933,21 @@ MainWindow::setupHelpMenu()
     QString name = QApplication::applicationName();
     QAction *action;
 
-    // action = new QAction(il.load("help"),
-    //                               tr("&Help Reference"), this); 
-    // action->setShortcut(tr("F1"));
-    // action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
-    // connect(action, SIGNAL(triggered()), this, SLOT(help()));
-    // m_keyReference->registerShortcut(action);
-    // menu->addAction(action);
-
     action = new QAction(tr("&Key and Mouse Reference"), this);
     action->setShortcut(tr("F2"));
     action->setStatusTip(tr("Open a window showing the keystrokes you can use in %1").arg(name));
     connect(action, SIGNAL(triggered()), this, SLOT(keyReference()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
+
+    action = new QAction(il.load("help"),
+                                  tr("&Help Reference"), this); 
+    action->setShortcut(tr("F1"));
+    action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
+    connect(action, SIGNAL(triggered()), this, SLOT(help()));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+
     
     action = new QAction(tr("%1 on the &Web").arg(name), this); 
     action->setStatusTip(tr("Open the %1 website").arg(name)); 
@@ -3263,7 +3264,7 @@ void
 MainWindow::help()
 {
     //!!! todo: help URL!
-    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/"));
+    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/wiki/Reference"));
 }
 
 void
