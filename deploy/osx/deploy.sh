@@ -5,6 +5,25 @@
 # as argument (the target will use $app.app regardless, but we need
 # to know the source)
 
+#!!! Special args for constructing experimental scripts. Do not merge
+#!!! to default branch.
+shext=""
+if [ "$1" = "--no-sonification" ]; then
+    shext=".no-sonification"
+    shift
+elif [ "$1" = "--no-spectrogram" ]; then
+    shext=".no-spectrogram"
+    shift
+elif [ "$1" = "--all-features" ]; then
+    shext=""
+    shift
+else
+    echo "Error: Must supply one of --all-features, --no-sonification, --no-spectrogram"
+    exit 2
+fi
+
+echo "Shell file extension: $shext"
+
 source="$1"
 dmg="$2"
 if [ -z "$source" ] || [ ! -d "$source" ] || [ -z "$dmg" ]; then
@@ -25,13 +44,16 @@ esac
 
 if file "$source/Contents/MacOS/$app" | grep -q script; then
     echo
-    echo "Executable is already a script, leaving it alone."
+    echo "Executable is already a script, replacing it."
+
+    cp "deploy/osx/$app.sh$shext" "$source/Contents/MacOS/$app" || exit 1
+    chmod +x "$source/Contents/MacOS/$app"
 else
     echo
     echo "Moving aside executable, adding script."
 
     mv "$source/Contents/MacOS/$app" "$source/Contents/MacOS/$app.bin" || exit 1
-    cp "deploy/osx/$app.sh" "$source/Contents/MacOS/$app" || exit 1
+    cp "deploy/osx/$app.sh$shext" "$source/Contents/MacOS/$app" || exit 1
     chmod +x "$source/Contents/MacOS/$app"
 fi
 
