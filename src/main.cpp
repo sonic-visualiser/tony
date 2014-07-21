@@ -217,6 +217,13 @@ main(int argc, char **argv)
     if (height < 450) height = (available.height() * 2) / 3;
     if (width > height * 2) width = height * 2;
 
+    {
+        //!!! For Tony experiments:
+        QSettings settings;
+        settings.clear();
+        settings.sync();
+    }
+
     QSettings settings;
     settings.beginGroup("MainWindow");
     QSize size = settings.value("size", QSize(width, height)).toSize();
