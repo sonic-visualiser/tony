@@ -73,7 +73,7 @@ echo "Making target tree."
 
 volume="$app"-"$version"
 target="$volume"/"$app".app
-dmg="$dmg"-"$version".dmg
+dmg="$dmg"-"$version$shext".dmg
 
 mkdir "$volume" || exit 1
 
