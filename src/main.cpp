@@ -167,6 +167,13 @@ main(int argc, char **argv)
     QApplication::setOrganizationDomain("qmul.ac.uk");
     QApplication::setApplicationName("Tony");
 
+    {
+        //!!! For Tony experiments:
+        QSettings settings;
+        settings.clear();
+        settings.sync();
+    }
+
     InteractiveFileFinder::getInstance()->setApplicationSessionExtension("ton");
 
     QSplashScreen *splash = 0;
@@ -216,13 +223,6 @@ main(int argc, char **argv)
     int height = available.height() / 2;
     if (height < 450) height = (available.height() * 2) / 3;
     if (width > height * 2) width = height * 2;
-
-    {
-        //!!! For Tony experiments:
-        QSettings settings;
-        settings.clear();
-        settings.sync();
-    }
 
     QSettings settings;
     settings.beginGroup("MainWindow");
