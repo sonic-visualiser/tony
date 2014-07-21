@@ -3288,6 +3288,15 @@ MainWindow::about()
     aboutText += tr("<p>Using Qt framework version %1.</p>")
         .arg(QT_VERSION_STR);
 
+    //!!! Tony experiment hacks:
+    if (!m_withSonification) {
+        aboutText += tr("<p>Sonification disabled.</p>");
+    }
+    if (!m_withSpectrogram) {
+        aboutText += tr("<p>Spectrogram disabled.</p>");
+    }
+    aboutText += tr("<p>Includes modification to forget all settings between program runs, for use in an experimental environment.</p>");
+
     aboutText += 
         "<p>Copyright &copy; 2005&ndash;2014 Chris Cannam, Queen Mary University of London, and the Tony project authors: Matthias Mauch, George Fazekas, Justin Salamon, and Rachel Bittner.</p>"
         "<p>pYIN analysis plugin written by Matthias Mauch.</p>"
