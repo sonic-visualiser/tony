@@ -1472,7 +1472,7 @@ MainWindow::showPitchToggled()
     } else {
         settings.setValue("playpitchwas", m_playPitch->isChecked());
     }
-    m_analyser->setAudible(Analyser::PitchTrack, playOn);
+    m_analyser->setAudible(Analyser::PitchTrack, playOn && m_withSonification);
     m_playPitch->setChecked(playOn);
 
     settings.endGroup();
@@ -1501,7 +1501,7 @@ MainWindow::showNotesToggled()
     } else {
         settings.setValue("playnoteswas", m_playNotes->isChecked());
     }
-    m_analyser->setAudible(Analyser::Notes, playOn);
+    m_analyser->setAudible(Analyser::Notes, playOn && m_withSonification);
     m_playNotes->setChecked(playOn);
 
     settings.endGroup();
