@@ -1689,7 +1689,7 @@ MainWindow::openFile()
 
     if (path.isEmpty()) return;
 
-    FileOpenStatus status = open(path, ReplaceSession);
+    FileOpenStatus status = openPath(path, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open file"),
@@ -1719,7 +1719,7 @@ MainWindow::openLocation()
 
     if (text.isEmpty()) return;
 
-    FileOpenStatus status = open(text, ReplaceSession);
+    FileOpenStatus status = openPath(text, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open location"),
@@ -1745,7 +1745,7 @@ MainWindow::openRecentFile()
     QString path = action->text();
     if (path == "") return;
 
-    FileOpenStatus status = open(path, ReplaceSession);
+    FileOpenStatus status = openPath(path, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open location"),
@@ -1783,7 +1783,7 @@ MainWindow::paneDropAccepted(Pane *pane, QStringList uriList)
 
     for (QStringList::iterator i = uriList.begin(); i != uriList.end(); ++i) {
 
-        FileOpenStatus status = open(*i, ReplaceSession);
+        FileOpenStatus status = openPath(*i, ReplaceSession);
 
         if (status == FileOpenFailed) {
             QMessageBox::critical(this, tr("Failed to open dropped URL"),
