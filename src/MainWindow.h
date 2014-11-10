@@ -55,7 +55,6 @@ protected slots:
     virtual void closeSession();
 
     virtual void toolNavigateSelected();
-    virtual void toolSelectSelected();
     virtual void toolEditSelected();
     virtual void toolFreeEditSelected();
 
