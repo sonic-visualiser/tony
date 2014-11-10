@@ -159,7 +159,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
 
     m_viewManager->setAlignMode(false);
     m_viewManager->setPlaySoloMode(false);
-    m_viewManager->setToolMode(ViewManager::NavigateMode);
+    m_viewManager->setToolMode(ViewManager::SelectMode);
     m_viewManager->setZoomWheelsEnabled(false);
     m_viewManager->setIlluminateLocalFeatures(true);
     m_viewManager->setShowWorkTitle(false);
@@ -580,6 +580,20 @@ MainWindow::setupEditMenu()
     IconLoader il;
 
     m_keyReference->setCategory(tr("Tool Selection"));
+
+    QAction *action = toolbar->addAction(il.load("select"),
+                                         tr("Select"));
+    action->setCheckable(true);
+    action->setChecked(true);
+    action->setShortcut(tr("1"));
+    action->setStatusTip(tr("Select"));
+    connect(action, SIGNAL(triggered()), this, SLOT(toolSelectSelected()));
+    connect(this, SIGNAL(replacedDocument()), action, SLOT(trigger()));
+    group->addAction(action);
+    menu->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+/*
     QAction *action = toolbar->addAction(il.load("navigate"),
                                          tr("Navigate"));
     action->setCheckable(true);
@@ -603,7 +617,7 @@ MainWindow::setupEditMenu()
     m_keyReference->registerShortcut
         (tr("Edit"), tr("Double-Click Left"), 
          tr("Double-click left button on an item to edit it"));
-
+    */
     m_keyReference->setCategory(tr("Tool Selection"));
     action = toolbar->addAction(il.load("move"),
 				tr("Edit"));
@@ -1340,6 +1354,13 @@ void
 MainWindow::toolNavigateSelected()
 {
     m_viewManager->setToolMode(ViewManager::NavigateMode);
+    m_intelligentActionOn = true;
+}
+
+void
+MainWindow::toolSelectSelected()
+{
+    m_viewManager->setToolMode(ViewManager::SelectMode);
     m_intelligentActionOn = true;
 }
 
