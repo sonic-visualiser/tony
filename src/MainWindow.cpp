@@ -1630,6 +1630,9 @@ MainWindow::newSession()
     Pane *pane = m_paneStack->addPane();
     pane->setPlaybackFollow(PlaybackScrollPage);
 
+    m_viewManager->setGlobalCentreFrame
+        (pane->getFrameForX(width() / 2));
+    
     connect(pane, SIGNAL(contextHelpChanged(const QString &)),
             this, SLOT(contextHelpChanged(const QString &)));
 
