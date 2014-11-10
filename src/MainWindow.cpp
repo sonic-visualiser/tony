@@ -192,7 +192,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     m_overview = new Overview(frame);
     m_overview->setPlaybackFollow(PlaybackScrollPage);
     m_overview->setViewManager(m_viewManager);
-    m_overview->setFixedHeight(40);
+    m_overview->setFixedHeight(60);
 #ifndef _WIN32
     // For some reason, the contents of the overview never appear if we
     // make this setting on Windows.  I have no inclination at the moment
@@ -205,6 +205,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     m_panLayer = new WaveformLayer;
     m_panLayer->setChannelMode(WaveformLayer::MergeChannels);
     m_panLayer->setAggressiveCacheing(true);
+    m_panLayer->setGain(0.5);
     m_overview->addLayer(m_panLayer);
 
     if (m_viewManager->getGlobalDarkBackground()) {
