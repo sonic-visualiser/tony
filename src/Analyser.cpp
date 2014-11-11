@@ -408,9 +408,9 @@ Analyser::addAnalyses()
         pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
         PlayParameters *params = pitchLayer->getPlayParameters();
         if (params) params->setPlayPan(1);
+        connect(pitchLayer, SIGNAL(modelCompletionChanged()),
+                this, SLOT(layerCompletionChanged()));
     }
-    connect(pitchLayer, SIGNAL(modelCompletionChanged()),
-            this, SLOT(layerCompletionChanged()));
     
     FlexiNoteLayer *flexiNoteLayer = 
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
@@ -418,11 +418,23 @@ Analyser::addAnalyses()
         flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
         PlayParameters *params = flexiNoteLayer->getPlayParameters();
         if (params) params->setPlayPan(1);
+        connect(flexiNoteLayer, SIGNAL(modelCompletionChanged()),
+                this, SLOT(layerCompletionChanged()));
+        connect(flexiNoteLayer, SIGNAL(reAnalyseRegion(int, int, float, float)),
+                this, SLOT(reAnalyseRegion(int, int, float, float)));
     }
-    connect(flexiNoteLayer, SIGNAL(modelCompletionChanged()),
-            this, SLOT(layerCompletionChanged()));
     
     return "";
+}
+
+void
+Analyser::reAnalyseRegion(int frame0, int frame1, float freq0, float freq1)
+{
+    cerr << "Analyser::reAnalyseRegion(" << frame0 << ", " << frame1
+         << ", " << freq0 << ", " << freq1 << ")" << endl;
+    showPitchCandidates(true);
+    (void)reAnalyseSelection(Selection(frame0, frame1),
+                             FrequencyRange(freq0, freq1));
 }
 
 QString
@@ -430,7 +442,14 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
     QMutexLocker locker(&m_asyncMutex);
 
-    if (sel == m_reAnalysingSelection || sel.isEmpty()) return "";
+    if (!m_reAnalysingSelection.isEmpty()) {
+        if (sel == m_reAnalysingSelection && range == m_reAnalysingRange) {
+            cerr << "selection & range are same as current analysis, ignoring" << endl;
+            return "";
+        }
+    }
+
+    if (sel.isEmpty()) return "";
 
     if (m_currentAsyncHandle) {
         m_document->cancelAsyncLayerCreation(m_currentAsyncHandle);
@@ -444,6 +463,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     }
 
     m_reAnalysingSelection = sel;
+    m_reAnalysingRange = range;
 
     m_preAnalysis = Clipboard();
     Layer *myLayer = m_layers[PitchTrack];
