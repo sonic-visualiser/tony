@@ -422,6 +422,8 @@ Analyser::addAnalyses()
                 this, SLOT(layerCompletionChanged()));
         connect(flexiNoteLayer, SIGNAL(reAnalyseRegion(int, int, float, float)),
                 this, SLOT(reAnalyseRegion(int, int, float, float)));
+        connect(flexiNoteLayer, SIGNAL(materialiseReAnalysis()),
+                this, SLOT(materialiseReAnalysis()));
     }
     
     return "";
@@ -435,6 +437,13 @@ Analyser::reAnalyseRegion(int frame0, int frame1, float freq0, float freq1)
     showPitchCandidates(true);
     (void)reAnalyseSelection(Selection(frame0, frame1),
                              FrequencyRange(freq0, freq1));
+}
+
+void
+Analyser::materialiseReAnalysis()
+{
+    if (m_reAnalysingSelection.isEmpty()) return;
+    switchPitchCandidate(m_reAnalysingSelection, true); // or false, doesn't matter
 }
 
 QString

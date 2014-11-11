@@ -219,6 +219,7 @@ protected slots:
     void layerAboutToBeDeleted(Layer *);
     void layerCompletionChanged();
     void reAnalyseRegion(int, int, float, float);
+    void materialiseReAnalysis();
 
 protected:
     Document *m_document;
