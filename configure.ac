@@ -25,6 +25,9 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_MKDIR_P
 
+# We are daringly making use of C++11 now
+AX_CXX_COMPILE_STDCXX_11(noext)
+
 AC_HEADER_STDC
 
 # These are the flags Autoconf guesses for us; we use them later if
@@ -50,7 +53,7 @@ CXXFLAGS_RELEASE="$AUTOCONF_CXXFLAGS"
 CXXFLAGS_MINIMAL="$AUTOCONF_CXXFLAGS"
 
 if test "x$GCC" = "xyes"; then
-   	CXXFLAGS_ANY="-std=c++11 -Wall -Wextra -Werror -Woverloaded-virtual -Wformat-nonliteral -Wformat-security -Winit-self -Wswitch-enum -Wconversion -pipe"
+   	CXXFLAGS_ANY="-Wall -Wextra -Werror -Woverloaded-virtual -Wformat-nonliteral -Wformat-security -Winit-self -Wswitch-enum -Wconversion -pipe"
         CXXFLAGS_DEBUG="$CXXFLAGS_ANY -g"
    	CXXFLAGS_RELEASE="$CXXFLAGS_ANY -g0 -O2"
    	CXXFLAGS_MINIMAL="$CXXFLAGS_ANY -g0 -O0"
