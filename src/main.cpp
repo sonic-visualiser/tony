@@ -100,9 +100,7 @@ protected:
     QStringList m_filepathQueue;
 
     virtual bool event(QEvent *event) {
-        switch (event->type()) {
-        case QEvent::FileOpen:
-        {
+        if (event->type() == QEvent::FileOpen) {
             QString path = static_cast<QFileOpenEvent *>(event)->file();
             if (m_readyForFiles) {
                 handleFilepathArgument(path, NULL);
@@ -110,8 +108,7 @@ protected:
                 m_filepathQueue.append(path);
             }
             return true;
-        }
-        default:
+        } else {
             return QApplication::event(event);
         }
     }
@@ -152,7 +149,7 @@ main(int argc, char **argv)
 
     if (args.contains("--help") || args.contains("-h") || args.contains("-?")) {
         std::cerr << QApplication::tr(
-            "\nTony is a program for interactive note and pitch analysis and annotation.\n\nUsage:\n\n  %1 [--no-audio] [--no-osc] [<file> ...]\n\n  --no-audio: Do not attempt to open an audio output device\n  <file>: One or more Tony (.ton) and audio files may be provided.\n").arg(argv[0]).toStdString() << std::endl;
+            "\nTony is a program for interactive note and pitch analysis and annotation.\n\nUsage:\n\n  %1 [--no-audio] [<file> ...]\n\n  --no-audio: Do not attempt to open an audio output device\n  <file>: One or more Tony (.ton) and audio files may be provided.\n").arg(argv[0]).toStdString() << std::endl;
         exit(2);
     }
 
@@ -198,7 +195,7 @@ main(int argc, char **argv)
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<PropertyContainer::PropertyName>("PropertyContainer::PropertyName");
 
-    MainWindow *gui = new MainWindow(audioOutput, false); // no osc support
+    MainWindow *gui = new MainWindow(audioOutput);
     application.setMainWindow(gui);
     if (splash) {
         QObject::connect(gui, SIGNAL(hideSplash()), splash, SLOT(hide()));
@@ -284,7 +281,7 @@ void TonyApplication::handleFilepathArgument(QString path,
 
     if (path.endsWith("ton")) {
         if (!haveSession) {
-            status = m_mainWindow->openSessionFile(path);
+            status = m_mainWindow->openSessionPath(path);
             if (status == MainWindow::FileOpenSucceeded) {
                 haveSession = true;
                 haveMainModel = true;
@@ -296,18 +293,18 @@ void TonyApplication::handleFilepathArgument(QString path,
     }
     if (status != MainWindow::FileOpenSucceeded) {
         if (!haveMainModel) {
-            status = m_mainWindow->open(path, MainWindow::ReplaceSession);
+            status = m_mainWindow->openPath(path, MainWindow::ReplaceSession);
             if (status == MainWindow::FileOpenSucceeded) {
                 haveMainModel = true;
             }
         } else {
             if (haveSession && !havePriorCommandLineModel) {
-                status = m_mainWindow->open(path, MainWindow::AskUser);
+                status = m_mainWindow->openPath(path, MainWindow::AskUser);
                 if (status == MainWindow::FileOpenSucceeded) {
                     havePriorCommandLineModel = true;
                 }
             } else {
-                status = m_mainWindow->open(path, MainWindow::CreateAdditionalModel);
+                status = m_mainWindow->openPath(path, MainWindow::CreateAdditionalModel);
             }
         }
     }

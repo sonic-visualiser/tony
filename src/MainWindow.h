@@ -27,8 +27,7 @@ class MainWindow : public MainWindowBase
     Q_OBJECT
 
 public:
-    MainWindow(bool withAudioOutput = true,
-               bool withOSCSupport = true);
+    MainWindow(bool withAudioOutput = true);
     virtual ~MainWindow();
 
 signals:
@@ -86,7 +85,7 @@ protected slots:
     virtual void precisionAnalysisToggled();
     virtual void lowampAnalysisToggled();
 
-    virtual void doubleClickSelectInvoked(size_t);
+    virtual void doubleClickSelectInvoked(sv_frame_t);
     virtual void abandonSelection();
 
     virtual void paneAdded(Pane *);
@@ -134,7 +133,7 @@ protected slots:
     virtual void decreaseNotesPan();
     virtual void restoreNormalNotesPan();
 
-    virtual void sampleRateMismatch(size_t, size_t, bool);
+    virtual void sampleRateMismatch(sv_samplerate_t, sv_samplerate_t, bool);
     virtual void audioOverloadPluginDisabled();
     virtual void audioTimeStretchMultiChannelDisabled();
 
@@ -229,7 +228,7 @@ protected:
     KeyReference  *m_keyReference;
     VersionTester *m_versionTester;
 
-    int m_selectionAnchor;
+    sv_frame_t m_selectionAnchor;
 
     Analyser::FrequencyRange m_pendingConstraint;
 
