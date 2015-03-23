@@ -185,8 +185,8 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     // variable
     m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
     m_paneStack->setShowPaneAccessories(false);
-    connect(m_paneStack, SIGNAL(doubleClickSelectInvoked(int)),
-            this, SLOT(doubleClickSelectInvoked(int)));
+    connect(m_paneStack, SIGNAL(doubleClickSelectInvoked(sv_frame_t)),
+            this, SLOT(doubleClickSelectInvoked(sv_frame_t)));
     scroll->setWidget(m_paneStack);
 
     m_overview = new Overview(frame);
@@ -1279,7 +1279,7 @@ MainWindow::selectOneNoteLeft()
 void
 MainWindow::moveByOneNote(bool right, bool doSelect)
 {
-    int frame = m_viewManager->getPlaybackFrame();
+    sv_frame_t frame = m_viewManager->getPlaybackFrame();
     cerr << "MainWindow::moveByOneNote startframe: " << frame << endl;
     
     bool isAtSelectionBoundary = false;
@@ -1302,22 +1302,20 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     if (points.empty()) return;
 
     FlexiNoteModel::PointList::iterator i = points.begin();
-    std::set<int> snapFrames;
+    std::set<sv_frame_t> snapFrames;
     snapFrames.insert(0);
     while (i != points.end()) {
         snapFrames.insert(i->frame);
         snapFrames.insert(i->frame + i->duration + 1);
         ++i;
     }
-    std::set<int>::iterator i2;
-    if (snapFrames.find(frame) == snapFrames.end())
-    {
+    std::set<sv_frame_t>::iterator i2;
+    if (snapFrames.find(frame) == snapFrames.end()) {
         // we're not on an existing snap point, so go to previous
         snapFrames.insert(frame);
     }
     i2 = snapFrames.find(frame);
-    if (right)
-    {
+    if (right) {
         i2++;
         if (i2 == snapFrames.end()) i2--;
     } else {
@@ -1554,9 +1552,9 @@ MainWindow::updateLayerStatuses()
 void
 MainWindow::editDisplayExtents()
 {
-    float min, max;
-    float vmin = 0;
-    float vmax = getMainModel()->getSampleRate() /2;
+    double min, max;
+    double vmin = 0;
+    double vmax = getMainModel()->getSampleRate() /2;
     
     if (!m_analyser->getDisplayFrequencyExtents(min, max)) {
         //!!!
@@ -1566,13 +1564,16 @@ MainWindow::editDisplayExtents()
     RangeInputDialog dialog(tr("Set frequency range"),
                             tr("Enter new frequency range, from %1 to %2 Hz.\nThese values will be rounded to the nearest spectrogram bin.")
                             .arg(vmin).arg(vmax),
-                            "Hz", vmin, vmax, this);
-    dialog.setRange(min, max);
+                            "Hz", float(vmin), float(vmax), this);
+    dialog.setRange(float(min), float(max));
 
     if (dialog.exec() == QDialog::Accepted) {
-        dialog.getRange(min, max);
+        float fmin, fmax;
+        dialog.getRange(fmin, fmax);
+        min = fmin;
+        max = fmax;
         if (min > max) {
-            float tmp = max;
+            double tmp = max;
             max = min;
             min = tmp;
         }
@@ -2305,9 +2306,9 @@ MainWindow::exportNoteLayer()
 }
 
 void
-MainWindow::doubleClickSelectInvoked(int frame)
+MainWindow::doubleClickSelectInvoked(sv_frame_t frame)
 {
-    int f0, f1;
+    sv_frame_t f0, f1;
     m_analyser->getEnclosingSelectionScope(frame, f0, f1);
     
     cerr << "MainWindow::doubleClickSelectInvoked(" << frame << "): [" << f0 << "," << f1 << "]" << endl;
@@ -2392,11 +2393,11 @@ MainWindow::regionOutlined(QRect r)
         return;
     }
 
-    int f0 = pane->getFrameForX(r.x());
-    int f1 = pane->getFrameForX(r.x() + r.width());
+    sv_frame_t f0 = pane->getFrameForX(r.x());
+    sv_frame_t f1 = pane->getFrameForX(r.x() + r.width());
     
-    float v0 = spectrogram->getFrequencyForY(pane, r.y() + r.height());
-    float v1 = spectrogram->getFrequencyForY(pane, r.y());
+    double v0 = spectrogram->getFrequencyForY(pane, r.y() + r.height());
+    double v1 = spectrogram->getFrequencyForY(pane, r.y());
 
     cerr << "MainWindow::regionOutlined: frame " << f0 << " -> " << f1 
          << ", frequency " << v0 << " -> " << v1 << endl;
@@ -2627,14 +2628,14 @@ MainWindow::playSpeedChanged(int position)
 {
     PlaySpeedRangeMapper mapper(0, 200);
 
-    float percent = m_playSpeed->mappedValue();
-    float factor = mapper.getFactorForValue(percent);
+    double percent = m_playSpeed->mappedValue();
+    double factor = mapper.getFactorForValue(percent);
 
     cerr << "speed = " << position << " percent = " << percent << " factor = " << factor << endl;
 
     bool something = (position != 100);
 
-    int pc = lrintf(percent);
+    int pc = int(lrint(percent));
 
     if (!something) {
         contextHelpChanged(tr("Playback speed: Normal"));
@@ -2700,14 +2701,14 @@ MainWindow::restoreNormalPlayback()
 void
 MainWindow::audioGainChanged(int position)
 {
-    float level = m_gainAudio->mappedValue();
-    float gain = powf(10, level / 20.0);
+    double level = m_gainAudio->mappedValue();
+    double gain = pow(10, level / 20.0);
 
     cerr << "gain = " << gain << " (" << position << " dB)" << endl;
 
     contextHelpChanged(tr("Audio Gain: %1 dB").arg(position));
 
-    m_analyser->setGain(Analyser::Audio, gain);
+    m_analyser->setGain(Analyser::Audio, float(gain));
 
     updateMenuStates();
 } 
@@ -2739,14 +2740,14 @@ MainWindow::restoreNormalAudioGain()
 void
 MainWindow::pitchGainChanged(int position)
 {
-    float level = m_gainPitch->mappedValue();
-    float gain = powf(10, level / 20.0);
+    double level = m_gainPitch->mappedValue();
+    double gain = pow(10, level / 20.0);
 
     cerr << "gain = " << gain << " (" << position << " dB)" << endl;
 
     contextHelpChanged(tr("Pitch Gain: %1 dB").arg(position));
 
-    m_analyser->setGain(Analyser::PitchTrack, gain);
+    m_analyser->setGain(Analyser::PitchTrack, float(gain));
 
     updateMenuStates();
 } 
@@ -2778,14 +2779,14 @@ MainWindow::restoreNormalPitchGain()
 void
 MainWindow::notesGainChanged(int position)
 {
-    float level = m_gainNotes->mappedValue();
-    float gain = powf(10, level / 20.0);
+    double level = m_gainNotes->mappedValue();
+    double gain = pow(10, level / 20.0);
 
     cerr << "gain = " << gain << " (" << position << " dB)" << endl;
 
     contextHelpChanged(tr("Notes Gain: %1 dB").arg(position));
 
-    m_analyser->setGain(Analyser::Notes, gain);
+    m_analyser->setGain(Analyser::Notes, float(gain));
 
     updateMenuStates();
 } 
@@ -2817,14 +2818,14 @@ MainWindow::restoreNormalNotesGain()
 void
 MainWindow::audioPanChanged(int position)
 {
-    float level = m_panAudio->mappedValue();
-    float pan = level/100.f;
+    double level = m_panAudio->mappedValue();
+    double pan = level/100.0;
 
     cerr << "pan = " << pan << " (" << position << ")" << endl;
 
     contextHelpChanged(tr("Audio Pan: %1").arg(position));
 
-    m_analyser->setPan(Analyser::Audio, pan);
+    m_analyser->setPan(Analyser::Audio, float(pan));
 
     updateMenuStates();
 } 
@@ -2856,14 +2857,14 @@ MainWindow::restoreNormalAudioPan()
 void
 MainWindow::pitchPanChanged(int position)
 {
-    float level = m_panPitch->mappedValue();
-    float pan = level/100.f;
+    double level = m_panPitch->mappedValue();
+    double pan = level/100.0;
 
     cerr << "pan = " << pan << " (" << position << ")" << endl;
 
     contextHelpChanged(tr("Pitch Pan: %1").arg(position));
 
-    m_analyser->setPan(Analyser::PitchTrack, pan);
+    m_analyser->setPan(Analyser::PitchTrack, float(pan));
 
     updateMenuStates();
 } 
@@ -2895,14 +2896,14 @@ MainWindow::restoreNormalPitchPan()
 void
 MainWindow::notesPanChanged(int position)
 {
-    float level = m_panNotes->mappedValue();
-    float pan = level/100.f;
+    double level = m_panNotes->mappedValue();
+    double pan = level/100.0;
 
     cerr << "pan = " << pan << " (" << position << ")" << endl;
 
     contextHelpChanged(tr("Notes Pan: %1").arg(position));
 
-    m_analyser->setPan(Analyser::Notes, pan);
+    m_analyser->setPan(Analyser::Notes, float(pan));
 
     updateMenuStates();
 } 
@@ -2939,7 +2940,7 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
     }
 
     bool haveSelection = false;
-    int startFrame = 0, endFrame = 0;
+    sv_frame_t startFrame = 0, endFrame = 0;
 
     if (m_viewManager && m_viewManager->haveInProgressSelection()) {
 
@@ -2997,9 +2998,9 @@ MainWindow::outputLevelsChanged(float left, float right)
 }
 
 void
-MainWindow::sampleRateMismatch(int /* requested */,
-                               int /* actual */,
-                               bool /* willResample */)
+MainWindow::sampleRateMismatch(sv_samplerate_t ,
+                               sv_samplerate_t ,
+                               bool )
 {
     updateDescriptionLabel();
 }
@@ -3191,7 +3192,8 @@ MainWindow::modelGenerationWarning(QString /* transformName */, QString message)
 
 void
 MainWindow::modelRegenerationFailed(QString layerName,
-                                    QString transformName, QString message)
+                                    QString transformName,
+                                    QString message)
 {
     if (message != "") {
 
@@ -3342,34 +3344,35 @@ MainWindow::ffwd()
 {
     if (!getMainModel()) return;
 
-    int frame = m_viewManager->getPlaybackFrame();
+    sv_frame_t frame = m_viewManager->getPlaybackFrame();
     ++frame;
 
-    size_t sr = getMainModel()->getSampleRate();
+    sv_samplerate_t sr = getMainModel()->getSampleRate();
 
     // The step is supposed to scale and be as wide as a step of 
     // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
-    size_t framesPerPixel = m_viewManager->getGlobalZoom();
-    size_t defaultZoom = (720 * 44100) / sr;
+    int framesPerPixel = m_viewManager->getGlobalZoom();
 
-    float scaler = (framesPerPixel * 1.0f) / defaultZoom;
-
-
+    double defaultZoom = (720 * 44100) / sr;
+    double scaler = framesPerPixel / defaultZoom;
+    RealTime step = m_defaultFfwdRwdStep * scaler;
+    
     frame = RealTime::realTime2Frame
-        (RealTime::frame2RealTime(frame, sr) + m_defaultFfwdRwdStep * scaler, sr);
-    if (frame > int(getMainModel()->getEndFrame())) {
+        (RealTime::frame2RealTime(frame, sr) + step, sr);
+
+    if (frame > getMainModel()->getEndFrame()) {
         frame = getMainModel()->getEndFrame();
     }
-        
+       
     if (frame < 0) frame = 0;
 
     if (m_viewManager->getPlaySelectionMode()) {
-        frame = m_viewManager->constrainFrameToSelection(size_t(frame));
+        frame = m_viewManager->constrainFrameToSelection(frame);
     }
     
     m_viewManager->setPlaybackFrame(frame);
 
-    if (frame == (int)getMainModel()->getEndFrame() &&
+    if (frame == getMainModel()->getEndFrame() &&
         m_playSource &&
         m_playSource->isPlaying() &&
         !m_viewManager->getPlayLoopMode()) {
@@ -3382,27 +3385,30 @@ MainWindow::rewind()
 {
     if (!getMainModel()) return;
 
-    int frame = m_viewManager->getPlaybackFrame();
+    sv_frame_t frame = m_viewManager->getPlaybackFrame();
     if (frame > 0) --frame;
 
-    size_t sr = getMainModel()->getSampleRate();
+    sv_samplerate_t sr = getMainModel()->getSampleRate();
 
     // The step is supposed to scale and be as wide as a step of 
     // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
-    size_t framesPerPixel = m_viewManager->getGlobalZoom();
-    size_t defaultZoom = (720 * 44100) / sr;
+    int framesPerPixel = m_viewManager->getGlobalZoom();
 
-    float scaler = (framesPerPixel * 1.0f) / defaultZoom;
+    double defaultZoom = (720 * 44100) / sr;
+    double scaler = framesPerPixel / defaultZoom;
+    RealTime step = m_defaultFfwdRwdStep * scaler;
+
     frame = RealTime::realTime2Frame
-        (RealTime::frame2RealTime(frame, sr) - m_defaultFfwdRwdStep * scaler, sr);
-    if (frame < int(getMainModel()->getStartFrame())) {
+        (RealTime::frame2RealTime(frame, sr) - step, sr);
+    
+    if (frame < getMainModel()->getStartFrame()) {
         frame = getMainModel()->getStartFrame();
     }
 
     if (frame < 0) frame = 0;
 
     if (m_viewManager->getPlaySelectionMode()) {
-        frame = m_viewManager->constrainFrameToSelection(size_t(frame));
+        frame = m_viewManager->constrainFrameToSelection(frame);
     }
 
     m_viewManager->setPlaybackFrame(frame);

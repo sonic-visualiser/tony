@@ -158,14 +158,14 @@ Analyser::fileClosed()
 }
 
 bool
-Analyser::getDisplayFrequencyExtents(float &min, float &max)
+Analyser::getDisplayFrequencyExtents(double &min, double &max)
 {
     if (!m_layers[Spectrogram]) return false;
     return m_layers[Spectrogram]->getDisplayExtents(min, max);
 }
 
 bool
-Analyser::setDisplayFrequencyExtents(float min, float max)
+Analyser::setDisplayFrequencyExtents(double min, double max)
 {
     if (!m_layers[Spectrogram]) return false;
     m_layers[Spectrogram]->setDisplayExtents(min, max);
@@ -420,8 +420,8 @@ Analyser::addAnalyses()
         if (params) params->setPlayPan(1);
         connect(flexiNoteLayer, SIGNAL(modelCompletionChanged()),
                 this, SLOT(layerCompletionChanged()));
-        connect(flexiNoteLayer, SIGNAL(reAnalyseRegion(int, int, float, float)),
-                this, SLOT(reAnalyseRegion(int, int, float, float)));
+        connect(flexiNoteLayer, SIGNAL(reAnalyseRegion(sv_frame_t, sv_frame_t, float, float)),
+                this, SLOT(reAnalyseRegion(sv_frame_t, sv_frame_t, float, float)));
         connect(flexiNoteLayer, SIGNAL(materialiseReAnalysis()),
                 this, SLOT(materialiseReAnalysis()));
     }
@@ -430,7 +430,7 @@ Analyser::addAnalyses()
 }
 
 void
-Analyser::reAnalyseRegion(int frame0, int frame1, float freq0, float freq1)
+Analyser::reAnalyseRegion(sv_frame_t frame0, sv_frame_t frame1, float freq0, float freq1)
 {
     cerr << "Analyser::reAnalyseRegion(" << frame0 << ", " << frame1
          << ", " << freq0 << ", " << freq1 << ")" << endl;
@@ -506,19 +506,22 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     t.setBlockSize(2048);
 
     if (range.isConstrained()) {
-        t.setParameter("minfreq", range.min);
-        t.setParameter("maxfreq", range.max);
+        t.setParameter("minfreq", float(range.min));
+        t.setParameter("maxfreq", float(range.max));
         t.setBlockSize(4096);
     }
 
     // get time stamps that align with the 256-sample grid of the original extraction
-    int startSample = ceil(sel.getStartFrame()*1.0/256) * 256;
-    int endSample   = ceil(sel.getEndFrame()*1.0/256) * 256;
+    const sv_frame_t grid = 256;
+    sv_frame_t startSample = (sel.getStartFrame() / grid) * grid;
+    if (startSample < sel.getStartFrame()) startSample += grid;
+    sv_frame_t endSample = (sel.getEndFrame() / grid) * grid;
+    if (endSample < sel.getEndFrame()) endSample += grid;
     if (!range.isConstrained()) {
-        startSample -= 4*256; // 4*256 is for 4 frames offset due to timestamp shift
-        endSample   -= 4*256;
+        startSample -= 4*grid; // 4*256 is for 4 frames offset due to timestamp shift
+        endSample   -= 4*grid;
     } else {
-        endSample   -= 9*256; // MM says: not sure what the CHP plugin does there
+        endSample   -= 9*grid; // MM says: not sure what the CHP plugin does there
     }
     RealTime start = RealTime::frame2RealTime(startSample, m_fileModel->getSampleRate()); 
     RealTime end = RealTime::frame2RealTime(endSample, m_fileModel->getSampleRate());
@@ -802,12 +805,12 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
 }
 
 void
-Analyser::getEnclosingSelectionScope(int f, int &f0, int &f1)
+Analyser::getEnclosingSelectionScope(sv_frame_t f, sv_frame_t &f0, sv_frame_t &f1)
 {
     FlexiNoteLayer *flexiNoteLayer = 
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
 
-    int f0i = f, f1i = f;
+    sv_frame_t f0i = f, f1i = f;
     int res = 1;
 
     if (!flexiNoteLayer) {

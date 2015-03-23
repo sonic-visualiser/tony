@@ -101,14 +101,7 @@ protected:
 
     virtual bool event(QEvent *event) {
 
-// Avoid warnings/errors with -Wextra because we aren't explicitly
-// handling all event types (-Wall is OK with this because of the
-// default but the stricter level insists)
-#pragma GCC diagnostic ignored "-Wswitch-enum"
-
-        switch (event->type()) {
-        case QEvent::FileOpen:
-        {
+        if (event->type() == QEvent::FileOpen) {
             QString path = static_cast<QFileOpenEvent *>(event)->file();
             if (m_readyForFiles) {
                 handleFilepathArgument(path, NULL);
@@ -116,8 +109,7 @@ protected:
                 m_filepathQueue.append(path);
             }
             return true;
-        }
-        default:
+        } else {
             return QApplication::event(event);
         }
     }

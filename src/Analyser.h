@@ -55,8 +55,8 @@ public:
 		       
     void setIntelligentActions(bool);
 
-    bool getDisplayFrequencyExtents(float &min, float &max);
-    bool setDisplayFrequencyExtents(float min, float max);
+    bool getDisplayFrequencyExtents(double &min, double &max);
+    bool setDisplayFrequencyExtents(double min, double max);
 
     // Return completion %age for initial analysis -- 100 means it's done
     int getInitialAnalysisCompletion();
@@ -100,14 +100,14 @@ public:
     float getPan(Component c) const;
     void setPan(Component c, float pan);
 
-    void getEnclosingSelectionScope(int f, int &f0, int &f1);
+    void getEnclosingSelectionScope(sv_frame_t f, sv_frame_t &f0, sv_frame_t &f1);
 
     struct FrequencyRange {
         FrequencyRange() : min(0), max(0) { }
-        FrequencyRange(float min_, float max_) : min(min_), max(max_) { }
+        FrequencyRange(double min_, double max_) : min(min_), max(max_) { }
         bool isConstrained() const { return min != max; }
-        float min;
-        float max;
+        double min;
+        double max;
         bool operator==(const FrequencyRange &r) {
             return min == r.min && max == r.max;
         }
@@ -218,7 +218,7 @@ signals:
 protected slots:
     void layerAboutToBeDeleted(Layer *);
     void layerCompletionChanged();
-    void reAnalyseRegion(int, int, float, float);
+    void reAnalyseRegion(sv_frame_t, sv_frame_t, float, float);
     void materialiseReAnalysis();
 
 protected:
