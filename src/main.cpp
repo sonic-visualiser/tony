@@ -61,7 +61,7 @@ signalHandler(int /* signal */)
 class TonyApplication : public QApplication
 {
 public:
-    TonyApplication(int argc, char **argv) :
+    TonyApplication(int &argc, char **argv) :
         QApplication(argc, argv),
         m_mainWindow(0),
         m_readyForFiles(false)
@@ -100,6 +100,7 @@ protected:
     QStringList m_filepathQueue;
 
     virtual bool event(QEvent *event) {
+
         if (event->type() == QEvent::FileOpen) {
             QString path = static_cast<QFileOpenEvent *>(event)->file();
             if (m_readyForFiles) {
@@ -128,14 +129,7 @@ main(int argc, char **argv)
 
     TonyApplication application(argc, argv);
 
-    // For some weird reason, Mac builds are crashing on startup when
-    // this line is present. Eliminate it on that platform for now.
-#ifndef Q_OS_MAC
     QStringList args = application.arguments();
-#else
-    cerr << "NOTE: Command-line arguments are currently disabled on Mac, see comments in main.cpp" << endl;
-    QStringList args;
-#endif
 
     signal(SIGINT,  signalHandler);
     signal(SIGTERM, signalHandler);
@@ -146,14 +140,20 @@ main(int argc, char **argv)
 #endif
 
     bool audioOutput = true;
+    bool sonification = true;
+    bool spectrogram = true;
 
     if (args.contains("--help") || args.contains("-h") || args.contains("-?")) {
         std::cerr << QApplication::tr(
-            "\nTony is a program for interactive note and pitch analysis and annotation.\n\nUsage:\n\n  %1 [--no-audio] [<file> ...]\n\n  --no-audio: Do not attempt to open an audio output device\n  <file>: One or more Tony (.ton) and audio files may be provided.\n").arg(argv[0]).toStdString() << std::endl;
+            "\nTony is a program for interactive note and pitch analysis and annotation.\n\nUsage:\n\n  %1 [--no-audio] [--no-sonification] [--no-spectrogram] [<file> ...]\n\n  --no-audio: Do not attempt to open an audio output device\n  --no-sonification: Disable sonification of pitch tracks and notes and hide their toggles.\n  --no-spectrogram: Disable spectrogram.\n  <file>: One or more Tony (.ton) and audio files may be provided.").arg(argv[0]).toStdString() << std::endl;
         exit(2);
     }
 
     if (args.contains("--no-audio")) audioOutput = false;
+
+    if (args.contains("--no-sonification")) sonification = false;
+
+    if (args.contains("--no-spectrogram")) spectrogram = false;
 
     QApplication::setOrganizationName("QMUL");
     QApplication::setOrganizationDomain("qmul.ac.uk");
@@ -195,7 +195,7 @@ main(int argc, char **argv)
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<PropertyContainer::PropertyName>("PropertyContainer::PropertyName");
 
-    MainWindow *gui = new MainWindow(audioOutput);
+    MainWindow *gui = new MainWindow(audioOutput, sonification, spectrogram);
     application.setMainWindow(gui);
     if (splash) {
         QObject::connect(gui, SIGNAL(hideSplash()), splash, SLOT(hide()));

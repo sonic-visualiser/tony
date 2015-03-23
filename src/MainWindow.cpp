@@ -88,7 +88,7 @@
 using std::vector;
 
 
-MainWindow::MainWindow(bool withAudioOutput) :
+MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpectrogram) :
     MainWindowBase(withAudioOutput, false),
     m_overview(0),
     m_mainMenusCreated(false),
@@ -102,7 +102,9 @@ MainWindow::MainWindow(bool withAudioOutput) :
     m_intelligentActionOn(true), //GF: !!! temporary
     m_activityLog(new ActivityLog()),
     m_keyReference(new KeyReference()),
-    m_selectionAnchor(0)
+    m_selectionAnchor(0),
+    m_withSonification(withSonification),
+    m_withSpectrogram(withSpectrogram)
 {
     setWindowTitle(QApplication::applicationName());
 
@@ -160,8 +162,9 @@ MainWindow::MainWindow(bool withAudioOutput) :
     m_viewManager->setToolMode(ViewManager::NavigateMode);
     m_viewManager->setZoomWheelsEnabled(false);
     m_viewManager->setIlluminateLocalFeatures(true);
-    m_viewManager->setShowWorkTitle(true);
+    m_viewManager->setShowWorkTitle(false);
     m_viewManager->setShowCentreLine(false);
+    m_viewManager->setShowDuration(false);
     m_viewManager->setOverlayMode(ViewManager::GlobalOverlays);
 
     connect(m_viewManager, SIGNAL(selectionChangedByUser()),
@@ -187,8 +190,9 @@ MainWindow::MainWindow(bool withAudioOutput) :
     scroll->setWidget(m_paneStack);
 
     m_overview = new Overview(frame);
+    m_overview->setPlaybackFollow(PlaybackScrollPage);
     m_overview->setViewManager(m_viewManager);
-    m_overview->setFixedHeight(40);
+    m_overview->setFixedHeight(60);
 #ifndef _WIN32
     // For some reason, the contents of the overview never appear if we
     // make this setting on Windows.  I have no inclination at the moment
@@ -201,6 +205,7 @@ MainWindow::MainWindow(bool withAudioOutput) :
     m_panLayer = new WaveformLayer;
     m_panLayer->setChannelMode(WaveformLayer::MergeChannels);
     m_panLayer->setAggressiveCacheing(true);
+    m_panLayer->setGain(0.5);
     m_overview->addLayer(m_panLayer);
 
     if (m_viewManager->getGlobalDarkBackground()) {
@@ -253,41 +258,44 @@ MainWindow::MainWindow(bool withAudioOutput) :
     connect(m_gainAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_gainAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_gainPitch = new AudioDial(frame);
-    m_gainPitch->setMeterColor(Qt::darkRed);
-    m_gainPitch->setMinimum(-50);
-    m_gainPitch->setMaximum(50);
-    m_gainPitch->setValue(0);
-    m_gainPitch->setDefaultValue(0);
-    m_gainPitch->setFixedWidth(24);
-    m_gainPitch->setFixedHeight(24);
-    m_gainPitch->setNotchesVisible(true);
-    m_gainPitch->setPageStep(10);
-    m_gainPitch->setObjectName(tr("Pitch Track Gain"));
-    m_gainPitch->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-    m_gainPitch->setShowToolTip(true);
-    connect(m_gainPitch, SIGNAL(valueChanged(int)),
-            this, SLOT(pitchGainChanged(int)));
-    connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    if (m_withSonification)
+    {   
+        m_gainPitch = new AudioDial(frame);
+        m_gainPitch->setMeterColor(Qt::darkRed);
+        m_gainPitch->setMinimum(-50);
+        m_gainPitch->setMaximum(50);
+        m_gainPitch->setValue(0);
+        m_gainPitch->setDefaultValue(0);
+        m_gainPitch->setFixedWidth(24);
+        m_gainPitch->setFixedHeight(24);
+        m_gainPitch->setNotchesVisible(true);
+        m_gainPitch->setPageStep(10);
+        m_gainPitch->setObjectName(tr("Pitch Track Gain"));
+        m_gainPitch->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
+        m_gainPitch->setShowToolTip(true);
+        connect(m_gainPitch, SIGNAL(valueChanged(int)),
+                this, SLOT(pitchGainChanged(int)));
+        connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_gainNotes = new AudioDial(frame);
-    m_gainNotes->setMeterColor(Qt::darkRed);
-    m_gainNotes->setMinimum(-50);
-    m_gainNotes->setMaximum(50);
-    m_gainNotes->setValue(0);
-    m_gainNotes->setDefaultValue(0);
-    m_gainNotes->setFixedWidth(24);
-    m_gainNotes->setFixedHeight(24);
-    m_gainNotes->setNotchesVisible(true);
-    m_gainNotes->setPageStep(10);
-    m_gainNotes->setObjectName(tr("Pitch Track Gain"));
-    m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-    m_gainNotes->setShowToolTip(true);
-    connect(m_gainNotes, SIGNAL(valueChanged(int)),
-            this, SLOT(notesGainChanged(int)));
-    connect(m_gainNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+        m_gainNotes = new AudioDial(frame);
+        m_gainNotes->setMeterColor(Qt::darkRed);
+        m_gainNotes->setMinimum(-50);
+        m_gainNotes->setMaximum(50);
+        m_gainNotes->setValue(0);
+        m_gainNotes->setDefaultValue(0);
+        m_gainNotes->setFixedWidth(24);
+        m_gainNotes->setFixedHeight(24);
+        m_gainNotes->setNotchesVisible(true);
+        m_gainNotes->setPageStep(10);
+        m_gainNotes->setObjectName(tr("Note Gain"));
+        m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
+        m_gainNotes->setShowToolTip(true);
+        connect(m_gainNotes, SIGNAL(valueChanged(int)),
+                this, SLOT(notesGainChanged(int)));
+        connect(m_gainNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    }
     // End of Gain controls
 
     // Pan controls
@@ -310,41 +318,47 @@ MainWindow::MainWindow(bool withAudioOutput) :
     connect(m_panAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_panAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_panPitch = new AudioDial(frame);
-    m_panPitch->setMeterColor(Qt::darkGreen);
-    m_panPitch->setMinimum(-100);
-    m_panPitch->setMaximum(100);
-    m_panPitch->setValue(100);
-    m_panPitch->setDefaultValue(100);
-    m_panPitch->setFixedWidth(24);
-    m_panPitch->setFixedHeight(24);
-    m_panPitch->setNotchesVisible(true);
-    m_panPitch->setPageStep(10);
-    m_panPitch->setObjectName(tr("Pitch Track Pan"));
-    m_panPitch->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-    m_panPitch->setShowToolTip(true);
-    connect(m_panPitch, SIGNAL(valueChanged(int)),
-            this, SLOT(pitchPanChanged(int)));
-    connect(m_panPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_panNotes = new AudioDial(frame);
-    m_panNotes->setMeterColor(Qt::darkGreen);
-    m_panNotes->setMinimum(-100);
-    m_panNotes->setMaximum(100);
-    m_panNotes->setValue(100);
-    m_panNotes->setDefaultValue(100);
-    m_panNotes->setFixedWidth(24);
-    m_panNotes->setFixedHeight(24);
-    m_panNotes->setNotchesVisible(true);
-    m_panNotes->setPageStep(10);
-    m_panNotes->setObjectName(tr("Notes Track Pan"));
-    m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-    m_panNotes->setShowToolTip(true);
-    connect(m_panNotes, SIGNAL(valueChanged(int)),
-            this, SLOT(notesPanChanged(int)));
-    connect(m_panNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_panNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+    if (m_withSonification)
+    {   
+        m_panPitch = new AudioDial(frame);
+        m_panPitch->setMeterColor(Qt::darkGreen);
+        m_panPitch->setMinimum(-100);
+        m_panPitch->setMaximum(100);
+        m_panPitch->setValue(100);
+        m_panPitch->setDefaultValue(100);
+        m_panPitch->setFixedWidth(24);
+        m_panPitch->setFixedHeight(24);
+        m_panPitch->setNotchesVisible(true);
+        m_panPitch->setPageStep(10);
+        m_panPitch->setObjectName(tr("Pitch Track Pan"));
+        m_panPitch->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+        m_panPitch->setShowToolTip(true);
+        connect(m_panPitch, SIGNAL(valueChanged(int)),
+                this, SLOT(pitchPanChanged(int)));
+        connect(m_panPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+
+        m_panNotes = new AudioDial(frame);
+        m_panNotes->setMeterColor(Qt::darkGreen);
+        m_panNotes->setMinimum(-100);
+        m_panNotes->setMaximum(100);
+        m_panNotes->setValue(100);
+        m_panNotes->setDefaultValue(100);
+        m_panNotes->setFixedWidth(24);
+        m_panNotes->setFixedHeight(24);
+        m_panNotes->setNotchesVisible(true);
+        m_panNotes->setPageStep(10);
+        m_panNotes->setObjectName(tr("Note Pan"));
+        m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
+        m_panNotes->setShowToolTip(true);
+        connect(m_panNotes, SIGNAL(valueChanged(int)),
+                this, SLOT(notesPanChanged(int)));
+        connect(m_panNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
+        connect(m_panNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));    
+    }
+    
     // End of Pan controls
 
     layout->setSpacing(4);
@@ -412,6 +426,17 @@ void
 MainWindow::setupMenus()
 {
     if (!m_mainMenusCreated) {
+
+#ifdef Q_OS_LINUX
+        // In Ubuntu 14.04 the window's menu bar goes missing entirely
+        // if the user is running any desktop environment other than Unity
+        // (in which the faux single-menubar appears). The user has a
+        // workaround, to remove the appmenu-qt5 package, but that is
+        // awkward and the problem is so severe that it merits disabling
+        // the system menubar integration altogether. Like this:
+	menuBar()->setNativeMenuBar(false);
+#endif
+
         m_rightButtonMenu = new QMenu();
     }
 
@@ -918,14 +943,7 @@ MainWindow::setupHelpMenu()
     IconLoader il;
 
     QString name = QApplication::applicationName();
-
-    QAction *action = new QAction(il.load("help"),
-                                  tr("&Help Reference"), this); 
-    action->setShortcut(tr("F1"));
-    action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
-    connect(action, SIGNAL(triggered()), this, SLOT(help()));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
+    QAction *action;
 
     action = new QAction(tr("&Key and Mouse Reference"), this);
     action->setShortcut(tr("F2"));
@@ -933,6 +951,15 @@ MainWindow::setupHelpMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(keyReference()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
+
+    action = new QAction(il.load("help"),
+                                  tr("&Help Reference"), this); 
+    action->setShortcut(tr("F1"));
+    action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
+    connect(action, SIGNAL(triggered()), this, SLOT(help()));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
+
     
     action = new QAction(tr("%1 on the &Web").arg(name), this); 
     action->setStatusTip(tr("Open the %1 website").arg(name)); 
@@ -1168,13 +1195,17 @@ MainWindow::setupToolbars()
     connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
 
-    m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
+    if (!m_withSonification) 
+    {
+        m_playPitch = new QAction(tr("Play Pitch Track"), this);
+    } else {
+        m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
+        toolbar->addWidget(m_gainPitch);
+        toolbar->addWidget(m_panPitch);
+    }
     m_playPitch->setCheckable(true);
     connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
     connect(this, SIGNAL(canPlayPitch(bool)), m_playPitch, SLOT(setEnabled(bool)));
-
-    toolbar->addWidget(m_gainPitch);
-    toolbar->addWidget(m_panPitch);
 
     // Notes
     spacer = new QLabel;
@@ -1186,25 +1217,35 @@ MainWindow::setupToolbars()
     connect(m_showNotes, SIGNAL(triggered()), this, SLOT(showNotesToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
 
-    m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
+    if (!m_withSonification) 
+    {
+        m_playNotes = new QAction(tr("Play Notes"), this);
+    } else {
+        m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
+        toolbar->addWidget(m_gainNotes);
+        toolbar->addWidget(m_panNotes);
+    }
     m_playNotes->setCheckable(true);
     connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
     connect(this, SIGNAL(canPlayNotes(bool)), m_playNotes, SLOT(setEnabled(bool)));
-
-    toolbar->addWidget(m_gainNotes);
-    toolbar->addWidget(m_panNotes);
 
     // Spectrogram
     spacer = new QLabel;
     spacer->setFixedWidth(40);
     toolbar->addWidget(spacer);
 
-    m_showSpect = toolbar->addAction(il.load("spectrogram"), tr("Show Spectrogram"));
+    if (!m_withSpectrogram)
+    {
+        m_showSpect = new QAction(tr("Show Spectrogram"), this);
+    } else {
+        m_showSpect = toolbar->addAction(il.load("spectrogram"), tr("Show Spectrogram"));
+    }
     m_showSpect->setCheckable(true);
     connect(m_showSpect, SIGNAL(triggered()), this, SLOT(showSpectToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showSpect, SLOT(setEnabled(bool)));
 
     Pane::registerShortcuts(*m_keyReference);
+
 }
 
 
@@ -1441,7 +1482,7 @@ MainWindow::showPitchToggled()
     } else {
         settings.setValue("playpitchwas", m_playPitch->isChecked());
     }
-    m_analyser->setAudible(Analyser::PitchTrack, playOn);
+    m_analyser->setAudible(Analyser::PitchTrack, playOn && m_withSonification);
     m_playPitch->setChecked(playOn);
 
     settings.endGroup();
@@ -1470,7 +1511,7 @@ MainWindow::showNotesToggled()
     } else {
         settings.setValue("playnoteswas", m_playNotes->isChecked());
     }
-    m_analyser->setAudible(Analyser::Notes, playOn);
+    m_analyser->setAudible(Analyser::Notes, playOn && m_withSonification);
     m_playNotes->setChecked(playOn);
 
     settings.endGroup();
@@ -1568,7 +1609,11 @@ MainWindow::newSession()
     m_document->setAutoAlignment(true);
 
     Pane *pane = m_paneStack->addPane();
+    pane->setPlaybackFollow(PlaybackScrollPage);
 
+    m_viewManager->setGlobalCentreFrame
+        (pane->getFrameForX(width() / 2));
+    
     connect(pane, SIGNAL(contextHelpChanged(const QString &)),
             this, SLOT(contextHelpChanged(const QString &)));
 
@@ -1649,7 +1694,7 @@ MainWindow::openFile()
 
     if (path.isEmpty()) return;
 
-    FileOpenStatus status = open(path, ReplaceSession);
+    FileOpenStatus status = openPath(path, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open file"),
@@ -1679,7 +1724,7 @@ MainWindow::openLocation()
 
     if (text.isEmpty()) return;
 
-    FileOpenStatus status = open(text, ReplaceSession);
+    FileOpenStatus status = openPath(text, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open location"),
@@ -1705,7 +1750,7 @@ MainWindow::openRecentFile()
     QString path = action->text();
     if (path == "") return;
 
-    FileOpenStatus status = open(path, ReplaceSession);
+    FileOpenStatus status = openPath(path, ReplaceSession);
 
     if (status == FileOpenFailed) {
         QMessageBox::critical(this, tr("Failed to open location"),
@@ -1743,7 +1788,7 @@ MainWindow::paneDropAccepted(Pane *pane, QStringList uriList)
 
     for (QStringList::iterator i = uriList.begin(); i != uriList.end(); ++i) {
 
-        FileOpenStatus status = open(*i, ReplaceSession);
+        FileOpenStatus status = openPath(*i, ReplaceSession);
 
         if (status == FileOpenFailed) {
             QMessageBox::critical(this, tr("Failed to open dropped URL"),
@@ -2895,7 +2940,7 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
     }
 
     bool haveSelection = false;
-    size_t startFrame = 0, endFrame = 0;
+    int startFrame = 0, endFrame = 0;
 
     if (m_viewManager && m_viewManager->haveInProgressSelection()) {
 
@@ -2935,7 +2980,7 @@ MainWindow::updateVisibleRangeDisplay(Pane *p) const
             .arg(startStr).arg(endStr).arg(durationStr);
     }
     
-    statusBar()->showMessage(m_myStatusMessage);
+    getStatusLabel()->setText(m_myStatusMessage);
 }
 
 void
@@ -3076,7 +3121,10 @@ MainWindow::analyseNewMainModel()
         selectionStrip = m_paneStack->getPane(1);
     }
 
+    pane->setPlaybackFollow(PlaybackScrollPage);
+
     if (selectionStrip) {
+        selectionStrip->setPlaybackFollow(PlaybackScrollPage);
         selectionStrip->setFixedHeight(26);
         m_paneStack->sizePanesEqually();
         m_viewManager->clearToolModeOverrides();
@@ -3100,6 +3148,17 @@ MainWindow::analyseNewMainModel()
                  tr("<b>Analysis failed</b><p>%1</p>").arg(error),
                  QMessageBox::Ok);
         }
+    }
+
+    if (!m_withSpectrogram) 
+    {
+        m_analyser->setVisible(Analyser::Spectrogram, false);
+    }
+
+    if (!m_withSonification) 
+    {
+        m_analyser->setAudible(Analyser::PitchTrack, false);
+        m_analyser->setAudible(Analyser::Notes, false);
     }
 }
 
@@ -3222,7 +3281,7 @@ void
 MainWindow::help()
 {
     //!!! todo: help URL!
-    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/"));
+    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/wiki/Reference"));
 }
 
 void
@@ -3280,5 +3339,73 @@ MainWindow::newerVersionAvailable(QString version)
     settings.endGroup();
 }
 
+void
+MainWindow::ffwd()
+{
+    if (!getMainModel()) return;
+
+    int frame = m_viewManager->getPlaybackFrame();
+    ++frame;
+
+    size_t sr = getMainModel()->getSampleRate();
+
+    // The step is supposed to scale and be as wide as a step of 
+    // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
+    size_t framesPerPixel = m_viewManager->getGlobalZoom();
+    size_t defaultZoom = (720 * 44100) / sr;
+
+    float scaler = (framesPerPixel * 1.0f) / defaultZoom;
 
 
+    frame = RealTime::realTime2Frame
+        (RealTime::frame2RealTime(frame, sr) + m_defaultFfwdRwdStep * scaler, sr);
+    if (frame > int(getMainModel()->getEndFrame())) {
+        frame = getMainModel()->getEndFrame();
+    }
+        
+    if (frame < 0) frame = 0;
+
+    if (m_viewManager->getPlaySelectionMode()) {
+        frame = m_viewManager->constrainFrameToSelection(size_t(frame));
+    }
+    
+    m_viewManager->setPlaybackFrame(frame);
+
+    if (frame == (int)getMainModel()->getEndFrame() &&
+        m_playSource &&
+        m_playSource->isPlaying() &&
+        !m_viewManager->getPlayLoopMode()) {
+        stop();
+    }
+}
+
+void
+MainWindow::rewind()
+{
+    if (!getMainModel()) return;
+
+    int frame = m_viewManager->getPlaybackFrame();
+    if (frame > 0) --frame;
+
+    size_t sr = getMainModel()->getSampleRate();
+
+    // The step is supposed to scale and be as wide as a step of 
+    // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
+    size_t framesPerPixel = m_viewManager->getGlobalZoom();
+    size_t defaultZoom = (720 * 44100) / sr;
+
+    float scaler = (framesPerPixel * 1.0f) / defaultZoom;
+    frame = RealTime::realTime2Frame
+        (RealTime::frame2RealTime(frame, sr) - m_defaultFfwdRwdStep * scaler, sr);
+    if (frame < int(getMainModel()->getStartFrame())) {
+        frame = getMainModel()->getStartFrame();
+    }
+
+    if (frame < 0) frame = 0;
+
+    if (m_viewManager->getPlaySelectionMode()) {
+        frame = m_viewManager->constrainFrameToSelection(size_t(frame));
+    }
+
+    m_viewManager->setPlaybackFrame(frame);
+}

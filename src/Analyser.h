@@ -108,6 +108,9 @@ public:
         bool isConstrained() const { return min != max; }
         double min;
         double max;
+        bool operator==(const FrequencyRange &r) {
+            return min == r.min && max == r.max;
+        }
     };
 
     /**
@@ -215,6 +218,8 @@ signals:
 protected slots:
     void layerAboutToBeDeleted(Layer *);
     void layerCompletionChanged();
+    void reAnalyseRegion(int, int, float, float);
+    void materialiseReAnalysis();
 
 protected:
     Document *m_document;
@@ -226,6 +231,7 @@ protected:
 
     Clipboard m_preAnalysis;
     Selection m_reAnalysingSelection;
+    FrequencyRange m_reAnalysingRange;
     std::vector<Layer *> m_reAnalysisCandidates;
     int m_currentCandidate;
     bool m_candidatesVisible;

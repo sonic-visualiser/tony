@@ -27,7 +27,7 @@ class MainWindow : public MainWindowBase
     Q_OBJECT
 
 public:
-    MainWindow(bool withAudioOutput = true);
+    MainWindow(bool withAudioOutput = true, bool withSonification = true, bool withSpectrogram = true);
     virtual ~MainWindow();
 
 signals:
@@ -186,6 +186,9 @@ protected slots:
     void selectOneNoteRight();
     void selectOneNoteLeft();
 
+    void ffwd();
+    void rewind();
+
 protected:
     Analyser      *m_analyser;
 
@@ -229,6 +232,9 @@ protected:
     VersionTester *m_versionTester;
 
     sv_frame_t m_selectionAnchor;
+
+    bool m_withSonification;
+    bool m_withSpectrogram;
 
     Analyser::FrequencyRange m_pendingConstraint;
 
