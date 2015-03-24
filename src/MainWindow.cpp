@@ -31,6 +31,7 @@
 #include "data/model/NoteModel.h"
 #include "view/ViewManager.h"
 #include "base/Preferences.h"
+#include "base/AudioLevel.h"
 #include "layer/WaveformLayer.h"
 #include "layer/TimeInstantLayer.h"
 #include "layer/TimeValueLayer.h"
@@ -40,6 +41,7 @@
 #include "widgets/AudioDial.h"
 #include "widgets/IconLoader.h"
 #include "widgets/KeyReference.h"
+#include "widgets/LevelPanWidget.h"
 #include "audioio/AudioCallbackPlaySource.h"
 #include "audioio/AudioCallbackPlayTarget.h"
 #include "audioio/PlaySpeedRangeMapper.h"
@@ -238,128 +240,26 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     connect(m_playSpeed, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    // Gain controls
-    m_gainAudio = new AudioDial(frame);
-    m_gainAudio->setMeterColor(Qt::darkRed);
-    m_gainAudio->setMinimum(-50);
-    m_gainAudio->setMaximum(50);
-    m_gainAudio->setValue(0);
-    m_gainAudio->setDefaultValue(0);
-    //m_gainAudio->setFixedWidth(40);
-    m_gainAudio->setFixedWidth(24);
-    m_gainAudio->setFixedHeight(24);
-    m_gainAudio->setNotchesVisible(true);
-    m_gainAudio->setPageStep(10);
-    m_gainAudio->setObjectName(tr("Audio Track Gain"));
-    m_gainAudio->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-    m_gainAudio->setShowToolTip(true);
-    connect(m_gainAudio, SIGNAL(valueChanged(int)),
-            this, SLOT(audioGainChanged(int)));
-    connect(m_gainAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_gainAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    m_audioLPW = new LevelPanWidget(frame);
+    m_audioLPW->setObjectName(tr("Audio Track Level and Pan"));
+    m_audioLPW->setPan(-1);
+    connect(m_audioLPW, SIGNAL(levelChanged(float)), this, SLOT(audioGainChanged(float)));
+    connect(m_audioLPW, SIGNAL(panChanged(float)), this, SLOT(audioPanChanged(float)));
 
-    if (m_withSonification)
-    {   
-        m_gainPitch = new AudioDial(frame);
-        m_gainPitch->setMeterColor(Qt::darkRed);
-        m_gainPitch->setMinimum(-50);
-        m_gainPitch->setMaximum(50);
-        m_gainPitch->setValue(0);
-        m_gainPitch->setDefaultValue(0);
-        m_gainPitch->setFixedWidth(24);
-        m_gainPitch->setFixedHeight(24);
-        m_gainPitch->setNotchesVisible(true);
-        m_gainPitch->setPageStep(10);
-        m_gainPitch->setObjectName(tr("Pitch Track Gain"));
-        m_gainPitch->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-        m_gainPitch->setShowToolTip(true);
-        connect(m_gainPitch, SIGNAL(valueChanged(int)),
-                this, SLOT(pitchGainChanged(int)));
-        connect(m_gainPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-        connect(m_gainPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+    if (m_withSonification) {
 
-        m_gainNotes = new AudioDial(frame);
-        m_gainNotes->setMeterColor(Qt::darkRed);
-        m_gainNotes->setMinimum(-50);
-        m_gainNotes->setMaximum(50);
-        m_gainNotes->setValue(0);
-        m_gainNotes->setDefaultValue(0);
-        m_gainNotes->setFixedWidth(24);
-        m_gainNotes->setFixedHeight(24);
-        m_gainNotes->setNotchesVisible(true);
-        m_gainNotes->setPageStep(10);
-        m_gainNotes->setObjectName(tr("Note Gain"));
-        m_gainNotes->setRangeMapper(new LinearRangeMapper(-50, 50, -25, 25, tr("dB")));
-        m_gainNotes->setShowToolTip(true);
-        connect(m_gainNotes, SIGNAL(valueChanged(int)),
-                this, SLOT(notesGainChanged(int)));
-        connect(m_gainNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-        connect(m_gainNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
+        m_pitchLPW = new LevelPanWidget(frame);
+        m_pitchLPW->setObjectName(tr("Pitch Track Level and Pan"));
+        m_pitchLPW->setPan(1);
+        connect(m_pitchLPW, SIGNAL(levelChanged(float)), this, SLOT(pitchGainChanged(float)));
+        connect(m_pitchLPW, SIGNAL(panChanged(float)), this, SLOT(pitchPanChanged(float)));
+
+        m_notesLPW = new LevelPanWidget(frame);
+        m_notesLPW->setObjectName(tr("Note Track Level and Pan"));
+        m_notesLPW->setPan(1);
+        connect(m_notesLPW, SIGNAL(levelChanged(float)), this, SLOT(notesGainChanged(float)));
+        connect(m_notesLPW, SIGNAL(panChanged(float)), this, SLOT(notesPanChanged(float)));
     }
-    // End of Gain controls
-
-    // Pan controls
-    m_panAudio = new AudioDial(frame);
-    m_panAudio->setMeterColor(Qt::darkGreen);
-    m_panAudio->setMinimum(-100);
-    m_panAudio->setMaximum(100);
-    m_panAudio->setValue(-100);
-    m_panAudio->setDefaultValue(-100);
-    m_panAudio->setFixedWidth(24);
-    //m_panAudio->setFixedWidth(40);
-    m_panAudio->setFixedHeight(24);
-    m_panAudio->setNotchesVisible(true);
-    m_panAudio->setPageStep(10);
-    m_panAudio->setObjectName(tr("Audio Track Pan"));
-    m_panAudio->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-    m_panAudio->setShowToolTip(true);
-    connect(m_panAudio, SIGNAL(valueChanged(int)),
-            this, SLOT(audioPanChanged(int)));
-    connect(m_panAudio, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-    connect(m_panAudio, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
-
-
-
-    if (m_withSonification)
-    {   
-        m_panPitch = new AudioDial(frame);
-        m_panPitch->setMeterColor(Qt::darkGreen);
-        m_panPitch->setMinimum(-100);
-        m_panPitch->setMaximum(100);
-        m_panPitch->setValue(100);
-        m_panPitch->setDefaultValue(100);
-        m_panPitch->setFixedWidth(24);
-        m_panPitch->setFixedHeight(24);
-        m_panPitch->setNotchesVisible(true);
-        m_panPitch->setPageStep(10);
-        m_panPitch->setObjectName(tr("Pitch Track Pan"));
-        m_panPitch->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-        m_panPitch->setShowToolTip(true);
-        connect(m_panPitch, SIGNAL(valueChanged(int)),
-                this, SLOT(pitchPanChanged(int)));
-        connect(m_panPitch, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-        connect(m_panPitch, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
-
-        m_panNotes = new AudioDial(frame);
-        m_panNotes->setMeterColor(Qt::darkGreen);
-        m_panNotes->setMinimum(-100);
-        m_panNotes->setMaximum(100);
-        m_panNotes->setValue(100);
-        m_panNotes->setDefaultValue(100);
-        m_panNotes->setFixedWidth(24);
-        m_panNotes->setFixedHeight(24);
-        m_panNotes->setNotchesVisible(true);
-        m_panNotes->setPageStep(10);
-        m_panNotes->setObjectName(tr("Note Pan"));
-        m_panNotes->setRangeMapper(new LinearRangeMapper(-100, 100, -100, 100, tr("")));
-        m_panNotes->setShowToolTip(true);
-        connect(m_panNotes, SIGNAL(valueChanged(int)),
-                this, SLOT(notesPanChanged(int)));
-        connect(m_panNotes, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
-        connect(m_panNotes, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));    
-    }
-    
-    // End of Pan controls
 
     layout->setSpacing(4);
     layout->addWidget(m_overview, 0, 1);
@@ -1182,9 +1082,10 @@ MainWindow::setupToolbars()
     connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
     connect(this, SIGNAL(canPlayWaveform(bool)), m_playAudio, SLOT(setEnabled(bool)));
 
-    toolbar->addWidget(m_gainAudio);
-    toolbar->addWidget(m_panAudio);
-
+    m_audioLPW->setFixedWidth(60);
+    m_audioLPW->setFixedHeight(60);
+    toolbar->addWidget(m_audioLPW);
+    
     // Pitch (f0)
     QLabel *spacer = new QLabel; // blank
     spacer->setFixedWidth(40);
@@ -1195,14 +1096,15 @@ MainWindow::setupToolbars()
     connect(m_showPitch, SIGNAL(triggered()), this, SLOT(showPitchToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
 
-    if (!m_withSonification) 
-    {
+    if (!m_withSonification) {
         m_playPitch = new QAction(tr("Play Pitch Track"), this);
     } else {
         m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
-        toolbar->addWidget(m_gainPitch);
-        toolbar->addWidget(m_panPitch);
+        m_pitchLPW->setFixedWidth(60);
+        m_pitchLPW->setFixedHeight(60);
+        toolbar->addWidget(m_pitchLPW);
     }
+
     m_playPitch->setCheckable(true);
     connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
     connect(this, SIGNAL(canPlayPitch(bool)), m_playPitch, SLOT(setEnabled(bool)));
@@ -1222,8 +1124,9 @@ MainWindow::setupToolbars()
         m_playNotes = new QAction(tr("Play Notes"), this);
     } else {
         m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
-        toolbar->addWidget(m_gainNotes);
-        toolbar->addWidget(m_panNotes);
+        m_notesLPW->setFixedWidth(60);
+        m_notesLPW->setFixedHeight(60);
+        toolbar->addWidget(m_notesLPW);
     }
     m_playNotes->setCheckable(true);
     connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
@@ -2699,238 +2602,58 @@ MainWindow::restoreNormalPlayback()
 }
 
 void
-MainWindow::audioGainChanged(int position)
+MainWindow::audioGainChanged(float gain)
 {
-    double level = m_gainAudio->mappedValue();
-    double gain = pow(10, level / 20.0);
-
-    cerr << "gain = " << gain << " (" << position << " dB)" << endl;
-
-    contextHelpChanged(tr("Audio Gain: %1 dB").arg(position));
-
-    m_analyser->setGain(Analyser::Audio, float(gain));
-
+    double db = AudioLevel::multiplier_to_dB(gain);
+    cerr << "gain = " << gain << " (" << db << " dB)" << endl;
+    contextHelpChanged(tr("Audio Gain: %1 dB").arg(db));
+    m_analyser->setGain(Analyser::Audio, gain);
     updateMenuStates();
 } 
 
 void
-MainWindow::increaseAudioGain()
+MainWindow::pitchGainChanged(float gain)
 {
-    int value = m_gainAudio->value();
-    value = value + m_gainAudio->pageStep();
-    if (value > m_gainAudio->maximum()) value = m_gainAudio->maximum();
-    m_gainAudio->setValue(value);
-}
-
-void
-MainWindow::decreaseAudioGain()
-{
-    int value = m_gainAudio->value();
-    value = value - m_gainAudio->pageStep();
-    if (value < m_gainAudio->minimum()) value = m_gainAudio->minimum();
-    m_gainAudio->setValue(value);
-}
-
-void
-MainWindow::restoreNormalAudioGain()
-{
-    m_gainAudio->setValue(m_gainAudio->defaultValue());
-}
-
-void
-MainWindow::pitchGainChanged(int position)
-{
-    double level = m_gainPitch->mappedValue();
-    double gain = pow(10, level / 20.0);
-
-    cerr << "gain = " << gain << " (" << position << " dB)" << endl;
-
-    contextHelpChanged(tr("Pitch Gain: %1 dB").arg(position));
-
-    m_analyser->setGain(Analyser::PitchTrack, float(gain));
-
+    double db = AudioLevel::multiplier_to_dB(gain);
+    cerr << "gain = " << gain << " (" << db << " dB)" << endl;
+    contextHelpChanged(tr("Pitch Gain: %1 dB").arg(db));
+    m_analyser->setGain(Analyser::PitchTrack, gain);
     updateMenuStates();
 } 
 
 void
-MainWindow::increasePitchGain()
+MainWindow::notesGainChanged(float gain)
 {
-    int value = m_gainPitch->value();
-    value = value + m_gainPitch->pageStep();
-    if (value > m_gainPitch->maximum()) value = m_gainPitch->maximum();
-    m_gainPitch->setValue(value);
-}
-
-void
-MainWindow::decreasePitchGain()
-{
-    int value = m_gainPitch->value();
-    value = value - m_gainPitch->pageStep();
-    if (value < m_gainPitch->minimum()) value = m_gainPitch->minimum();
-    m_gainPitch->setValue(value);
-}
-
-void
-MainWindow::restoreNormalPitchGain()
-{
-    m_gainPitch->setValue(m_gainPitch->defaultValue());
-}
-
-void
-MainWindow::notesGainChanged(int position)
-{
-    double level = m_gainNotes->mappedValue();
-    double gain = pow(10, level / 20.0);
-
-    cerr << "gain = " << gain << " (" << position << " dB)" << endl;
-
-    contextHelpChanged(tr("Notes Gain: %1 dB").arg(position));
-
-    m_analyser->setGain(Analyser::Notes, float(gain));
-
+    double db = AudioLevel::multiplier_to_dB(gain);
+    cerr << "gain = " << gain << " (" << db << " dB)" << endl;
+    contextHelpChanged(tr("Notes Gain: %1 dB").arg(db));
+    m_analyser->setGain(Analyser::Notes, gain);
     updateMenuStates();
 } 
 
 void
-MainWindow::increaseNotesGain()
+MainWindow::audioPanChanged(float pan)
 {
-    int value = m_gainNotes->value();
-    value = value + m_gainNotes->pageStep();
-    if (value > m_gainNotes->maximum()) value = m_gainNotes->maximum();
-    m_gainNotes->setValue(value);
-}
-
-void
-MainWindow::decreaseNotesGain()
-{
-    int value = m_gainNotes->value();
-    value = value - m_gainNotes->pageStep();
-    if (value < m_gainNotes->minimum()) value = m_gainNotes->minimum();
-    m_gainNotes->setValue(value);
-}
-
-void
-MainWindow::restoreNormalNotesGain()
-{
-    m_gainNotes->setValue(m_gainNotes->defaultValue());
-}
-
-void
-MainWindow::audioPanChanged(int position)
-{
-    double level = m_panAudio->mappedValue();
-    double pan = level/100.0;
-
-    cerr << "pan = " << pan << " (" << position << ")" << endl;
-
-    contextHelpChanged(tr("Audio Pan: %1").arg(position));
-
-    m_analyser->setPan(Analyser::Audio, float(pan));
-
+    contextHelpChanged(tr("Audio Pan: %1").arg(pan));
+    m_analyser->setPan(Analyser::Audio, pan);
     updateMenuStates();
 } 
 
 void
-MainWindow::increaseAudioPan()
+MainWindow::pitchPanChanged(float pan)
 {
-    int value = m_panAudio->value();
-    value = value + m_panAudio->pageStep();
-    if (value > m_panAudio->maximum()) value = m_panAudio->maximum();
-    m_panAudio->setValue(value);
-}
-
-void
-MainWindow::decreaseAudioPan()
-{
-    int value = m_panAudio->value();
-    value = value - m_panAudio->pageStep();
-    if (value < m_panAudio->minimum()) value = m_panAudio->minimum();
-    m_panAudio->setValue(value);
-}
-
-void
-MainWindow::restoreNormalAudioPan()
-{
-    m_panAudio->setValue(m_panAudio->defaultValue());
-}
-
-void
-MainWindow::pitchPanChanged(int position)
-{
-    double level = m_panPitch->mappedValue();
-    double pan = level/100.0;
-
-    cerr << "pan = " << pan << " (" << position << ")" << endl;
-
-    contextHelpChanged(tr("Pitch Pan: %1").arg(position));
-
-    m_analyser->setPan(Analyser::PitchTrack, float(pan));
-
+    contextHelpChanged(tr("Pitch Pan: %1").arg(pan));
+    m_analyser->setPan(Analyser::PitchTrack, pan);
     updateMenuStates();
 } 
 
 void
-MainWindow::increasePitchPan()
+MainWindow::notesPanChanged(float pan)
 {
-    int value = m_panPitch->value();
-    value = value + m_panPitch->pageStep();
-    if (value > m_panPitch->maximum()) value = m_panPitch->maximum();
-    m_panPitch->setValue(value);
-}
-
-void
-MainWindow::decreasePitchPan()
-{
-    int value = m_panPitch->value();
-    value = value - m_panPitch->pageStep();
-    if (value < m_panPitch->minimum()) value = m_panPitch->minimum();
-    m_panPitch->setValue(value);
-}
-
-void
-MainWindow::restoreNormalPitchPan()
-{
-    m_panPitch->setValue(m_panPitch->defaultValue());
-}
-
-void
-MainWindow::notesPanChanged(int position)
-{
-    double level = m_panNotes->mappedValue();
-    double pan = level/100.0;
-
-    cerr << "pan = " << pan << " (" << position << ")" << endl;
-
-    contextHelpChanged(tr("Notes Pan: %1").arg(position));
-
-    m_analyser->setPan(Analyser::Notes, float(pan));
-
+    contextHelpChanged(tr("Notes Pan: %1").arg(pan));
+    m_analyser->setPan(Analyser::Notes, pan);
     updateMenuStates();
 } 
-
-void
-MainWindow::increaseNotesPan()
-{
-    int value = m_panNotes->value();
-    value = value + m_panNotes->pageStep();
-    if (value > m_panNotes->maximum()) value = m_panNotes->maximum();
-    m_panNotes->setValue(value);
-}
-
-void
-MainWindow::decreaseNotesPan()
-{
-    int value = m_panNotes->value();
-    value = value - m_panNotes->pageStep();
-    if (value < m_panNotes->minimum()) value = m_panNotes->minimum();
-    m_panNotes->setValue(value);
-}
-
-void
-MainWindow::restoreNormalNotesPan()
-{
-    m_panNotes->setValue(m_panNotes->defaultValue());
-}
 
 void
 MainWindow::updateVisibleRangeDisplay(Pane *p) const

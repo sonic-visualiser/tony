@@ -21,6 +21,7 @@
 
 class VersionTester;
 class ActivityLog;
+class LevelPanWidget;
 
 class MainWindow : public MainWindowBase
 {
@@ -103,35 +104,13 @@ protected slots:
     virtual void slowDownPlayback();
     virtual void restoreNormalPlayback();
 
-    virtual void audioGainChanged(int);
-    virtual void increaseAudioGain();
-    virtual void decreaseAudioGain();
-    virtual void restoreNormalAudioGain();
+    virtual void audioGainChanged(float);
+    virtual void pitchGainChanged(float);
+    virtual void notesGainChanged(float);
 
-    virtual void pitchGainChanged(int);
-    virtual void increasePitchGain();
-    virtual void decreasePitchGain();
-    virtual void restoreNormalPitchGain();
-
-    virtual void notesGainChanged(int);
-    virtual void increaseNotesGain();
-    virtual void decreaseNotesGain();
-    virtual void restoreNormalNotesGain();
-
-    virtual void audioPanChanged(int);
-    virtual void increaseAudioPan();
-    virtual void decreaseAudioPan();
-    virtual void restoreNormalAudioPan();
-
-    virtual void pitchPanChanged(int);
-    virtual void increasePitchPan();
-    virtual void decreasePitchPan();
-    virtual void restoreNormalPitchPan();
-
-    virtual void notesPanChanged(int);
-    virtual void increaseNotesPan();
-    virtual void decreaseNotesPan();
-    virtual void restoreNormalNotesPan();
+    virtual void audioPanChanged(float);
+    virtual void pitchPanChanged(float);
+    virtual void notesPanChanged(float);
 
     virtual void sampleRateMismatch(sv_samplerate_t, sv_samplerate_t, bool);
     virtual void audioOverloadPluginDisabled();
@@ -220,12 +199,9 @@ protected:
     QAction       *m_playAudio;
     QAction       *m_playPitch;
     QAction       *m_playNotes;
-    AudioDial     *m_gainAudio;
-    AudioDial     *m_gainPitch;
-    AudioDial     *m_gainNotes;
-    AudioDial     *m_panAudio;
-    AudioDial     *m_panPitch;
-    AudioDial     *m_panNotes;
+    LevelPanWidget *m_audioLPW;
+    LevelPanWidget *m_pitchLPW;
+    LevelPanWidget *m_notesLPW;
     
     ActivityLog   *m_activityLog;
     KeyReference  *m_keyReference;
