@@ -41,7 +41,7 @@
 #include "widgets/AudioDial.h"
 #include "widgets/IconLoader.h"
 #include "widgets/KeyReference.h"
-#include "widgets/LevelPanWidget.h"
+#include "widgets/LevelPanToolButton.h"
 #include "audioio/AudioCallbackPlaySource.h"
 #include "audioio/AudioCallbackPlayTarget.h"
 #include "audioio/PlaySpeedRangeMapper.h"
@@ -241,19 +241,19 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     connect(m_playSpeed, SIGNAL(mouseEntered()), this, SLOT(mouseEnteredWidget()));
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
-    m_audioLPW = new LevelPanWidget(frame);
+    m_audioLPW = new LevelPanToolButton(frame);
     m_audioLPW->setObjectName(tr("Audio Track Level and Pan"));
     connect(m_audioLPW, SIGNAL(levelChanged(float)), this, SLOT(audioGainChanged(float)));
     connect(m_audioLPW, SIGNAL(panChanged(float)), this, SLOT(audioPanChanged(float)));
 
     if (m_withSonification) {
 
-        m_pitchLPW = new LevelPanWidget(frame);
+        m_pitchLPW = new LevelPanToolButton(frame);
         m_pitchLPW->setObjectName(tr("Pitch Track Level and Pan"));
         connect(m_pitchLPW, SIGNAL(levelChanged(float)), this, SLOT(pitchGainChanged(float)));
         connect(m_pitchLPW, SIGNAL(panChanged(float)), this, SLOT(pitchPanChanged(float)));
 
-        m_notesLPW = new LevelPanWidget(frame);
+        m_notesLPW = new LevelPanToolButton(frame);
         m_notesLPW->setObjectName(tr("Note Track Level and Pan"));
         connect(m_notesLPW, SIGNAL(levelChanged(float)), this, SLOT(notesGainChanged(float)));
         connect(m_notesLPW, SIGNAL(panChanged(float)), this, SLOT(notesPanChanged(float)));
@@ -1075,23 +1075,8 @@ MainWindow::setupToolbars()
     connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
 
-    int lpwSize = m_viewManager->scalePixelSize(30);
-    
-    m_audioLPW->setFixedWidth(lpwSize*2);
-    m_audioLPW->setFixedHeight(lpwSize*2);
-//    toolbar->addWidget(m_audioLPW);
+    toolbar->addWidget(m_audioLPW);
 
-    QMenu *alpwm = new QMenu();
-    QWidgetAction *alpwmwa = new QWidgetAction(alpwm);
-    alpwmwa->setDefaultWidget(m_audioLPW);
-    alpwm->addAction(alpwmwa);
-    alpwm->addAction("Done");
-    QToolButton *alpwtb = new QToolButton();
-    alpwtb->setPopupMode(QToolButton::MenuButtonPopup);
-    alpwtb->setText("blah");
-    alpwtb->setMenu(alpwm);
-    toolbar->addWidget(alpwtb);
-    
     // Pitch (f0)
     QLabel *spacer = new QLabel; // blank
     spacer->setFixedWidth(40);
@@ -1103,8 +1088,6 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
 
     if (m_withSonification) {
-        m_pitchLPW->setFixedWidth(lpwSize);
-        m_pitchLPW->setFixedHeight(lpwSize);
         toolbar->addWidget(m_pitchLPW);
     }
 
@@ -1119,8 +1102,6 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
 
     if (m_withSonification) {
-        m_notesLPW->setFixedWidth(lpwSize);
-        m_notesLPW->setFixedHeight(lpwSize);
         toolbar->addWidget(m_notesLPW);
     }
 

@@ -21,7 +21,7 @@
 
 class VersionTester;
 class ActivityLog;
-class LevelPanWidget;
+class LevelPanToolButton;
 
 class MainWindow : public MainWindowBase
 {
@@ -196,9 +196,9 @@ protected:
     QAction       *m_showSpect;
     QAction       *m_showPitch;
     QAction       *m_showNotes;
-    LevelPanWidget *m_audioLPW;
-    LevelPanWidget *m_pitchLPW;
-    LevelPanWidget *m_notesLPW;
+    LevelPanToolButton *m_audioLPW;
+    LevelPanToolButton *m_pitchLPW;
+    LevelPanToolButton *m_notesLPW;
     
     ActivityLog   *m_activityLog;
     KeyReference  *m_keyReference;
