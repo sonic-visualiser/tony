@@ -1075,11 +1075,12 @@ MainWindow::setupToolbars()
     connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
 
+    m_audioLPW->setImageSize(m_viewManager->scalePixelSize(26));
     toolbar->addWidget(m_audioLPW);
 
     // Pitch (f0)
     QLabel *spacer = new QLabel; // blank
-    spacer->setFixedWidth(40);
+    spacer->setFixedWidth(m_viewManager->scalePixelSize(30));
     toolbar->addWidget(spacer);
 
     m_showPitch = toolbar->addAction(il.load("values"), tr("Show Pitch Track"));
@@ -1088,12 +1089,13 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
 
     if (m_withSonification) {
+        m_pitchLPW->setImageSize(m_viewManager->scalePixelSize(26));
         toolbar->addWidget(m_pitchLPW);
     }
 
     // Notes
     spacer = new QLabel;
-    spacer->setFixedWidth(40);
+    spacer->setFixedWidth(m_viewManager->scalePixelSize(30));
     toolbar->addWidget(spacer);
 
     m_showNotes = toolbar->addAction(il.load("notes"), tr("Show Notes"));
@@ -1102,12 +1104,13 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
 
     if (m_withSonification) {
+        m_notesLPW->setImageSize(m_viewManager->scalePixelSize(26));
         toolbar->addWidget(m_notesLPW);
     }
 
     // Spectrogram
     spacer = new QLabel;
-    spacer->setFixedWidth(40);
+    spacer->setFixedWidth(m_viewManager->scalePixelSize(30));
     toolbar->addWidget(spacer);
 
     if (!m_withSpectrogram)
@@ -2848,6 +2851,8 @@ MainWindow::analyseNewMainModel()
         m_analyser->setAudible(Analyser::PitchTrack, false);
         m_analyser->setAudible(Analyser::Notes, false);
     }
+   
+    updateLayerStatuses();
 }
 
 void
