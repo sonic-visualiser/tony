@@ -781,6 +781,20 @@ MainWindow::setupAnalysisMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
     menu->addAction(action);
 
+    action = new QAction(tr("&Amplitude-based Note Separation"), this);
+    action->setStatusTip(tr("Increase likelihood of separating notes, especially consecutive notes at the same pitch."));
+    action->setCheckable(true);
+    action->setChecked(false);
+    // connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
+    menu->addAction(action);
+
+    action = new QAction(tr("&Drop Short Notes"), this);
+    action->setStatusTip(tr("Duration-based pruning: automatic note estimator will not output notes of less than 100ms duration."));
+    action->setCheckable(true);
+    action->setChecked(true);
+    // connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
+    menu->addAction(action);
+
     menu->addSeparator();
 
     action = new QAction(tr("Reset Options to Defaults"), this);

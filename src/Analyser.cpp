@@ -374,7 +374,7 @@ Analyser::addAnalyses()
 
     if (lowamp) {
         cerr << "setting parameters for lowamp suppression" << endl;
-        t.setParameter("lowampsuppression", 0.1f);
+        t.setParameter("lowampsuppression", 0.2f);
     } else {
         cerr << "setting parameters for no lowamp suppression" << endl;
         t.setParameter("lowampsuppression", 0.0f);
