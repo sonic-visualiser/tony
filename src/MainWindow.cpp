@@ -82,6 +82,7 @@
 #include <QSettings>
 #include <QScrollArea>
 #include <QPainter>
+#include <QWidgetAction>
 
 #include <iostream>
 #include <cstdio>
@@ -1076,9 +1077,20 @@ MainWindow::setupToolbars()
 
     int lpwSize = m_viewManager->scalePixelSize(30);
     
-    m_audioLPW->setFixedWidth(lpwSize);
-    m_audioLPW->setFixedHeight(lpwSize);
-    toolbar->addWidget(m_audioLPW);
+    m_audioLPW->setFixedWidth(lpwSize*2);
+    m_audioLPW->setFixedHeight(lpwSize*2);
+//    toolbar->addWidget(m_audioLPW);
+
+    QMenu *alpwm = new QMenu();
+    QWidgetAction *alpwmwa = new QWidgetAction(alpwm);
+    alpwmwa->setDefaultWidget(m_audioLPW);
+    alpwm->addAction(alpwmwa);
+    alpwm->addAction("Done");
+    QToolButton *alpwtb = new QToolButton();
+    alpwtb->setPopupMode(QToolButton::MenuButtonPopup);
+    alpwtb->setText("blah");
+    alpwtb->setMenu(alpwm);
+    toolbar->addWidget(alpwtb);
     
     // Pitch (f0)
     QLabel *spacer = new QLabel; // blank
