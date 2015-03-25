@@ -745,15 +745,6 @@ MainWindow::setupAnalysisMenu()
     QMenu *menu = menuBar()->addMenu(tr("&Analysis"));
     menu->setTearOffEnabled(true);
 
-
-    action = new QAction(tr("&Analyse now!"), this);
-    action->setStatusTip(tr("Trigger analysis of pitches and notes. (This will delete all existing pitches and notes.)"));
-    connect(action, SIGNAL(triggered()), this, SLOT(analyseNow()));
-    menu->addAction(action);
-    m_keyReference->registerShortcut(action);
-
-    menu->addSeparator();
-
     QSettings settings;
     settings.beginGroup("Analyser");
     bool autoAnalyse = settings.value("auto-analysis", true).toBool();
@@ -767,6 +758,14 @@ MainWindow::setupAnalysisMenu()
     action->setChecked(autoAnalyse);
     connect(action, SIGNAL(triggered()), this, SLOT(autoAnalysisToggled()));
     menu->addAction(action);
+
+    action = new QAction(tr("&Analyse Now!"), this);
+    action->setStatusTip(tr("Trigger analysis of pitches and notes. (This will delete all existing pitches and notes.)"));
+    connect(action, SIGNAL(triggered()), this, SLOT(analyseNow()));
+    menu->addAction(action);
+    m_keyReference->registerShortcut(action);
+
+    menu->addSeparator();
 
     action = new QAction(tr("&Unbiased Timing (slow)"), this);
     action->setStatusTip(tr("Use a symmetric window in YIN to remove frequency-dependent timing bias. (This is slow!)"));
@@ -782,6 +781,12 @@ MainWindow::setupAnalysisMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
     menu->addAction(action);
 
+    menu->addSeparator();
+
+    action = new QAction(tr("Reset Options to Defaults"), this);
+    action->setStatusTip(tr("Reset all of the Analyse menu options to their default settings."));
+    connect(action, SIGNAL(triggered()), this, SLOT(resetAnalyseOptions()));
+    menu->addAction(action);
 }
 
 void
