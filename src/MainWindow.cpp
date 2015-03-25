@@ -2557,7 +2557,12 @@ MainWindow::audioGainChanged(float gain)
     double db = AudioLevel::multiplier_to_dB(gain);
     cerr << "gain = " << gain << " (" << db << " dB)" << endl;
     contextHelpChanged(tr("Audio Gain: %1 dB").arg(db));
-    m_analyser->setGain(Analyser::Audio, gain);
+    if (gain == 0.f) {
+        m_analyser->setAudible(Analyser::Audio, false);
+    } else {
+        m_analyser->setAudible(Analyser::Audio, true);
+        m_analyser->setGain(Analyser::Audio, gain);
+    }
     updateMenuStates();
 } 
 
@@ -2567,7 +2572,12 @@ MainWindow::pitchGainChanged(float gain)
     double db = AudioLevel::multiplier_to_dB(gain);
     cerr << "gain = " << gain << " (" << db << " dB)" << endl;
     contextHelpChanged(tr("Pitch Gain: %1 dB").arg(db));
-    m_analyser->setGain(Analyser::PitchTrack, gain);
+    if (gain == 0.f) {
+        m_analyser->setAudible(Analyser::PitchTrack, false);
+    } else {
+        m_analyser->setAudible(Analyser::PitchTrack, true);
+        m_analyser->setGain(Analyser::PitchTrack, gain);
+    }
     updateMenuStates();
 } 
 
@@ -2577,7 +2587,12 @@ MainWindow::notesGainChanged(float gain)
     double db = AudioLevel::multiplier_to_dB(gain);
     cerr << "gain = " << gain << " (" << db << " dB)" << endl;
     contextHelpChanged(tr("Notes Gain: %1 dB").arg(db));
-    m_analyser->setGain(Analyser::Notes, gain);
+    if (gain == 0.f) {
+        m_analyser->setAudible(Analyser::Notes, false);
+    } else {
+        m_analyser->setAudible(Analyser::Notes, true);
+        m_analyser->setGain(Analyser::Notes, gain);
+    }
     updateMenuStates();
 } 
 
