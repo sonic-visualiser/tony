@@ -353,10 +353,9 @@ Analyser::addAnalyses()
     QSettings settings;
     settings.beginGroup("Analyser");
     bool precise = settings.value("precision-analysis", false).toBool();
-    settings.endGroup();
-
-    settings.beginGroup("Analyser");
     bool lowamp = settings.value("lowamp-analysis", false).toBool();
+    bool onset = settings.value("onset-analysis", true).toBool(); // should these be the same as in MainWindow.cpp?
+    bool prune = settings.value("prune-analysis", true).toBool();
     settings.endGroup();
 
     Transform t = tf->getDefaultTransformFor
@@ -378,6 +377,22 @@ Analyser::addAnalyses()
     } else {
         cerr << "setting parameters for no lowamp suppression" << endl;
         t.setParameter("lowampsuppression", 0.0f);
+    }
+
+    if (onset) {
+        cerr << "setting parameters for increased onset sensitivity" << endl;
+        t.setParameter("onsetsensitivity", 0.7f);
+    } else {
+        cerr << "setting parameters for non-increased onset sensitivity" << endl;
+        t.setParameter("onsetsensitivity", 0.0f);
+    }
+
+    if (prune) {
+        cerr << "setting parameters for duration pruning" << endl;
+        t.setParameter("prunethresh", 0.1f);
+    } else {
+        cerr << "setting parameters for no duration pruning" << endl;
+        t.setParameter("prunethresh", 0.0f);
     }
 
     transforms.push_back(t);

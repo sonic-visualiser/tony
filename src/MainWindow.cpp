@@ -750,6 +750,8 @@ MainWindow::setupAnalysisMenu()
     bool autoAnalyse = settings.value("auto-analysis", true).toBool();
     bool precise = settings.value("precision-analysis", false).toBool();
     bool lowamp = settings.value("lowamp-analysis", true).toBool();
+    bool onset = settings.value("onset-analysis", true).toBool();
+    bool prune = settings.value("prune-analysis", true).toBool();
     settings.endGroup();
 
     action = new QAction(tr("Auto-Analyse &New Audio"), this);
@@ -781,18 +783,18 @@ MainWindow::setupAnalysisMenu()
     connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
     menu->addAction(action);
 
-    action = new QAction(tr("&Amplitude-based Note Separation"), this);
+    action = new QAction(tr("&High Onset Sensitivity"), this);
     action->setStatusTip(tr("Increase likelihood of separating notes, especially consecutive notes at the same pitch."));
     action->setCheckable(true);
-    action->setChecked(false);
-    // connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
+    action->setChecked(onset);
+    connect(action, SIGNAL(triggered()), this, SLOT(onsetAnalysisToggled()));
     menu->addAction(action);
 
     action = new QAction(tr("&Drop Short Notes"), this);
     action->setStatusTip(tr("Duration-based pruning: automatic note estimator will not output notes of less than 100ms duration."));
     action->setCheckable(true);
-    action->setChecked(true);
-    // connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
+    action->setChecked(prune);
+    connect(action, SIGNAL(triggered()), this, SLOT(pruneAnalysisToggled()));
     menu->addAction(action);
 
     menu->addSeparator();
@@ -844,6 +846,38 @@ MainWindow::lowampAnalysisToggled()
     QSettings settings;
     settings.beginGroup("Analyser");
     settings.setValue("lowamp-analysis", set);
+    settings.endGroup();
+
+    // don't run analyseNow() automatically -- it's a destructive operation
+}
+
+void
+MainWindow::onsetAnalysisToggled()
+{
+    QAction *a = qobject_cast<QAction *>(sender());
+    if (!a) return;
+
+    bool set = a->isChecked();
+
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue("onset-analysis", set);
+    settings.endGroup();
+
+    // don't run analyseNow() automatically -- it's a destructive operation
+}
+
+void
+MainWindow::pruneAnalysisToggled()
+{
+    QAction *a = qobject_cast<QAction *>(sender());
+    if (!a) return;
+
+    bool set = a->isChecked();
+
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue("prune-analysis", set);
     settings.endGroup();
 
     // don't run analyseNow() automatically -- it's a destructive operation
