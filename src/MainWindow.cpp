@@ -745,21 +745,11 @@ MainWindow::setupAnalysisMenu()
     QMenu *menu = menuBar()->addMenu(tr("&Analysis"));
     menu->setTearOffEnabled(true);
 
-    QSettings settings;
-    settings.beginGroup("Analyser");
-    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
-    bool precise = settings.value("precision-analysis", false).toBool();
-    bool lowamp = settings.value("lowamp-analysis", true).toBool();
-    bool onset = settings.value("onset-analysis", true).toBool();
-    bool prune = settings.value("prune-analysis", true).toBool();
-    settings.endGroup();
-
-    action = new QAction(tr("Auto-Analyse &New Audio"), this);
-    action->setStatusTip(tr("Automatically trigger analysis upon opening of a new audio file."));
-    action->setCheckable(true);
-    action->setChecked(autoAnalyse);
-    connect(action, SIGNAL(triggered()), this, SLOT(autoAnalysisToggled()));
-    menu->addAction(action);
+    m_autoAnalyse = new QAction(tr("Auto-Analyse &New Audio"), this);
+    m_autoAnalyse->setStatusTip(tr("Automatically trigger analysis upon opening of a new audio file."));
+    m_autoAnalyse->setCheckable(true);
+    connect(m_autoAnalyse, SIGNAL(triggered()), this, SLOT(autoAnalysisToggled()));
+    menu->addAction(m_autoAnalyse);
 
     action = new QAction(tr("&Analyse Now!"), this);
     action->setStatusTip(tr("Trigger analysis of pitches and notes. (This will delete all existing pitches and notes.)"));
@@ -769,33 +759,29 @@ MainWindow::setupAnalysisMenu()
 
     menu->addSeparator();
 
-    action = new QAction(tr("&Unbiased Timing (slow)"), this);
-    action->setStatusTip(tr("Use a symmetric window in YIN to remove frequency-dependent timing bias. (This is slow!)"));
-    action->setCheckable(true);
-    action->setChecked(precise);
-    connect(action, SIGNAL(triggered()), this, SLOT(precisionAnalysisToggled()));
-    menu->addAction(action);
+    m_precise = new QAction(tr("&Unbiased Timing (slow)"), this);
+    m_precise->setStatusTip(tr("Use a symmetric window in YIN to remove frequency-dependent timing bias. (This is slow!)"));
+    m_precise->setCheckable(true);
+    connect(m_precise, SIGNAL(triggered()), this, SLOT(precisionAnalysisToggled()));
+    menu->addAction(m_precise);
 
-    action = new QAction(tr("&Penalise Soft Pitches"), this);
-    action->setStatusTip(tr("Reduce the likelihood of detecting a pitch when the signal has low amplitude."));
-    action->setCheckable(true);
-    action->setChecked(lowamp);
-    connect(action, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
-    menu->addAction(action);
+    m_lowamp = new QAction(tr("&Penalise Soft Pitches"), this);
+    m_lowamp->setStatusTip(tr("Reduce the likelihood of detecting a pitch when the signal has low amplitude."));
+    m_lowamp->setCheckable(true);
+    connect(m_lowamp, SIGNAL(triggered()), this, SLOT(lowampAnalysisToggled()));
+    menu->addAction(m_lowamp);
 
-    action = new QAction(tr("&High Onset Sensitivity"), this);
-    action->setStatusTip(tr("Increase likelihood of separating notes, especially consecutive notes at the same pitch."));
-    action->setCheckable(true);
-    action->setChecked(onset);
-    connect(action, SIGNAL(triggered()), this, SLOT(onsetAnalysisToggled()));
-    menu->addAction(action);
+    m_onset = new QAction(tr("&High Onset Sensitivity"), this);
+    m_onset->setStatusTip(tr("Increase likelihood of separating notes, especially consecutive notes at the same pitch."));
+    m_onset->setCheckable(true);
+    connect(m_onset, SIGNAL(triggered()), this, SLOT(onsetAnalysisToggled()));
+    menu->addAction(m_onset);
 
-    action = new QAction(tr("&Drop Short Notes"), this);
-    action->setStatusTip(tr("Duration-based pruning: automatic note estimator will not output notes of less than 100ms duration."));
-    action->setCheckable(true);
-    action->setChecked(prune);
-    connect(action, SIGNAL(triggered()), this, SLOT(pruneAnalysisToggled()));
-    menu->addAction(action);
+    m_prune = new QAction(tr("&Drop Short Notes"), this);
+    m_prune->setStatusTip(tr("Duration-based pruning: automatic note estimator will not output notes of less than 100ms duration."));
+    m_prune->setCheckable(true);
+    connect(m_prune, SIGNAL(triggered()), this, SLOT(pruneAnalysisToggled()));
+    menu->addAction(m_prune);
 
     menu->addSeparator();
 
@@ -803,6 +789,42 @@ MainWindow::setupAnalysisMenu()
     action->setStatusTip(tr("Reset all of the Analyse menu options to their default settings."));
     connect(action, SIGNAL(triggered()), this, SLOT(resetAnalyseOptions()));
     menu->addAction(action);
+
+    updateAnalyseStates();
+}
+
+void
+MainWindow::resetAnalyseOptions()
+{
+    //!!! oh no, we need to update the menu states as well...
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    settings.setValue("auto-analysis", true);
+    settings.setValue("precision-analysis", false);
+    settings.setValue("lowamp-analysis", true);
+    settings.setValue("onset-analysis", true);
+    settings.setValue("prune-analysis", true);
+    settings.endGroup();
+    updateAnalyseStates();
+}
+
+void
+MainWindow::updateAnalyseStates()
+{
+    QSettings settings;
+    settings.beginGroup("Analyser");
+    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
+    bool precise = settings.value("precision-analysis", false).toBool();
+    bool lowamp = settings.value("lowamp-analysis", true).toBool();
+    bool onset = settings.value("onset-analysis", true).toBool();
+    bool prune = settings.value("prune-analysis", true).toBool();
+    settings.endGroup();
+
+    m_autoAnalyse->setChecked(autoAnalyse);
+    m_precise->setChecked(precise);
+    m_lowamp->setChecked(lowamp);
+    m_onset->setChecked(onset);
+    m_prune->setChecked(prune);
 }
 
 void

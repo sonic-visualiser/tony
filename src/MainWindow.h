@@ -82,11 +82,13 @@ protected slots:
     virtual void editDisplayExtents();
 
     virtual void analyseNow();
+    virtual void resetAnalyseOptions();
     virtual void autoAnalysisToggled();
     virtual void precisionAnalysisToggled();
     virtual void lowampAnalysisToggled();
     virtual void onsetAnalysisToggled();
     virtual void pruneAnalysisToggled();
+    virtual void updateAnalyseStates();
 
     virtual void doubleClickSelectInvoked(sv_frame_t);
     virtual void abandonSelection();
@@ -194,6 +196,12 @@ protected:
     QAction       *m_toggleIntelligenceAction;
     bool           m_intelligentActionOn; // GF: !!! temporary
 
+    QAction       *m_autoAnalyse;
+    QAction       *m_precise;
+    QAction       *m_lowamp;
+    QAction       *m_onset;
+    QAction       *m_prune;
+        
     QAction       *m_showAudio;
     QAction       *m_showSpect;
     QAction       *m_showPitch;
