@@ -198,6 +198,9 @@ protected:
     QAction       *m_showSpect;
     QAction       *m_showPitch;
     QAction       *m_showNotes;
+    QAction       *m_playAudio;
+    QAction       *m_playPitch;
+    QAction       *m_playNotes;
     LevelPanToolButton *m_audioLPW;
     LevelPanToolButton *m_pitchLPW;
     LevelPanToolButton *m_notesLPW;

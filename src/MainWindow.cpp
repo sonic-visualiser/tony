@@ -1128,6 +1128,11 @@ MainWindow::setupToolbars()
     connect(m_showAudio, SIGNAL(triggered()), this, SLOT(showAudioToggled()));
     connect(this, SIGNAL(canPlay(bool)), m_showAudio, SLOT(setEnabled(bool)));
 
+    m_playAudio = toolbar->addAction(il.load("speaker"), tr("Play Audio"));
+    m_playAudio->setCheckable(true);
+    connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
+    connect(this, SIGNAL(canPlayWaveform(bool)), m_playAudio, SLOT(setEnabled(bool)));
+
     m_audioLPW->setImageSize(m_viewManager->scalePixelSize(26));
     toolbar->addWidget(m_audioLPW);
 
@@ -1142,8 +1147,15 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showPitch, SLOT(setEnabled(bool)));
 
     if (m_withSonification) {
+        m_playPitch = toolbar->addAction(il.load("speaker"), tr("Play Pitch Track"));
+        m_playPitch->setCheckable(true);
+        connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
+        connect(this, SIGNAL(canPlayPitch(bool)), m_playPitch, SLOT(setEnabled(bool)));
+
         m_pitchLPW->setImageSize(m_viewManager->scalePixelSize(26));
         toolbar->addWidget(m_pitchLPW);
+    } else {
+        m_playPitch = 0;
     }
 
     // Notes
@@ -1157,8 +1169,15 @@ MainWindow::setupToolbars()
     connect(this, SIGNAL(canPlay(bool)), m_showNotes, SLOT(setEnabled(bool)));
 
     if (m_withSonification) {
+        m_playNotes = toolbar->addAction(il.load("speaker"), tr("Play Notes"));
+        m_playNotes->setCheckable(true);
+        connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
+        connect(this, SIGNAL(canPlayNotes(bool)), m_playNotes, SLOT(setEnabled(bool)));
+
         m_notesLPW->setImageSize(m_viewManager->scalePixelSize(26));
         toolbar->addWidget(m_notesLPW);
+    } else {
+        m_playNotes = 0;
     }
 
     // Spectrogram
@@ -1382,11 +1401,22 @@ MainWindow::showAudioToggled()
 {
     m_analyser->toggleVisible(Analyser::Audio);
 
-    bool playOn = (m_analyser->isVisible(Analyser::Audio));
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    bool playOn = false;
+    if (m_analyser->isVisible(Analyser::Audio)) {
+        // just switched layer on; check whether playback was also on previously
+        playOn = settings.value("playaudiowas", true).toBool();
+    } else {
+        settings.setValue("playaudiowas", m_playAudio->isChecked());
+    }
     m_analyser->setAudible(Analyser::Audio, playOn);
-    m_audioLPW->setEnabled(playOn);
+
+    settings.endGroup();
 
     updateMenuStates();
+    updateLayerStatuses();
 }
 
 void
@@ -1394,11 +1424,22 @@ MainWindow::showPitchToggled()
 {
     m_analyser->toggleVisible(Analyser::PitchTrack);
 
-    bool playOn = (m_analyser->isVisible(Analyser::PitchTrack));
-    m_analyser->setAudible(Analyser::PitchTrack, playOn && m_withSonification);
-    m_pitchLPW->setEnabled(playOn);
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    bool playOn = false;
+    if (m_analyser->isVisible(Analyser::PitchTrack)) {
+        // just switched layer on; check whether playback was also on previously
+        playOn = settings.value("playpitchwas", true).toBool();
+    } else {
+        settings.setValue("playpitchwas", m_playPitch->isChecked());
+    }
+    m_analyser->setAudible(Analyser::PitchTrack, playOn);
+
+    settings.endGroup();
 
     updateMenuStates();
+    updateLayerStatuses();
 }
 
 void
@@ -1412,46 +1453,63 @@ MainWindow::showNotesToggled()
 {
     m_analyser->toggleVisible(Analyser::Notes);
 
-    bool playOn = (m_analyser->isVisible(Analyser::Notes));
-    m_analyser->setAudible(Analyser::Notes, playOn && m_withSonification);
-    m_notesLPW->setEnabled(playOn);
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    bool playOn = false;
+    if (m_analyser->isVisible(Analyser::Notes)) {
+        // just switched layer on; check whether playback was also on previously
+        playOn = settings.value("playnoteswas", true).toBool();
+    } else {
+        settings.setValue("playnoteswas", m_playNotes->isChecked());
+    }
+    m_analyser->setAudible(Analyser::Notes, playOn);
+
+    settings.endGroup();
 
     updateMenuStates();
+    updateLayerStatuses();
 }
 
 void
 MainWindow::playAudioToggled()
 {
     m_analyser->toggleAudible(Analyser::Audio);
+    updateLayerStatuses();
 }
 
 void
 MainWindow::playPitchToggled()
 {
     m_analyser->toggleAudible(Analyser::PitchTrack);
+    updateLayerStatuses();
 }
 
 void
 MainWindow::playNotesToggled()
 {
     m_analyser->toggleAudible(Analyser::Notes);
+    updateLayerStatuses();
 }
 
 void
 MainWindow::updateLayerStatuses()
 {
     m_showAudio->setChecked(m_analyser->isVisible(Analyser::Audio));
-    m_audioLPW->setEnabled(m_analyser->isVisible(Analyser::Audio));
+    m_playAudio->setChecked(m_analyser->isAudible(Analyser::Audio));
+    m_audioLPW->setEnabled(m_analyser->isAudible(Analyser::Audio));
     m_audioLPW->setLevel(m_analyser->getGain(Analyser::Audio));
     m_audioLPW->setPan(m_analyser->getPan(Analyser::Audio));
-
+    
     m_showPitch->setChecked(m_analyser->isVisible(Analyser::PitchTrack));
-    m_pitchLPW->setEnabled(m_analyser->isVisible(Analyser::PitchTrack));
+    m_playPitch->setChecked(m_analyser->isAudible(Analyser::PitchTrack));
+    m_pitchLPW->setEnabled(m_analyser->isAudible(Analyser::PitchTrack));
     m_pitchLPW->setLevel(m_analyser->getGain(Analyser::PitchTrack));
     m_pitchLPW->setPan(m_analyser->getPan(Analyser::PitchTrack));
 
     m_showNotes->setChecked(m_analyser->isVisible(Analyser::Notes));
-    m_notesLPW->setEnabled(m_analyser->isVisible(Analyser::Notes));
+    m_playNotes->setChecked(m_analyser->isAudible(Analyser::Notes));
+    m_notesLPW->setEnabled(m_analyser->isAudible(Analyser::Notes));
     m_notesLPW->setLevel(m_analyser->getGain(Analyser::Notes));
     m_notesLPW->setPan(m_analyser->getPan(Analyser::Notes));
 
