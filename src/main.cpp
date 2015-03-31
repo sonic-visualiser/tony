@@ -40,6 +40,8 @@
 #include <iostream>
 #include <signal.h>
 
+#include <vamp-hostsdk/PluginHostAdapter.h>
+
 static QMutex cleanupMutex;
 static bool cleanedUp = false;
 
@@ -114,6 +116,46 @@ protected:
         }
     }
 };
+
+static void
+setupTonyVampPath()
+{
+#ifdef Q_OS_WIN32
+    QChar sep(';');
+    QString programFiles = getenv("ProgramFiles");
+    if (programFiles == "") programFiles = "C:\\Program Files";
+    QString defaultTonyPath(programFiles + "\\Tony");
+#else
+    QChar sep(':');
+#ifdef Q_OS_MAC
+    QString defaultTonyPath;
+#else
+    QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
+#endif
+#endif
+
+    QString tonyVampPath = getenv("TONY_VAMP_PATH");
+    if (tonyVampPath == "") {
+        tonyVampPath = defaultTonyPath;
+    }
+    if (tonyVampPath == "") {
+        // just use the default Vamp path or VAMP_PATH environment
+        // variable -- leave it up to the Vamp SDK
+        return;
+    }
+
+    std::vector<std::string> vampPathList = 
+        Vamp::PluginHostAdapter::getPluginPath();
+
+    QStringList qVampPathList;
+    for (auto p: vampPathList) qVampPathList.push_back(p.c_str());
+    QString vampPath = qVampPathList.join(sep);
+    QString newPath = tonyVampPath + sep + vampPath;
+
+    cerr << "Setting VAMP_PATH to " << newPath << " for Tony plugins" << endl;
+    
+    setenv("VAMP_PATH", newPath.toLocal8Bit().data(), 1);
+}
         
 int
 main(int argc, char **argv)
@@ -126,6 +168,8 @@ main(int argc, char **argv)
         QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
     }
 #endif
+
+    setupTonyVampPath();
 
     TonyApplication application(argc, argv);
 
