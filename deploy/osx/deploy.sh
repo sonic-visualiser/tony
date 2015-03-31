@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 # Execute this from the top-level directory of the project (the one
 # that contains the .app bundle).  Supply the name of the .app bundle
 # as argument (the target will use $app.app regardless, but we need
@@ -17,10 +19,11 @@ fi
 app=`basename "$source" .app`
 
 version=`perl -p -e 's/^[^"]*"([^"]*)".*$/$1/' version.h`
-case "$version" in
-    [0-9].[0-9]) bundleVersion="$version".0 ;;
-    [0-9].[0-9].[0-9]) bundleVersion="$version" ;;
-    *) echo "Error: Version $version is neither two- nor three-part number" ;;
+stem=${version%%-*}
+case "$stem" in
+    [0-9].[0-9]) bundleVersion="$stem".0 ;;
+    [0-9].[0-9].[0-9]) bundleVersion="$stem" ;;
+    *) echo "Error: Version stem $stem (of version $version) is neither two- nor three-part number"; exit 1 ;;
 esac
 
 if file "$source/Contents/MacOS/$app" | grep -q script; then
@@ -39,7 +42,12 @@ echo
 echo "Copying in plugins from pyin/pyin.dylib and chp/chp.dylib."
 echo "(make sure they're present, up-to-date and compiled with optimisation!)"
 
-cp pyin/pyin.{dylib,cat,n3} chp/chp.{dylib,cat,n3} "$source/Contents/Resources/"
+cp pyin/pyin.dylib chp/chp.dylib "$source/Contents/Resources/"
+
+echo
+echo "Copying in frameworks and plugins from Qt installation directory."
+
+deploy/osx/copy-qt.sh "$app" || exit 2
 
 echo
 echo "Fixing up paths."
@@ -56,8 +64,8 @@ dmg="$dmg"-"$version".dmg
 mkdir "$volume" || exit 1
 
 ln -s /Applications "$volume"/Applications
-cp README README.OSC COPYING CHANGELOG "$volume/"
-cp -r "$source" "$target"
+cp README COPYING CHANGELOG "$volume/"
+cp -rp "$source" "$target"
 
 echo "Done"
 
