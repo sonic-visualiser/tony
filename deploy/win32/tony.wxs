@@ -28,7 +28,61 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="PFiles">
 
-        <Directory Id="VampPlugins" Name="Vamp Plugins">
+        <Directory Id="APPLICATIONFOLDER" Name="Tony">
+
+          <Component
+              Id="MainExecutable"
+              Guid="B0DA872A-E8B9-4C41-B0B0-7702A9EBBD51">
+
+            <File
+                Id="T"
+                Name="Tony.exe"
+                DiskId="1"
+                Source="release\Tony.exe"
+                KeyPath="yes">
+
+              <Shortcut
+                  Id="TStartEntry"
+                  Directory="ProgramMenuDir"
+                  Name="Tony"
+		  Icon="winicon.ico"
+		  IconIndex="0"
+                  WorkingDirectory="INSTALLDIR"
+                  Advertise="yes"/>
+	      
+              <Shortcut
+                  Id="TDesktop"
+                  Directory="DesktopFolder"
+                  Name="Tony"
+		  Icon="winicon.ico"
+		  IconIndex="0"
+                  WorkingDirectory="INSTALLDIR"
+                  Advertise="yes"/>
+            </File>
+
+            <File
+                Id="CHANGELOG"
+                Name="CHANGELOG.txt"
+                DiskId="1"
+                Source="CHANGELOG"/>
+            <File
+                Id="COPYING"
+                Name="COPYING.txt"
+                DiskId="1"
+                Source="COPYING"/>
+            <File
+                Id="README"
+                Name="README.txt"
+                DiskId="1"
+                Source="README"/>
+
+            <File
+                Id="winicon.ico"
+                Name="tony-winicon.ico"
+                DiskId="1"
+                Source="icons/tony-winicon.ico"/>
+          </Component>
+            
           <Component
               Id="pYin"
               Guid="5C3B7285-B652-4FE5-8A1D-AC92376F8AD5">
@@ -57,137 +111,86 @@
                 DiskId="1"
                 Source="chp\win32-build\release\chp.dll"/>
           </Component>
-        </Directory>
 
-        <Directory Id="APPLICATIONFOLDER" Name="Tony">
-            
-            <Component
-                Id="MainExecutable"
-                Guid="B0DA872A-E8B9-4C41-B0B0-7702A9EBBD51">
-
-              <File
-                  Id="T"
-                  Name="Tony.exe"
-                  DiskId="1"
-                  Source="release\Tony.exe"
-                  KeyPath="yes">
-
-                <Shortcut
-                    Id="TStartEntry"
-                    Directory="ProgramMenuDir"
-                    Name="Tony"
-		    Icon="winicon.ico"
-		    IconIndex="0"
-                    WorkingDirectory="INSTALLDIR"
-                    Advertise="yes"/>
-
-                <Shortcut
-                    Id="TDesktop"
-                    Directory="DesktopFolder"
-                    Name="Tony"
-		    Icon="winicon.ico"
-		    IconIndex="0"
-                    WorkingDirectory="INSTALLDIR"
-                    Advertise="yes"/>
-              </File>
-
-              <File
-                  Id="COPYING"
-                  Name="COPYING"
-                  DiskId="1"
-                  Source="COPYING"/>
-              <File
-                  Id="README"
-                  Name="README"
-                  DiskId="1"
-                  Source="README"/>
-
-              <File
-                  Id="winicon.ico"
-                  Name="tony-winicon.ico"
-                  DiskId="1"
-                  Source="icons/tony-winicon.ico"/>
-            </Component>
-
-            <Component
-                Id="Qt5"
-                Guid="7DCE15D9-DB56-4ECC-A324-A9B74E30B872">
-              <File
-                  Id="QtCore"
-                  Name="Qt5Core.dll"
-                  DiskId="1"
-                  Source="release\Qt5Core.dll"
-		  KeyPath="yes"/>
-              <File
-                  Id="QtGui"
-                  Name="Qt5Gui.dll"
-                  DiskId="1"
-                  Source="release\Qt5Gui.dll"/>
-              <File
-                  Id="QtNetwork"
-                  Name="Qt5Network.dll"
-                  DiskId="1"
-                  Source="release\Qt5Network.dll"/>
-              <File
-                  Id="QtWidgets"
-                  Name="Qt5Widgets.dll"
-                  DiskId="1"
-                  Source="release\Qt5Widgets.dll"/>
-              <File
-                  Id="QtXml"
-                  Name="Qt5Xml.dll"
-                  DiskId="1"
-                  Source="release\Qt5Xml.dll"/>
-              <File
-                  Id="icudt52"
-                  Name="icudt52.dll"
-                  DiskId="1"
-                  Source="release\icudt52.dll"/>
-              <File
-                  Id="icuin52"
-                  Name="icuin52.dll"
-                  DiskId="1"
-                  Source="release\icuin52.dll"/>
-              <File
-                  Id="icuuc52"
-                  Name="icuuc52.dll"
-                  DiskId="1"
-                  Source="release\icuuc52.dll"/>
-              <File
-                  Id="libgcc"
-                  Name="libgcc_s_dw2-1.dll"
-                  DiskId="1"
-                  Source="release\libgcc_s_dw2-1.dll"/>
-              <File
-                  Id="libstdcplusplus"
-                  Name="libstdc++-6.dll"
-                  DiskId="1"
-                  Source="release\libstdc++-6.dll"/>
-              <File
-                  Id="libwinpthread"
-                  Name="libwinpthread-1.dll"
-                  DiskId="1"
-                  Source="release\libwinpthread-1.dll"/>
-            </Component>
+          <Component
+              Id="Qt5"
+              Guid="7DCE15D9-DB56-4ECC-A324-A9B74E30B872">
+            <File
+                Id="QtCore"
+                Name="Qt5Core.dll"
+                DiskId="1"
+                Source="release\Qt5Core.dll"
+		KeyPath="yes"/>
+            <File
+                Id="QtGui"
+                Name="Qt5Gui.dll"
+                DiskId="1"
+                Source="release\Qt5Gui.dll"/>
+            <File
+                Id="QtNetwork"
+                Name="Qt5Network.dll"
+                DiskId="1"
+                Source="release\Qt5Network.dll"/>
+            <File
+                Id="QtWidgets"
+                Name="Qt5Widgets.dll"
+                DiskId="1"
+                Source="release\Qt5Widgets.dll"/>
+            <File
+                Id="QtXml"
+                Name="Qt5Xml.dll"
+                DiskId="1"
+                Source="release\Qt5Xml.dll"/>
+            <File
+                Id="icudt52"
+                Name="icudt52.dll"
+                DiskId="1"
+                Source="release\icudt52.dll"/>
+            <File
+                Id="icuin52"
+                Name="icuin52.dll"
+                DiskId="1"
+                Source="release\icuin52.dll"/>
+            <File
+                Id="icuuc52"
+                Name="icuuc52.dll"
+                DiskId="1"
+                Source="release\icuuc52.dll"/>
+            <File
+                Id="libgcc"
+                Name="libgcc_s_dw2-1.dll"
+                DiskId="1"
+                Source="release\libgcc_s_dw2-1.dll"/>
+            <File
+                Id="libstdcplusplus"
+                Name="libstdc++-6.dll"
+                DiskId="1"
+                Source="release\libstdc++-6.dll"/>
+            <File
+                Id="libwinpthread"
+                Name="libwinpthread-1.dll"
+                DiskId="1"
+                Source="release\libwinpthread-1.dll"/>
+          </Component>
 	    
-	    <Directory Id="Platforms" Name="platforms">
-              <Component
-                  Id="Qt5PlatformPlugins"
-                  Guid="F3AAECAE-3B5E-4BA7-8F17-D20F608BE43A">
-		<File
-                    Id="qminimal"
-                    Name="qminimal.dll"
-                    DiskId="1"
-                    Source="release\qminimal.dll"/>
-		<File
-                    Id="qwindows"
-                    Name="qwindows.dll"
-                    DiskId="1"
-                    Source="release\qwindows.dll"/>
-              </Component>
-	    </Directory>
+	  <Directory Id="Platforms" Name="platforms">
+            <Component
+                Id="Qt5PlatformPlugins"
+                Guid="F3AAECAE-3B5E-4BA7-8F17-D20F608BE43A">
+	      <File
+                  Id="qminimal"
+                  Name="qminimal.dll"
+                  DiskId="1"
+                  Source="release\qminimal.dll"/>
+	      <File
+                  Id="qwindows"
+                  Name="qwindows.dll"
+                  DiskId="1"
+                  Source="release\qwindows.dll"/>
+            </Component>
+	  </Directory>
         </Directory>
-
+	
       </Directory>
       
       <Directory Id="ProgramMenuFolder" Name="Programs">
