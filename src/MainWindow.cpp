@@ -1158,7 +1158,17 @@ MainWindow::setupToolbars()
     connect(m_playAudio, SIGNAL(triggered()), this, SLOT(playAudioToggled()));
     connect(this, SIGNAL(canPlayWaveform(bool)), m_playAudio, SLOT(setEnabled(bool)));
 
-    m_audioLPW->setImageSize(m_viewManager->scalePixelSize(26));
+    int lpwSize, bigLpwSize;
+#ifdef Q_OS_MAC
+    lpwSize = m_viewManager->scalePixelSize(32); // Mac toolbars are fatter
+    bigLpwSize = lpwSize * 2.2;
+#else
+    lpwSize = m_viewManager->scalePixelSize(26);
+    bigLpwSize = lpwSize * 2.8;
+#endif
+    
+    m_audioLPW->setImageSize(lpwSize);
+    m_audioLPW->setBigImageSize(bigLpwSize);
     toolbar->addWidget(m_audioLPW);
 
     // Pitch (f0)
@@ -1177,7 +1187,8 @@ MainWindow::setupToolbars()
         connect(m_playPitch, SIGNAL(triggered()), this, SLOT(playPitchToggled()));
         connect(this, SIGNAL(canPlayPitch(bool)), m_playPitch, SLOT(setEnabled(bool)));
 
-        m_pitchLPW->setImageSize(m_viewManager->scalePixelSize(26));
+        m_pitchLPW->setImageSize(lpwSize);
+        m_pitchLPW->setBigImageSize(bigLpwSize);
         toolbar->addWidget(m_pitchLPW);
     } else {
         m_playPitch = 0;
@@ -1199,7 +1210,8 @@ MainWindow::setupToolbars()
         connect(m_playNotes, SIGNAL(triggered()), this, SLOT(playNotesToggled()));
         connect(this, SIGNAL(canPlayNotes(bool)), m_playNotes, SLOT(setEnabled(bool)));
 
-        m_notesLPW->setImageSize(m_viewManager->scalePixelSize(26));
+        m_notesLPW->setImageSize(lpwSize);
+        m_notesLPW->setBigImageSize(bigLpwSize);
         toolbar->addWidget(m_notesLPW);
     } else {
         m_playNotes = 0;
