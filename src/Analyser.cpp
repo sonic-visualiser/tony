@@ -77,6 +77,8 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
+    if (!m_fileModel) return "Internal error: Analyser::newFileLoaded() called with no model present";
+    
     connect(doc, SIGNAL(layerAboutToBeDeleted(Layer *)),
             this, SLOT(layerAboutToBeDeleted(Layer *)));
 
@@ -95,6 +97,8 @@ Analyser::analyseExistingFile()
 
     if (!m_pane) return "Internal error: Analyser::analyseExistingFile() called with no pane present";
 
+    if (!m_fileModel) return "Internal error: Analyser::analyseExistingFile() called with no model present";
+    
     if (m_layers[PitchTrack]) {
         m_document->removeLayerFromView(m_pane, m_layers[PitchTrack]);
         m_layers[PitchTrack] = 0;
@@ -225,6 +229,8 @@ Analyser::layerCompletionChanged()
 QString
 Analyser::addVisualisations()
 {
+    if (!m_fileModel) return "Internal error: Analyser::addVisualisations() called with no model present";
+
     // A spectrogram, off by default. Must go at the back because it's
     // opaque
 
