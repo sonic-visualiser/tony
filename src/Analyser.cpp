@@ -193,7 +193,32 @@ void
 Analyser::layerCompletionChanged()
 {
     if (getInitialAnalysisCompletion() == 100) {
+
         emit initialAnalysisCompleted();
+
+        if (m_layers[Audio]) {
+
+            // Extend pitch-track and note layers so as to nominally
+            // end at the same time as the audio. This affects any
+            // time-filling done on export etc.
+            
+            sv_frame_t endFrame = m_layers[Audio]->getModel()->getEndFrame();
+        
+            if (m_layers[PitchTrack]) {
+                SparseTimeValueModel *model = qobject_cast<SparseTimeValueModel *>
+                    (m_layers[PitchTrack]->getModel());
+                if (model) {
+                    model->extendEndFrame(endFrame);
+                }
+            }
+            if (m_layers[Notes]) {
+                NoteModel *model = qobject_cast<NoteModel *>
+                    (m_layers[Notes]->getModel());
+                if (model) {
+                    model->extendEndFrame(endFrame);
+                }
+            }
+        }
     }
 }
 
