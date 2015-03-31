@@ -637,6 +637,8 @@ Analyser::layersCreated(Document::LayerCreationAsyncHandle handle,
                 t->setPresentationName("candidate");
                 m_document->addLayerToView(m_pane, t);
                 m_reAnalysisCandidates.push_back(t);
+                cerr << "New re-analysis candidate model has "
+                     << ((SparseTimeValueModel *)t->getModel())->getPoints().size() << " point(s)" << endl;
             }
         }
 
