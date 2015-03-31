@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 # Execute this from the top-level directory of the project (the one
 # that contains the .app bundle).  Supply the name of the .app bundle
@@ -17,6 +17,8 @@ if [ -z "$source" ] || [ ! -d "$source" ] || [ -z "$dmg" ]; then
 	exit 2
 fi
 app=`basename "$source" .app`
+
+set -u
 
 version=`perl -p -e 's/^[^"]*"([^"]*)".*$/$1/' version.h`
 stem=${version%%-*}
