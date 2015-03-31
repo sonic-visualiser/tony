@@ -848,11 +848,23 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
                               myLayer->getModel()->getEndFrame());
     myLayer->deleteSelection(sel);
 
-    cerr << "deleted from " << sel.getStartFrame() << " to " << sel.getEndFrame() << endl;
-    
     sel = Selection(otherLayer->getModel()->getStartFrame(),
                     otherLayer->getModel()->getEndFrame());
     otherLayer->copy(m_pane, sel, clip);
+
+    // Remove all pitches <= 0Hz -- we now save absent pitches as 0Hz
+    // values when exporting a pitch track, so we need to exclude them
+    // here when importing again
+    Clipboard::PointList after;
+    int excl = 0;
+    for (auto &p: clip.getPoints()) {
+        if (p.haveValue() && p.getValue() > 0.f) {
+            after.push_back(p);
+        } else {
+            ++excl;
+        }
+    }
+    clip.setPoints(after);
 
     myLayer->paste(m_pane, clip, 0, false);
 }
