@@ -2219,8 +2219,11 @@ MainWindow::exportPitchLayer()
 
     } else {
 
+        DataExportOptions options = DataExportFillGaps;
+        
         CSVFileWriter writer(path, model,
-                             ((suffix == "csv") ? "," : "\t"));
+                             ((suffix == "csv") ? "," : "\t"),
+                             options);
         writer.write();
 
         if (!writer.isOK()) {
@@ -2278,8 +2281,11 @@ MainWindow::exportNoteLayer()
 
     } else {
 
+        DataExportOptions options = DataExportOmitLevels;
+        
         CSVFileWriter writer(path, model,
-                             ((suffix == "csv") ? "," : "\t"));
+                             ((suffix == "csv") ? "," : "\t"),
+                             options);
         writer.write();
 
         if (!writer.isOK()) {
