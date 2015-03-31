@@ -242,6 +242,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     connect(m_playSpeed, SIGNAL(mouseLeft()), this, SLOT(mouseLeftWidget()));
 
     m_audioLPW = new LevelPanToolButton(frame);
+    m_audioLPW->setIncludeMute(false);
     m_audioLPW->setObjectName(tr("Audio Track Level and Pan"));
     connect(m_audioLPW, SIGNAL(levelChanged(float)), this, SLOT(audioGainChanged(float)));
     connect(m_audioLPW, SIGNAL(panChanged(float)), this, SLOT(audioPanChanged(float)));
@@ -249,11 +250,13 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     if (m_withSonification) {
 
         m_pitchLPW = new LevelPanToolButton(frame);
+        m_pitchLPW->setIncludeMute(false);
         m_pitchLPW->setObjectName(tr("Pitch Track Level and Pan"));
         connect(m_pitchLPW, SIGNAL(levelChanged(float)), this, SLOT(pitchGainChanged(float)));
         connect(m_pitchLPW, SIGNAL(panChanged(float)), this, SLOT(pitchPanChanged(float)));
 
         m_notesLPW = new LevelPanToolButton(frame);
+        m_notesLPW->setIncludeMute(false);
         m_notesLPW->setObjectName(tr("Note Track Level and Pan"));
         connect(m_notesLPW, SIGNAL(levelChanged(float)), this, SLOT(notesGainChanged(float)));
         connect(m_notesLPW, SIGNAL(panChanged(float)), this, SLOT(notesPanChanged(float)));
