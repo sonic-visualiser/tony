@@ -13,8 +13,8 @@ Features
 
  * robust monophonic pitch track extraction (using pYIN)
  * note track extraction
- * facility to adjust pitch track and note track
- * note pitch automatically adjusts to pitch track
+ * facility to manually adjust pitch track and note track
+ * note pitch automatically snaps to pitch track
  * import/export of pitch track and note track
  * some more
 
