@@ -1,4 +1,35 @@
 
+Changes in Tony 1.0 since the previous release 0.6:
+
+ * The underlying pYin analysis plugin has been updated; more analysis
+   options are available
+
+ * Notes can be dragged up and down using the mouse in edit mode. When
+   you drag a note, the pitch track underneath it snaps to the nearest
+   spectral peaks (if any are found). Releasing the note makes the
+   note snap back to the (possibly now moved) underlying pitch values.
+
+ * Exported pitch track CSV files now contain one row for every
+   processing frame in the file, and those with no identified pitch
+   have the pitch recorded as 0. This is useful for some evaluation
+   and post-processing tools, and it's easier to filter out the 0
+   values if you don't need them than add them afterwards if you do
+
+ * Exported note track CSV files now omit the (meaningless, in this
+   context) velocity column
+
+ * Level and pan for a layer (audio, pitch track, notes) are now shown
+   in a little matrix widget, which is quicker to read than the
+   previous pair of rotary dials; click on it to pop up an editable
+   version
+
+ * Horizontal scrolling using a Mac trackpad now works properly
+
+ * Tony now finds plugins in its own installation directory by default
+   (can be overridden with TONY_VAMP_PATH environment variable)
+
+ * Bug fixes
+
 Changes in Tony 0.6 since the previous release 0.5:
 
  * The play pointer no longer tracks to the centre of the main pane
