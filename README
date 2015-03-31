@@ -11,40 +11,12 @@ audio.
 Features
 ========
 
- * robust monophonic pitch track extraction
+ * robust monophonic pitch track extraction (using pYIN)
  * note track extraction
- * facility to adjust the note track
- * note pitch adjusts to pitch track when notes are split
+ * facility to adjust pitch track and note track
+ * note pitch automatically adjusts to pitch track
  * import/export of pitch track and note track
-
-
-Warning
-=======
-
-This program is still a prototype, which may change, and which
-generally may not have the functionality you'd expect.
-
-
-Note Editing
-============
-
-A particular problem (see Warning, above) is the opaque editing
-procedure. In order to edit notes, enter the multi-tool mode by
-selecting the move button in the toolbar. There are four ways in which
-you can change a note:
-
- 1. by clicking on the upper half of a note and dragging you can move
-    the note
- 2. by clicking on the beginning or end of a note and dragging you can
-    change the onset or offset time
- 3. by clicking into the bottom part of a note you can split the note
-    (this will recalculate the pitch of the resulting new notes)
- 4. by shift-clicking into the bottom part of a note you can delete
-    the note
-
-By double-clicking into an empty part of the timeline you can create a
-new note.
-
+ * some more
 
 Authors, Citation, License and Use
 ==================================
