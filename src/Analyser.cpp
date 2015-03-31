@@ -307,7 +307,10 @@ Analyser::addWaveform()
     waveform->setBaseColour
         (ColourDatabase::getInstance()->getColourIndex(tr("Grey")));
     PlayParameters *params = waveform->getPlayParameters();
-    if (params) params->setPlayPan(-1);
+    if (params) {
+        params->setPlayPan(-1);
+        params->setPlayGain(1);
+    }
     
     m_document->addLayerToView(m_pane, waveform);
 
@@ -447,7 +450,10 @@ Analyser::addAnalyses()
     if (pitchLayer) {
         pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
         PlayParameters *params = pitchLayer->getPlayParameters();
-        if (params) params->setPlayPan(1);
+        if (params) {
+            params->setPlayPan(1);
+            params->setPlayGain(0.5);
+        }
         connect(pitchLayer, SIGNAL(modelCompletionChanged()),
                 this, SLOT(layerCompletionChanged()));
     }
@@ -457,7 +463,10 @@ Analyser::addAnalyses()
     if (flexiNoteLayer) {
         flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
         PlayParameters *params = flexiNoteLayer->getPlayParameters();
-        if (params) params->setPlayPan(1);
+        if (params) {
+            params->setPlayPan(1);
+            params->setPlayGain(0.5);
+        }
         connect(flexiNoteLayer, SIGNAL(modelCompletionChanged()),
                 this, SLOT(layerCompletionChanged()));
         connect(flexiNoteLayer, SIGNAL(reAnalyseRegion(sv_frame_t, sv_frame_t, float, float)),
@@ -839,6 +848,8 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
                               myLayer->getModel()->getEndFrame());
     myLayer->deleteSelection(sel);
 
+    cerr << "deleted from " << sel.getStartFrame() << " to " << sel.getEndFrame() << endl;
+    
     sel = Selection(otherLayer->getModel()->getStartFrame(),
                     otherLayer->getModel()->getEndFrame());
     otherLayer->copy(m_pane, sel, clip);
