@@ -54,7 +54,7 @@ NetworkPermissionTester::havePermission()
 	    (QCoreApplication::translate
 	     ("NetworkPermissionTester",
 	      "<h2>Tony: a tool for melody annotation</h2>"
-	      "<p><img src=\":icons/qm-logo-smaller.png\" style=\"float:right\">Tony is a program for computer-aided melody annotation.<br>This is a very preliminary release, with many unfinished and provisional features.</p>"
+	      "<p><img src=\":icons/qm-logo-smaller.png\" style=\"float:right\">Tony is a program for computer-assisted pitch and note annotation of unaccompanied melody.</p>"
 	      "<p>Developed in the Centre for Digital Music at Queen Mary, University of London, Tony is provided free as open source software under the GNU General Public License.</p>"
               "<p><hr></p>"
 	      "<p><b>Before we go on...</b></p>"
