@@ -1161,10 +1161,10 @@ MainWindow::setupToolbars()
     int lpwSize, bigLpwSize;
 #ifdef Q_OS_MAC
     lpwSize = m_viewManager->scalePixelSize(32); // Mac toolbars are fatter
-    bigLpwSize = lpwSize * 2.2;
+    bigLpwSize = int(lpwSize * 2.2);
 #else
     lpwSize = m_viewManager->scalePixelSize(26);
-    bigLpwSize = lpwSize * 2.8;
+    bigLpwSize = int(lpwSize * 2.8);
 #endif
     
     m_audioLPW->setImageSize(lpwSize);
@@ -1951,7 +1951,7 @@ MainWindow::waitForInitialAnalysis()
 
     QMessageBox mb(QMessageBox::Information,
                    tr("Waiting for analysis"),
-                   tr("Waiting for initial analysis to complete before saving..."),
+                   tr("Waiting for initial analysis to finish before loading or saving..."),
                    QMessageBox::Cancel,
                    this);
 
@@ -2130,6 +2130,8 @@ MainWindow::importPitchLayer(FileSource source)
     if (!source.isAvailable()) return FileOpenFailed;
     source.waitForData();
 
+    if (!waitForInitialAnalysis()) return FileOpenCancelled;
+    
     QString path = source.getLocalFilename();
 
     RDFImporter::RDFDocumentType rdfType = 
@@ -2214,6 +2216,8 @@ MainWindow::exportPitchLayer()
 
     if (path == "") return;
 
+    if (!waitForInitialAnalysis()) return;
+    
     if (QFileInfo(path).suffix() == "") path += ".svl";
 
     QString suffix = QFileInfo(path).suffix().toLower();
