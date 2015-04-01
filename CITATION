@@ -1,0 +1,10 @@
+If you are using Tony in research work for publication, please cite:
+
+@inproceedings{mauch2015computeraided,
+  author = {M. Mauch and C. Cannam and R. Bittner and G. Fazekas and J. Salamon and J. Dai and J. Bello and S. Dixon},
+  title = {Computer-aided Melody Note Transcription Using the Tony Software: Accuracy and Efficiency},
+  booktitle = {Proceedings of the First International Conference on Technologies for Music Notation and Representation},
+  month = {May},
+  note = {accepted},
+  year = {2015}
+}

@@ -66,7 +66,7 @@ dmg="$dmg"-"$version".dmg
 mkdir "$volume" || exit 1
 
 ln -s /Applications "$volume"/Applications
-cp README COPYING CHANGELOG "$volume/"
+cp README COPYING CHANGELOG CITATION "$volume/"
 cp -rp "$source" "$target"
 
 echo "Done"
