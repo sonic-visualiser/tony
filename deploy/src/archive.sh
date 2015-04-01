@@ -11,5 +11,5 @@ fi
 
 echo "Packaging up version $v from tag $tag..."
 
-hg archive -r"$tag" --subrepos --exclude sv-dependency-builds --exclude testdata /tmp/tony-"$v".tar.gz
+hg archive -r"$tag" --subrepos --exclude sv-dependency-builds --exclude pyin/testdata --exclude testdata /tmp/tony-"$v".tar.gz
 
