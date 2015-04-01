@@ -75,6 +75,11 @@
                 Name="README.txt"
                 DiskId="1"
                 Source="README"/>
+            <File
+                Id="CITATION"
+                Name="CITATION.txt"
+                DiskId="1"
+                Source="CITATION"/>
 
             <File
                 Id="winicon.ico"
