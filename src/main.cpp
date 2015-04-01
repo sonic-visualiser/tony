@@ -39,6 +39,7 @@
 
 #include <iostream>
 #include <signal.h>
+#include <cstdlib>
 
 #include <vamp-hostsdk/PluginHostAdapter.h>
 
@@ -153,8 +154,11 @@ setupTonyVampPath()
     QString newPath = tonyVampPath + sep + vampPath;
 
     cerr << "Setting VAMP_PATH to " << newPath << " for Tony plugins" << endl;
-    
-    setenv("VAMP_PATH", newPath.toLocal8Bit().data(), 1);
+
+    QString env = "VAMP_PATH=" + newPath;
+
+    // Windows lacks setenv, must use putenv (different arg convention)
+    putenv(strdup(env.toLocal8Bit().data()));
 }
         
 int

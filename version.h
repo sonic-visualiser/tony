@@ -1,1 +1,1 @@
-#define TONY_VERSION "1.0-test1"
+#define TONY_VERSION "1.0"
