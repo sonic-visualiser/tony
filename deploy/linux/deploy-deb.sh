@@ -15,14 +15,14 @@ usage() {
     exit 2
 }
 
-set -u
-
 version="$1"
 arch="$2"
 
 if [ -z "$version" ] || [ -z "$arch" ]; then
     usage
 fi
+
+set -u
 
 program=tony
 plugins="chp pyin"
