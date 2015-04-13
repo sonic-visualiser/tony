@@ -1,0 +1,13 @@
+Package: tony
+Priority: optional
+Maintainer: Chris Cannam <cannam@all-day-breakfast.com>
+Architecture: amd64
+Version: 1.0cc-1
+Installed-Size: 6056
+Section: contrib/sound
+Depends: libqt5core5a, libsndfile1, libsamplerate0, libfftw3-3, libbz2-1.0, libpulse0, libmad0, libid3tag0, liboggz2, libfishsound1, libasound2, liblo7, liblrdf0, libsord-0-0, libserd-0-0, vamp-plugin-sdk, librubberband2, libc6
+Description: Computer-aided melody annotation from audio recordings
+ Tony is a program for computer-aided melody annotation. It has a
+ graphical interface based on the Sonic Visualiser libraries, and uses
+ the pYIN Vamp plugin to extract pitch track and notes from monophonic
+ audio.
