@@ -1,0 +1,13 @@
+
+These Dockerfiles create images that contain .deb builds for
+Tony. That is, the entire build is run in the process of creating the
+image, and the resulting image contains the built .deb file in the
+/opt/tony directory.
+
+Run:
+
+sudo docker build -t tony:build-v1.0-amd64 64
+sudo docker build -t tony:build-v1.0-i386 32
+
+to create images ("docker images" lists them) with the builds in them.
+
