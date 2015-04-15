@@ -1,5 +1,5 @@
 
-AC_INIT([Tony], 0.6, cannam@all-day-breakfast.com)
+AC_INIT([Tony], 1.0, cannam@all-day-breakfast.com)
 
 AC_CONFIG_SRCDIR(src/main.cpp)
 
@@ -53,8 +53,8 @@ CXXFLAGS_RELEASE="$AUTOCONF_CXXFLAGS"
 CXXFLAGS_MINIMAL="$AUTOCONF_CXXFLAGS"
 
 if test "x$GCC" = "xyes"; then
-   	CXXFLAGS_ANY="-Wall -Wextra -Werror -Woverloaded-virtual -Wformat-nonliteral -Wformat-security -Winit-self -Wswitch-enum -Wconversion -pipe"
-        CXXFLAGS_DEBUG="$CXXFLAGS_ANY -g"
+   	CXXFLAGS_ANY="-Wall -Wextra -Woverloaded-virtual -Wformat-nonliteral -Wformat-security -Winit-self -Wswitch-enum -Wconversion -pipe"
+        CXXFLAGS_DEBUG="$CXXFLAGS_ANY -Werror -g"
    	CXXFLAGS_RELEASE="$CXXFLAGS_ANY -g0 -O2"
    	CXXFLAGS_MINIMAL="$CXXFLAGS_ANY -g0 -O0"
 fi
