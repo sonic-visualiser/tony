@@ -1,5 +1,5 @@
 
-AC_INIT([Tony], 0.6, cannam@all-day-breakfast.com)
+AC_INIT([Tony], 1.0, cannam@all-day-breakfast.com)
 
 AC_CONFIG_SRCDIR(src/main.cpp)
 
