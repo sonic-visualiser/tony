@@ -1020,6 +1020,17 @@ MainWindow::setupToolbars()
     connect(ffwdEndAction, SIGNAL(triggered()), this, SLOT(ffwdEnd()));
     connect(this, SIGNAL(canPlay(bool)), ffwdEndAction, SLOT(setEnabled(bool)));
 
+    QAction *recordAction = toolbar->addAction(il.load("record"),
+                                               tr("Record"));
+    recordAction->setCheckable(true);
+    recordAction->setShortcut(tr("Ctrl+Space"));
+    recordAction->setStatusTip(tr("Record a new audio file"));
+    connect(recordAction, SIGNAL(triggered()), this, SLOT(record()));
+    connect(m_recordTarget, SIGNAL(recordStatusChanged(bool)),
+	    recordAction, SLOT(setChecked(bool)));
+    connect(this, SIGNAL(canRecord(bool)),
+            recordAction, SLOT(setEnabled(bool)));
+
     toolbar = addToolBar(tr("Play Mode Toolbar"));
 
     QAction *psAction = toolbar->addAction(il.load("playselection"),
@@ -1071,10 +1082,12 @@ MainWindow::setupToolbars()
     m_keyReference->registerShortcut(psAction);
     m_keyReference->registerShortcut(plAction);
     m_keyReference->registerShortcut(playAction);
+    m_keyReference->registerShortcut(recordAction);
     m_keyReference->registerShortcut(m_rwdAction);
     m_keyReference->registerShortcut(m_ffwdAction);
     m_keyReference->registerShortcut(rwdStartAction);
     m_keyReference->registerShortcut(ffwdEndAction);
+    m_keyReference->registerShortcut(recordAction);
     m_keyReference->registerShortcut(oneLeftAction);
     m_keyReference->registerShortcut(oneRightAction);
     m_keyReference->registerShortcut(selectOneLeftAction);
@@ -1095,6 +1108,8 @@ MainWindow::setupToolbars()
     menu->addAction(selectOneLeftAction);
     menu->addAction(selectOneRightAction);
     menu->addSeparator();
+    menu->addAction(recordAction);
+    menu->addSeparator();
 
     m_rightButtonPlaybackMenu->addAction(playAction);
     m_rightButtonPlaybackMenu->addAction(psAction);
@@ -1110,6 +1125,8 @@ MainWindow::setupToolbars()
     m_rightButtonPlaybackMenu->addAction(oneRightAction);
     m_rightButtonPlaybackMenu->addAction(selectOneLeftAction);
     m_rightButtonPlaybackMenu->addAction(selectOneRightAction);
+    m_rightButtonPlaybackMenu->addSeparator();
+    m_rightButtonPlaybackMenu->addAction(recordAction);
     m_rightButtonPlaybackMenu->addSeparator();
 
     QAction *fastAction = menu->addAction(tr("Speed Up"));
