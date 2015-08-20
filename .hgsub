@@ -5,3 +5,7 @@ dataquay = https://bitbucket.org/breakfastquay/dataquay
 pyin = https://code.soundsoftware.ac.uk/hg/pyin
 chp = https://code.soundsoftware.ac.uk/hg/chp
 sv-dependency-builds = https://code.soundsoftware.ac.uk/hg/sv-dependency-builds
+bqvec = https://bitbucket.org/breakfastquay/bqvec
+bqresample = https://bitbucket.org/breakfastquay/bqresample
+bqaudioio = https://bitbucket.org/breakfastquay/bqaudioio
+icons/scalable = https://code.soundsoftware.ac.uk/hg/sv-iconset

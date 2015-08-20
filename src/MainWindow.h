@@ -28,7 +28,7 @@ class MainWindow : public MainWindowBase
     Q_OBJECT
 
 public:
-    MainWindow(bool withAudioOutput = true, bool withSonification = true, bool withSpectrogram = true);
+    MainWindow(SoundOptions options, bool withSonification = true, bool withSpectrogram = true);
     virtual ~MainWindow();
 
 signals:
@@ -134,6 +134,7 @@ protected slots:
     virtual void layerInAView(Layer *, bool);
 
     virtual void mainModelChanged(WaveFileModel *);
+    virtual void mainModelGainChanged(float);
     virtual void modelAdded(Model *);
     virtual void modelAboutToBeDeleted(Model *);
 

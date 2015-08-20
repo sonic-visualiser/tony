@@ -42,9 +42,9 @@
 #include "widgets/IconLoader.h"
 #include "widgets/KeyReference.h"
 #include "widgets/LevelPanToolButton.h"
-#include "audioio/AudioCallbackPlaySource.h"
-#include "audioio/AudioCallbackPlayTarget.h"
-#include "audioio/PlaySpeedRangeMapper.h"
+#include "audio/AudioCallbackPlaySource.h"
+#include "audio/AudioRecordTarget.h"
+#include "audio/PlaySpeedRangeMapper.h"
 #include "base/Profiler.h"
 #include "base/UnitDatabase.h"
 #include "layer/ColourDatabase.h"
@@ -65,6 +65,8 @@
 #include "vamp-sdk/PluginBase.h"
 #include "plugin/api/ladspa.h"
 #include "plugin/api/dssi.h"
+
+#include <bqaudioio/SystemPlaybackTarget.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -91,8 +93,8 @@
 using std::vector;
 
 
-MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpectrogram) :
-    MainWindowBase(withAudioOutput, false),
+MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpectrogram) :
+    MainWindowBase(options),
     m_overview(0),
     m_mainMenusCreated(false),
     m_playbackMenu(0),
@@ -234,7 +236,7 @@ MainWindow::MainWindow(bool withAudioOutput, bool withSonification, bool withSpe
     m_playSpeed->setPageStep(10);
     m_playSpeed->setObjectName(tr("Playback Speedup"));
     m_playSpeed->setDefaultValue(100);
-    m_playSpeed->setRangeMapper(new PlaySpeedRangeMapper(0, 200));
+    m_playSpeed->setRangeMapper(new PlaySpeedRangeMapper);
     m_playSpeed->setShowToolTip(true);
     connect(m_playSpeed, SIGNAL(valueChanged(int)),
         this, SLOT(playSpeedChanged(int)));
@@ -370,7 +372,6 @@ MainWindow::setupFileMenu()
     QAction *action;
 
     icon = il.load("fileopen");
-    icon.addPixmap(il.loadPixmap("fileopen-22"));
     action = new QAction(icon, tr("&Open..."), this);
     action->setShortcut(tr("Ctrl+O"));
     action->setStatusTip(tr("Open a session or audio file"));
@@ -395,7 +396,6 @@ MainWindow::setupFileMenu()
     menu->addSeparator();
 
     icon = il.load("filesave");
-    icon.addPixmap(il.loadPixmap("filesave-22"));
     action = new QAction(icon, tr("&Save Session"), this);
     action->setShortcut(tr("Ctrl+S"));
     action->setStatusTip(tr("Save the current session into a %1 session file").arg(QApplication::applicationName()));
@@ -406,7 +406,6 @@ MainWindow::setupFileMenu()
     toolbar->addAction(action);
 	
     icon = il.load("filesaveas");
-    icon.addPixmap(il.loadPixmap("filesaveas-22"));
     action = new QAction(icon, tr("Save Session &As..."), this);
     action->setShortcut(tr("Ctrl+Shift+S"));
     action->setStatusTip(tr("Save the current session into a new %1 session file").arg(QApplication::applicationName()));
@@ -2640,26 +2639,36 @@ MainWindow::formNoteFromSelection()
 void
 MainWindow::playSpeedChanged(int position)
 {
-    PlaySpeedRangeMapper mapper(0, 200);
+    PlaySpeedRangeMapper mapper;
 
     double percent = m_playSpeed->mappedValue();
     double factor = mapper.getFactorForValue(percent);
 
-    cerr << "speed = " << position << " percent = " << percent << " factor = " << factor << endl;
+    int centre = m_playSpeed->defaultValue();
 
-    bool something = (position != 100);
+    // Percentage is shown to 0dp if >100, to 1dp if <100; factor is
+    // shown to 3sf
 
-    int pc = int(lrint(percent));
-
-    if (!something) {
+    char pcbuf[30];
+    char facbuf[30];
+    
+    if (position == centre) {
         contextHelpChanged(tr("Playback speed: Normal"));
+    } else if (position < centre) {
+        sprintf(pcbuf, "%.1f", percent);
+        sprintf(facbuf, "%.3g", 1.0 / factor);
+        contextHelpChanged(tr("Playback speed: %1% (%2x slower)")
+                           .arg(pcbuf)
+                           .arg(facbuf));
     } else {
-        contextHelpChanged(tr("Playback speed: %1%2%")
-                           .arg(position > 100 ? "+" : "")
-                           .arg(pc));
+        sprintf(pcbuf, "%.0f", percent);
+        sprintf(facbuf, "%.3g", factor);
+        contextHelpChanged(tr("Playback speed: %1% (%2x faster)")
+                           .arg(pcbuf)
+                           .arg(facbuf));
     }
 
-    m_playSource->setTimeStretch(factor);
+    m_playSource->setTimeStretch(1.0 / factor); // factor is a speedup
 
     updateMenuStates();
 }
@@ -2910,7 +2919,15 @@ MainWindow::mainModelChanged(WaveFileModel *model)
 
     if (m_playTarget) {
         connect(m_fader, SIGNAL(valueChanged(float)),
-                m_playTarget, SLOT(setOutputGain(float)));
+                this, SLOT(mainModelGainChanged(float)));
+    }
+}
+
+void
+MainWindow::mainModelGainChanged(float gain)
+{
+    if (m_playTarget) {
+        m_playTarget->setOutputGain(gain);
     }
 }
 
