@@ -67,6 +67,7 @@
 #include "plugin/api/dssi.h"
 
 #include <bqaudioio/SystemPlaybackTarget.h>
+#include <bqaudioio/SystemAudioIO.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -1378,7 +1379,7 @@ MainWindow::updateMenuStates()
     bool haveMainModel =
 	(getMainModel() != 0);
     bool havePlayTarget =
-	(m_playTarget != 0);
+	(m_playTarget != 0 || m_audioIO != 0);
     bool haveCurrentPane =
         (currentPane != 0);
     bool haveCurrentLayer =
@@ -1417,6 +1418,10 @@ MainWindow::updateMenuStates()
     emit canExportNotes(haveNotes);
     emit canSnapNotes(haveSelection && haveNotes);
 
+    cerr << "haveWaveform = " << haveWaveform << endl;
+    cerr << "haveMainModel = " << haveMainModel << endl;
+    cerr << "havePlayTarget = " << havePlayTarget << endl;
+    
     emit canPlayWaveform(haveWaveform && haveMainModel && havePlayTarget);
     emit canPlayPitch(havePitchTrack && haveMainModel && havePlayTarget);
     emit canPlayNotes(haveNotes && haveMainModel && havePlayTarget);
@@ -2934,7 +2939,7 @@ MainWindow::mainModelChanged(WaveFileModel *model)
 
     MainWindowBase::mainModelChanged(model);
 
-    if (m_playTarget) {
+    if (m_playTarget || m_audioIO) {
         connect(m_fader, SIGNAL(valueChanged(float)),
                 this, SLOT(mainModelGainChanged(float)));
     }
@@ -2945,6 +2950,8 @@ MainWindow::mainModelGainChanged(float gain)
 {
     if (m_playTarget) {
         m_playTarget->setOutputGain(gain);
+    } else if (m_audioIO) {
+        m_audioIO->setOutputGain(gain);
     }
 }
 
