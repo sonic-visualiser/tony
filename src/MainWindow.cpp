@@ -228,14 +228,14 @@ MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpe
     m_playSpeed = new AudioDial(frame);
     m_playSpeed->setMeterColor(Qt::darkBlue);
     m_playSpeed->setMinimum(0);
-    m_playSpeed->setMaximum(200);
+    m_playSpeed->setMaximum(120);
     m_playSpeed->setValue(100);
     m_playSpeed->setFixedWidth(24);
     m_playSpeed->setFixedHeight(24);
     m_playSpeed->setNotchesVisible(true);
     m_playSpeed->setPageStep(10);
-    m_playSpeed->setObjectName(tr("Playback Speedup"));
-    m_playSpeed->setDefaultValue(100);
+    m_playSpeed->setObjectName(tr("Playback Speed"));
+    m_playSpeed->setDefaultValue(60);
     m_playSpeed->setRangeMapper(new PlaySpeedRangeMapper);
     m_playSpeed->setShowToolTip(true);
     connect(m_playSpeed, SIGNAL(valueChanged(int)),
