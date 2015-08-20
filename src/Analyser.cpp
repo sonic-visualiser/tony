@@ -278,7 +278,8 @@ Analyser::addVisualisations()
 
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
     spectrogram->setNormalization(SpectrogramLayer::NormalizeHybrid);
-    spectrogram->setGain(100);
+//    spectrogram->setGain(100);
+    spectrogram->setGain(0.02f);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 
