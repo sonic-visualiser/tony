@@ -300,6 +300,8 @@ MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpe
     connect(this, SIGNAL(audioFileLoaded()), this, SLOT(analyseNewMainModel()));
     m_activityLog->hide();
 
+    setAudioRecordMode(RecordReplaceSession);
+    
     newSession();
 
     settings.beginGroup("MainWindow");
@@ -443,6 +445,14 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
 
     menu->addSeparator();
+    
+    action = new QAction(tr("Browse Recorded Audio"), this);
+    action->setStatusTip(tr("Open the Recorded Audio folder in the system file browser"));
+    connect(action, SIGNAL(triggered()), this, SLOT(browseRecordedAudio()));
+    menu->addAction(action);
+
+    menu->addSeparator();
+
     action = new QAction(il.load("exit"), tr("&Quit"), this);
     action->setShortcut(tr("Ctrl+Q"));
     action->setStatusTip(tr("Exit %1").arg(QApplication::applicationName()));
@@ -2338,6 +2348,17 @@ MainWindow::exportNoteLayer()
     } else {
         emit activity(tr("Export layer to \"%1\"").arg(path));
     }
+}
+
+void
+MainWindow::browseRecordedAudio()
+{
+    if (!m_recordTarget) return;
+
+    QString path = m_recordTarget->getRecordFolder();
+    if (path == "") return;
+
+    openLocalFolder(path);
 }
 
 void

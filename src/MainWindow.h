@@ -52,6 +52,7 @@ protected slots:
     virtual void exportPitchLayer();
     virtual void exportNoteLayer();
     virtual void importPitchLayer();
+    virtual void browseRecordedAudio();
     virtual void newSession();
     virtual void closeSession();
 
