@@ -417,7 +417,7 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
     toolbar->addAction(action);
 
-    action = new QAction(tr("Save Session to Audio &Path"), this);
+    action = new QAction(tr("Save Session to Audio File &Path"), this);
     action->setShortcut(tr("Ctrl+Alt+S"));
     action->setStatusTip(tr("Save the current session into a %1 session file with the same filename as the audio but a .ton extension.").arg(QApplication::applicationName()));
     connect(action, SIGNAL(triggered()), this, SLOT(saveSessionInAudioPath()));
