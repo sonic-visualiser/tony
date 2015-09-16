@@ -3073,6 +3073,7 @@ MainWindow::analyseNewMainModel()
     }
    
     updateLayerStatuses();
+    documentRestored();
 }
 
 void
