@@ -209,6 +209,8 @@ main(int argc, char **argv)
 
     InteractiveFileFinder::getInstance()->setApplicationSessionExtension("ton");
 
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
     QSplashScreen *splash = 0;
     // If we had a splash screen, we would show it here
 

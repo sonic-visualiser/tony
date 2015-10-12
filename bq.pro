@@ -12,6 +12,7 @@ win32-msvc* {
 mac* {
     INCLUDEPATH += sv-dependency-builds/osx/include
     LIBS += -Lsv-dependency-builds/osx/lib
+    DEFINES += HAVE_POSIX_MEMALIGN LACK_SINCOS
 }
 
 exists(config.pri) {
@@ -23,7 +24,7 @@ exists(config.pri) {
     CONFIG += release
     DEFINES += NDEBUG BUILD_RELEASE NO_TIMING
 
-    DEFINES += HAVE_BZ2 HAVE_FFTW3 HAVE_FFTW3F HAVE_SNDFILE HAVE_SAMPLERATE HAVE_VAMP HAVE_VAMPHOSTSDK HAVE_RUBBERBAND HAVE_DATAQUAY HAVE_LIBLO HAVE_MAD HAVE_ID3TAG HAVE_PORTAUDIO
+    DEFINES += HAVE_BZ2 HAVE_FFTW3 HAVE_FFTW3F HAVE_SNDFILE HAVE_LIBSAMPLERATE HAVE_VAMP HAVE_VAMPHOSTSDK HAVE_RUBBERBAND HAVE_DATAQUAY HAVE_LIBLO HAVE_MAD HAVE_ID3TAG HAVE_PORTAUDIO
 
     LIBS += -lbz2 -lrubberband -lvamp-hostsdk -lfftw3 -lfftw3f -lsndfile -lFLAC -logg -lvorbis -lvorbisenc -lvorbisfile -logg -lmad -lid3tag -lportaudio -lsamplerate -lz -lsord-0 -lserd-0 -llo
 

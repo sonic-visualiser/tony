@@ -67,6 +67,7 @@
 #include "plugin/api/dssi.h"
 
 #include <bqaudioio/SystemPlaybackTarget.h>
+#include <bqaudioio/SystemAudioIO.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -299,6 +300,8 @@ MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpe
     connect(this, SIGNAL(audioFileLoaded()), this, SLOT(analyseNewMainModel()));
     m_activityLog->hide();
 
+    setAudioRecordMode(RecordReplaceSession);
+    
     newSession();
 
     settings.beginGroup("MainWindow");
@@ -414,7 +417,7 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
     toolbar->addAction(action);
 
-    action = new QAction(tr("Save Session to Audio &Path"), this);
+    action = new QAction(tr("Save Session to Audio File &Path"), this);
     action->setShortcut(tr("Ctrl+Alt+S"));
     action->setStatusTip(tr("Save the current session into a %1 session file with the same filename as the audio but a .ton extension.").arg(QApplication::applicationName()));
     connect(action, SIGNAL(triggered()), this, SLOT(saveSessionInAudioPath()));
@@ -442,6 +445,14 @@ MainWindow::setupFileMenu()
     menu->addAction(action);
 
     menu->addSeparator();
+    
+    action = new QAction(tr("Browse Recorded Audio"), this);
+    action->setStatusTip(tr("Open the Recorded Audio folder in the system file browser"));
+    connect(action, SIGNAL(triggered()), this, SLOT(browseRecordedAudio()));
+    menu->addAction(action);
+
+    menu->addSeparator();
+
     action = new QAction(il.load("exit"), tr("&Quit"), this);
     action->setShortcut(tr("Ctrl+Q"));
     action->setStatusTip(tr("Exit %1").arg(QApplication::applicationName()));
@@ -1020,6 +1031,17 @@ MainWindow::setupToolbars()
     connect(ffwdEndAction, SIGNAL(triggered()), this, SLOT(ffwdEnd()));
     connect(this, SIGNAL(canPlay(bool)), ffwdEndAction, SLOT(setEnabled(bool)));
 
+    QAction *recordAction = toolbar->addAction(il.load("record"),
+                                               tr("Record"));
+    recordAction->setCheckable(true);
+    recordAction->setShortcut(tr("Ctrl+Space"));
+    recordAction->setStatusTip(tr("Record a new audio file"));
+    connect(recordAction, SIGNAL(triggered()), this, SLOT(record()));
+    connect(m_recordTarget, SIGNAL(recordStatusChanged(bool)),
+	    recordAction, SLOT(setChecked(bool)));
+    connect(this, SIGNAL(canRecord(bool)),
+            recordAction, SLOT(setEnabled(bool)));
+
     toolbar = addToolBar(tr("Play Mode Toolbar"));
 
     QAction *psAction = toolbar->addAction(il.load("playselection"),
@@ -1071,10 +1093,12 @@ MainWindow::setupToolbars()
     m_keyReference->registerShortcut(psAction);
     m_keyReference->registerShortcut(plAction);
     m_keyReference->registerShortcut(playAction);
+    m_keyReference->registerShortcut(recordAction);
     m_keyReference->registerShortcut(m_rwdAction);
     m_keyReference->registerShortcut(m_ffwdAction);
     m_keyReference->registerShortcut(rwdStartAction);
     m_keyReference->registerShortcut(ffwdEndAction);
+    m_keyReference->registerShortcut(recordAction);
     m_keyReference->registerShortcut(oneLeftAction);
     m_keyReference->registerShortcut(oneRightAction);
     m_keyReference->registerShortcut(selectOneLeftAction);
@@ -1095,6 +1119,8 @@ MainWindow::setupToolbars()
     menu->addAction(selectOneLeftAction);
     menu->addAction(selectOneRightAction);
     menu->addSeparator();
+    menu->addAction(recordAction);
+    menu->addSeparator();
 
     m_rightButtonPlaybackMenu->addAction(playAction);
     m_rightButtonPlaybackMenu->addAction(psAction);
@@ -1110,6 +1136,8 @@ MainWindow::setupToolbars()
     m_rightButtonPlaybackMenu->addAction(oneRightAction);
     m_rightButtonPlaybackMenu->addAction(selectOneLeftAction);
     m_rightButtonPlaybackMenu->addAction(selectOneRightAction);
+    m_rightButtonPlaybackMenu->addSeparator();
+    m_rightButtonPlaybackMenu->addAction(recordAction);
     m_rightButtonPlaybackMenu->addSeparator();
 
     QAction *fastAction = menu->addAction(tr("Speed Up"));
@@ -1361,7 +1389,7 @@ MainWindow::updateMenuStates()
     bool haveMainModel =
 	(getMainModel() != 0);
     bool havePlayTarget =
-	(m_playTarget != 0);
+	(m_playTarget != 0 || m_audioIO != 0);
     bool haveCurrentPane =
         (currentPane != 0);
     bool haveCurrentLayer =
@@ -1400,6 +1428,10 @@ MainWindow::updateMenuStates()
     emit canExportNotes(haveNotes);
     emit canSnapNotes(haveSelection && haveNotes);
 
+    cerr << "haveWaveform = " << haveWaveform << endl;
+    cerr << "haveMainModel = " << haveMainModel << endl;
+    cerr << "havePlayTarget = " << havePlayTarget << endl;
+    
     emit canPlayWaveform(haveWaveform && haveMainModel && havePlayTarget);
     emit canPlayPitch(havePitchTrack && haveMainModel && havePlayTarget);
     emit canPlayNotes(haveNotes && haveMainModel && havePlayTarget);
@@ -2319,6 +2351,17 @@ MainWindow::exportNoteLayer()
 }
 
 void
+MainWindow::browseRecordedAudio()
+{
+    if (!m_recordTarget) return;
+
+    QString path = m_recordTarget->getRecordFolder();
+    if (path == "") return;
+
+    openLocalFolder(path);
+}
+
+void
 MainWindow::doubleClickSelectInvoked(sv_frame_t frame)
 {
     sv_frame_t f0, f1;
@@ -2917,7 +2960,7 @@ MainWindow::mainModelChanged(WaveFileModel *model)
 
     MainWindowBase::mainModelChanged(model);
 
-    if (m_playTarget) {
+    if (m_playTarget || m_audioIO) {
         connect(m_fader, SIGNAL(valueChanged(float)),
                 this, SLOT(mainModelGainChanged(float)));
     }
@@ -2928,6 +2971,8 @@ MainWindow::mainModelGainChanged(float gain)
 {
     if (m_playTarget) {
         m_playTarget->setOutputGain(gain);
+    } else if (m_audioIO) {
+        m_audioIO->setOutputGain(gain);
     }
 }
 
@@ -3028,6 +3073,7 @@ MainWindow::analyseNewMainModel()
     }
    
     updateLayerStatuses();
+    documentRestored();
 }
 
 void
