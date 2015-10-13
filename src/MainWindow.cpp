@@ -1039,6 +1039,8 @@ MainWindow::setupToolbars()
     connect(recordAction, SIGNAL(triggered()), this, SLOT(record()));
     connect(m_recordTarget, SIGNAL(recordStatusChanged(bool)),
 	    recordAction, SLOT(setChecked(bool)));
+    connect(m_recordTarget, SIGNAL(recordCompleted()),
+	    this, SLOT(analyseNow()));
     connect(this, SIGNAL(canRecord(bool)),
             recordAction, SLOT(setEnabled(bool)));
 
