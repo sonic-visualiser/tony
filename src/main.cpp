@@ -69,6 +69,8 @@ public:
         m_mainWindow(0),
         m_readyForFiles(false)
     {
+        // tidier without, I reckon
+        setAttribute(Qt::AA_DontShowIconsInMenus);
     }
     virtual ~TonyApplication() {
     }
