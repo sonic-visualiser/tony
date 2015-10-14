@@ -230,7 +230,7 @@ MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpe
     m_playSpeed->setMeterColor(Qt::darkBlue);
     m_playSpeed->setMinimum(0);
     m_playSpeed->setMaximum(120);
-    m_playSpeed->setValue(100);
+    m_playSpeed->setValue(60);
     m_playSpeed->setFixedWidth(24);
     m_playSpeed->setFixedHeight(24);
     m_playSpeed->setNotchesVisible(true);
