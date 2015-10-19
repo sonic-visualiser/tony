@@ -4,6 +4,7 @@ TEMPLATE = lib
 win32-g++ {
     INCLUDEPATH += sv-dependency-builds/win32-mingw/include
     LIBS += -Lsv-dependency-builds/win32-mingw/lib
+    DEFINES += USE_OWN_ALIGNED_MALLOC
 }
 win32-msvc* {
     INCLUDEPATH += sv-dependency-builds/win32-msvc/include

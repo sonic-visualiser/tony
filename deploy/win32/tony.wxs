@@ -5,7 +5,7 @@
       Id="*"
       Language="1033"
       Codepage="1252" 
-      Version="1.0"
+      Version="2.0"
       UpgradeCode="3F073027-A65B-4688-906C-5F64597C5BB1"
       Manufacturer="Queen Mary, University of London">
     
@@ -136,6 +136,11 @@
                 Name="Qt5Network.dll"
                 DiskId="1"
                 Source="release\Qt5Network.dll"/>
+            <File
+                Id="QtSvg"
+                Name="Qt5Svg.dll"
+                DiskId="1"
+                Source="release\Qt5Svg.dll"/>
             <File
                 Id="QtWidgets"
                 Name="Qt5Widgets.dll"

@@ -60,7 +60,7 @@ MY_LIBS = -Wl,-Bstatic $$MY_LIBS -Wl,-Bdynamic
 }
 
 win* {
-MY_LIBS = -Lsvapp/release -Lsvgui/release -Lsvcore/release -Ldataquay/release $$MY_LIBS
+MY_LIBS = -Lsvapp/release -Lsvgui/release -Lsvcore/release -Ldataquay/release -Lrelease $$MY_LIBS
 }
 
 LIBS = $$MY_LIBS $$LIBS
