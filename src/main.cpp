@@ -69,6 +69,8 @@ public:
         m_mainWindow(0),
         m_readyForFiles(false)
     {
+        // tidier without, I reckon
+        setAttribute(Qt::AA_DontShowIconsInMenus);
     }
     virtual ~TonyApplication() {
     }
@@ -209,6 +211,8 @@ main(int argc, char **argv)
 
     InteractiveFileFinder::getInstance()->setApplicationSessionExtension("ton");
 
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
     QSplashScreen *splash = 0;
     // If we had a splash screen, we would show it here
 
@@ -243,7 +247,10 @@ main(int argc, char **argv)
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<PropertyContainer::PropertyName>("PropertyContainer::PropertyName");
 
-    MainWindow *gui = new MainWindow(audioOutput, sonification, spectrogram);
+    MainWindow::SoundOptions options = MainWindow::WithEverything;
+    if (!audioOutput) options = 0;
+    
+    MainWindow *gui = new MainWindow(options, sonification, spectrogram);
     application.setMainWindow(gui);
     if (splash) {
         QObject::connect(gui, SIGNAL(hideSplash()), splash, SLOT(hide()));

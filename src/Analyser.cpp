@@ -277,8 +277,9 @@ Analyser::addVisualisations()
         (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
 
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
-    spectrogram->setNormalizeHybrid(true);
-    spectrogram->setGain(100);
+    spectrogram->setNormalization(SpectrogramLayer::NormalizeHybrid);
+//    spectrogram->setGain(100);
+    spectrogram->setGain(0.02f);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 

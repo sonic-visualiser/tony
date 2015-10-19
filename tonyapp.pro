@@ -38,21 +38,22 @@ exists(config.pri) {
 }
 
 CONFIG += qt thread warn_on stl rtti exceptions c++11
-QT += network xml gui widgets
+QT += network xml gui widgets svg
 
 TARGET = Tony
 linux*:TARGET = tony
 solaris*:TARGET = tony
 
-DEPENDPATH += . svcore svgui svapp
-INCLUDEPATH += . svcore svgui svapp
+DEPENDPATH += . bqaudioio svcore svgui svapp
+INCLUDEPATH += . bqaudioio svcore svgui svapp
 
 OBJECTS_DIR = o
 MOC_DIR = o
 
 contains(DEFINES, BUILD_STATIC):LIBS -= -ljack
 
-MY_LIBS = -Lsvapp -Lsvgui -Lsvcore -Ldataquay -lsvapp -lsvgui -lsvcore -ldataquay
+MY_LIBS = -Lsvapp -Lsvgui -Lsvcore -Ldataquay -L. \
+          -lsvapp -lsvgui -lsvcore -ldataquay -lbq
 
 linux* {
 MY_LIBS = -Wl,-Bstatic $$MY_LIBS -Wl,-Bdynamic
