@@ -1430,10 +1430,6 @@ MainWindow::updateMenuStates()
     emit canExportNotes(haveNotes);
     emit canSnapNotes(haveSelection && haveNotes);
 
-    cerr << "haveWaveform = " << haveWaveform << endl;
-    cerr << "haveMainModel = " << haveMainModel << endl;
-    cerr << "havePlayTarget = " << havePlayTarget << endl;
-    
     emit canPlayWaveform(haveWaveform && haveMainModel && havePlayTarget);
     emit canPlayPitch(havePitchTrack && haveMainModel && havePlayTarget);
     emit canPlayNotes(haveNotes && haveMainModel && havePlayTarget);
@@ -3222,7 +3218,7 @@ MainWindow::about()
         .arg(QT_VERSION_STR);
 
     aboutText += 
-        "<p>Copyright &copy; 2005&ndash;2014 Chris Cannam, Queen Mary University of London, and the Tony project authors: Matthias Mauch, George Fazekas, Justin Salamon, and Rachel Bittner.</p>"
+        "<p>Copyright &copy; 2005&ndash;2015 Chris Cannam, Queen Mary University of London, and the Tony project authors: Matthias Mauch, George Fazekas, Justin Salamon, and Rachel Bittner.</p>"
         "<p>pYIN analysis plugin written by Matthias Mauch.</p>"
         "<p>This program is free software; you can redistribute it and/or "
         "modify it under the terms of the GNU General Public License as "
