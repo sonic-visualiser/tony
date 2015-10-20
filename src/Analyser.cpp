@@ -278,8 +278,9 @@ Analyser::addVisualisations()
 
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
     spectrogram->setNormalization(SpectrogramLayer::NormalizeHybrid);
-//    spectrogram->setGain(100);
-    spectrogram->setGain(0.02f);
+    // This magical-looking scale factor happens to get us an
+    // identical display to Tony v1.0
+    spectrogram->setGain(100.f / 4096.f);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 
