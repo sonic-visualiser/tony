@@ -50,6 +50,8 @@ INCLUDEPATH += . bqaudioio svcore svgui svapp
 OBJECTS_DIR = o
 MOC_DIR = o
 
+ICON = tony.icns
+
 contains(DEFINES, BUILD_STATIC):LIBS -= -ljack
 
 MY_LIBS = -Lsvapp -Lsvgui -Lsvcore -Ldataquay -L. \
