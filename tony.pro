@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS = sub_bq sub_dataquay svcore svgui svapp sub_tony
+SUBDIRS = sub_bq sub_dataquay svcore svgui svapp checker sub_tony
 
 sub_bq.file = bq.pro
 sub_tony.file = tonyapp.pro

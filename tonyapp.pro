@@ -55,15 +55,15 @@ RC_FILE = icons/tony.rc
 
 contains(DEFINES, BUILD_STATIC):LIBS -= -ljack
 
-MY_LIBS = -Lsvapp -Lsvgui -Lsvcore -Ldataquay -L. \
-          -lsvapp -lsvgui -lsvcore -ldataquay -lbq
+MY_LIBS = -Lsvapp -Lsvgui -Lsvcore -Lchecker -Ldataquay -L. \
+          -lsvapp -lsvgui -lsvcore -lchecker -ldataquay -lbq
 
 linux* {
 MY_LIBS = -Wl,-Bstatic $$MY_LIBS -Wl,-Bdynamic
 }
 
 win* {
-MY_LIBS = -Lsvapp/release -Lsvgui/release -Lsvcore/release -Ldataquay/release -Lrelease $$MY_LIBS
+MY_LIBS = -Lsvapp/release -Lsvgui/release -Lsvcore/release -Lchecker/release -Ldataquay/release -Lrelease $$MY_LIBS
 }
 
 LIBS = $$MY_LIBS $$LIBS
@@ -72,21 +72,24 @@ win32-msvc* {
 PRE_TARGETDEPS += svapp/svapp.lib \
                   svgui/svgui.lib \
                   svcore/svcore.lib \
-                  dataquay/dataquay.lib
+                  dataquay/dataquay.lib \
+                  checker/checker.lib
 }
 
 win32-g++ {
 PRE_TARGETDEPS += svapp/release/libsvapp.a \
                   svgui/release/libsvgui.a \
                   svcore/release/libsvcore.a \
-                  dataquay/release/libdataquay.a
+                  dataquay/release/libdataquay.a \
+                  checker/release/libchecker.a
 }
 
 !win* {
 PRE_TARGETDEPS += svapp/libsvapp.a \
                   svgui/libsvgui.a \
                   svcore/libsvcore.a \
-                  dataquay/libdataquay.a
+                  dataquay/libdataquay.a \
+                  checker/libchecker.a
 }
 
 RESOURCES += tony.qrc

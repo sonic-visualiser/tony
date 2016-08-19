@@ -277,7 +277,7 @@ Analyser::addVisualisations()
         (m_document->createMainModelLayer(LayerFactory::MelodicRangeSpectrogram));
 
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
-    spectrogram->setNormalization(SpectrogramLayer::NormalizeHybrid);
+    spectrogram->setNormalization(ColumnNormalization::Hybrid);
     // This magical-looking scale factor happens to get us an
     // identical display to Tony v1.0
     spectrogram->setGain(100.f / 4096.f);
