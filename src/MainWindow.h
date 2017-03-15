@@ -32,6 +32,7 @@ public:
     virtual ~MainWindow();
 
 signals:
+    void canSaveAll(bool);
     void canExportPitchTrack(bool);
     void canExportNotes(bool);
     void canSnapNotes(bool);
@@ -49,6 +50,7 @@ protected slots:
     virtual void saveSession();
     virtual void saveSessionInAudioPath();
     virtual void saveSessionAs();
+    virtual void saveAll();
     virtual void exportPitchLayer();
     virtual void exportNoteLayer();
     virtual void importPitchLayer();
@@ -242,6 +244,11 @@ protected:
     virtual void auxSnapNotes(Selection s);
 
     virtual void closeEvent(QCloseEvent *e);
+
+    bool trySaveSessionInAudioPath();
+    void exportNoteLayerTo(QString path);
+    void exportPitchLayerTo(QString path);
+    
     bool checkSaveModified();
     bool waitForInitialAnalysis();
 

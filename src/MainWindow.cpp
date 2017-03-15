@@ -444,6 +444,12 @@ MainWindow::setupFileMenu()
     connect(this, SIGNAL(canExportNotes(bool)), action, SLOT(setEnabled(bool)));
     menu->addAction(action);
 
+    action = new QAction(tr("Save Session and All Layers"), this);
+    action->setStatusTip(tr("Save the current session, pitch and note layers with the same filename as the audio but different extensions."));
+    connect(action, SIGNAL(triggered()), this, SLOT(saveAll()));
+    connect(this, SIGNAL(canSaveAll(bool)), action, SLOT(setEnabled(bool)));
+    menu->addAction(action);
+
     menu->addSeparator();
     
     action = new QAction(tr("Browse Recorded Audio"), this);
@@ -1426,6 +1432,8 @@ MainWindow::updateMenuStates()
         m_analyser->isVisible(Analyser::Notes) &&
         m_analyser->getLayer(Analyser::Notes);
 
+    emit canSaveAll(haveMainModel && havePitchTrack && haveNotes);
+
     emit canExportPitchTrack(havePitchTrack);
     emit canExportNotes(haveNotes);
     emit canSnapNotes(haveSelection && haveNotes);
@@ -2019,9 +2027,15 @@ MainWindow::saveSession()
 void
 MainWindow::saveSessionInAudioPath()
 {
-    if (m_audioFile == "") return;
+    (void)trySaveSessionInAudioPath();
+}
 
-    if (!waitForInitialAnalysis()) return;
+bool
+MainWindow::trySaveSessionInAudioPath()
+{
+    if (m_audioFile == "") return false;
+
+    if (!waitForInitialAnalysis()) return false;
 
     // We do not want to save mid-analysis regions -- that would cause
     // confusion on reloading
@@ -2047,18 +2061,14 @@ MainWindow::saveSessionInAudioPath()
                                   tr("<b>File exists</b><p>The file \"%1\" already exists.\nDo you want to overwrite it?").arg(path),
                                   QMessageBox::Ok,
                                   QMessageBox::Cancel) != QMessageBox::Ok) {
-            return;
+            return false;
         }
-    }
-
-    if (!waitForInitialAnalysis()) {
-        QMessageBox::warning(this, tr("File not saved"),
-                             tr("Wait cancelled: the session has not been saved."));
     }
 
     if (!saveSessionFile(path)) {
         QMessageBox::critical(this, tr("Failed to save file"),
                               tr("Session file \"%1\" could not be saved.").arg(path));
+        return false;
     } else {
         setWindowTitle(tr("%1: %2")
                        .arg(QApplication::applicationName())
@@ -2067,6 +2077,7 @@ MainWindow::saveSessionInAudioPath()
         CommandHistory::getInstance()->documentSaved();
         documentRestored();
         m_recentFiles.addFile(path);
+        return true;
     }
 }
 
@@ -2102,6 +2113,21 @@ MainWindow::saveSessionAs()
         documentRestored();
         m_recentFiles.addFile(path);
     }
+}
+
+void
+MainWindow::saveAll()
+{
+    if (!trySaveSessionInAudioPath()) return;
+    
+    QString filepath = QFileInfo(m_audioFile).absoluteDir().canonicalPath();
+    QString basename = QFileInfo(m_audioFile).completeBaseName();
+
+    QString pitchPath = QDir(filepath).filePath(basename + "_track.txt");
+    QString notesPath = QDir(filepath).filePath(basename + "_notes.txt");
+
+    exportPitchLayerTo(pitchPath);
+    exportNoteLayerTo(notesPath);
 }
 
 QString
@@ -2245,6 +2271,12 @@ MainWindow::exportPitchLayer()
 
     if (path == "") return;
 
+    exportPitchLayerTo(path);
+}
+
+void
+MainWindow::exportPitchLayerTo(QString path)
+{
     if (!waitForInitialAnalysis()) return;
     
     if (QFileInfo(path).suffix() == "") path += ".svl";
@@ -2252,6 +2284,13 @@ MainWindow::exportPitchLayer()
     QString suffix = QFileInfo(path).suffix().toLower();
 
     QString error;
+
+    Layer *layer = m_analyser->getLayer(Analyser::PitchTrack);
+    if (!layer) return;
+
+    SparseTimeValueModel *model =
+        qobject_cast<SparseTimeValueModel *>(layer->getModel());
+    if (!model) return;
 
     if (suffix == "xml" || suffix == "svl") {
 
@@ -2301,11 +2340,23 @@ MainWindow::exportNoteLayer()
 
     if (path == "") return;
 
+    exportNoteLayerTo(path);
+}
+
+void
+MainWindow::exportNoteLayerTo(QString path)
+{
     if (QFileInfo(path).suffix() == "") path += ".svl";
 
     QString suffix = QFileInfo(path).suffix().toLower();
 
     QString error;
+
+    Layer *layer = m_analyser->getLayer(Analyser::Notes);
+    if (!layer) return;
+
+    FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer->getModel());
+    if (!model) return;
 
     if (suffix == "xml" || suffix == "svl") {
 
