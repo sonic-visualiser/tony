@@ -43,7 +43,7 @@
 #include "widgets/KeyReference.h"
 #include "widgets/LevelPanToolButton.h"
 #include "audio/AudioCallbackPlaySource.h"
-#include "audio/AudioRecordTarget.h"
+#include "audio/AudioCallbackRecordTarget.h"
 #include "audio/PlaySpeedRangeMapper.h"
 #include "base/Profiler.h"
 #include "base/UnitDatabase.h"
@@ -2890,7 +2890,7 @@ MainWindow::updatePositionStatusDisplays() const
 }
 
 void
-MainWindow::outputLevelsChanged(float left, float right)
+MainWindow::monitoringLevelsChanged(float left, float right)
 {
     m_fader->setPeakLeft(left);
     m_fader->setPeakRight(right);

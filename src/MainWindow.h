@@ -109,6 +109,8 @@ protected slots:
     virtual void slowDownPlayback();
     virtual void restoreNormalPlayback();
 
+    virtual void monitoringLevelsChanged(float, float);
+
     virtual void audioGainChanged(float);
     virtual void pitchGainChanged(float);
     virtual void notesGainChanged(float);
@@ -120,8 +122,6 @@ protected slots:
     virtual void sampleRateMismatch(sv_samplerate_t, sv_samplerate_t, bool);
     virtual void audioOverloadPluginDisabled();
     virtual void audioTimeStretchMultiChannelDisabled();
-
-    virtual void outputLevelsChanged(float, float);
 
     virtual void documentModified();
     virtual void documentRestored();
