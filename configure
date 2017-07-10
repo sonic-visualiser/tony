@@ -4487,8 +4487,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for bz2" >&5
-$as_echo_n "checking for bz2... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$bz2_CFLAGS"; then
     pkg_cv_bz2_CFLAGS="$bz2_CFLAGS"
@@ -4528,7 +4528,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -4547,7 +4547,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -4638,8 +4638,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw3" >&5
-$as_echo_n "checking for fftw3... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$fftw3_CFLAGS"; then
     pkg_cv_fftw3_CFLAGS="$fftw3_CFLAGS"
@@ -4679,7 +4679,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -4698,7 +4698,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -4789,8 +4789,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw3f" >&5
-$as_echo_n "checking for fftw3f... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$fftw3f_CFLAGS"; then
     pkg_cv_fftw3f_CFLAGS="$fftw3f_CFLAGS"
@@ -4830,7 +4830,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -4849,7 +4849,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -4940,8 +4940,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sndfile" >&5
-$as_echo_n "checking for sndfile... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$sndfile_CFLAGS"; then
     pkg_cv_sndfile_CFLAGS="$sndfile_CFLAGS"
@@ -4981,7 +4981,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5000,7 +5000,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -5091,8 +5091,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libsamplerate" >&5
-$as_echo_n "checking for libsamplerate... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$libsamplerate_CFLAGS"; then
     pkg_cv_libsamplerate_CFLAGS="$libsamplerate_CFLAGS"
@@ -5132,7 +5132,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5151,7 +5151,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -5242,8 +5242,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for rubberband" >&5
-$as_echo_n "checking for rubberband... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$rubberband_CFLAGS"; then
     pkg_cv_rubberband_CFLAGS="$rubberband_CFLAGS"
@@ -5283,7 +5283,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5302,7 +5302,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -5393,8 +5393,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sord" >&5
-$as_echo_n "checking for sord... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$sord_CFLAGS"; then
     pkg_cv_sord_CFLAGS="$sord_CFLAGS"
@@ -5434,7 +5434,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5453,7 +5453,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -5544,8 +5544,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for serd" >&5
-$as_echo_n "checking for serd... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$serd_CFLAGS"; then
     pkg_cv_serd_CFLAGS="$serd_CFLAGS"
@@ -5585,7 +5585,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5604,7 +5604,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find required module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -5696,8 +5696,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for liblo" >&5
-$as_echo_n "checking for liblo... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$liblo_CFLAGS"; then
     pkg_cv_liblo_CFLAGS="$liblo_CFLAGS"
@@ -5737,7 +5737,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5756,7 +5756,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -5851,8 +5851,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for portaudio" >&5
-$as_echo_n "checking for portaudio... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$portaudio_CFLAGS"; then
     pkg_cv_portaudio_CFLAGS="$portaudio_CFLAGS"
@@ -5892,7 +5892,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -5911,7 +5911,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6006,8 +6006,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for JACK" >&5
-$as_echo_n "checking for JACK... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$JACK_CFLAGS"; then
     pkg_cv_JACK_CFLAGS="$JACK_CFLAGS"
@@ -6047,7 +6047,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6066,7 +6066,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6161,8 +6161,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libpulse" >&5
-$as_echo_n "checking for libpulse... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$libpulse_CFLAGS"; then
     pkg_cv_libpulse_CFLAGS="$libpulse_CFLAGS"
@@ -6202,7 +6202,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6221,7 +6221,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6316,8 +6316,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lrdf" >&5
-$as_echo_n "checking for lrdf... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$lrdf_CFLAGS"; then
     pkg_cv_lrdf_CFLAGS="$lrdf_CFLAGS"
@@ -6357,7 +6357,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6376,7 +6376,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6471,8 +6471,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for oggz" >&5
-$as_echo_n "checking for oggz... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$oggz_CFLAGS"; then
     pkg_cv_oggz_CFLAGS="$oggz_CFLAGS"
@@ -6512,7 +6512,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6531,7 +6531,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6626,8 +6626,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fishsound" >&5
-$as_echo_n "checking for fishsound... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$fishsound_CFLAGS"; then
     pkg_cv_fishsound_CFLAGS="$fishsound_CFLAGS"
@@ -6667,7 +6667,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6686,7 +6686,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6781,8 +6781,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for mad" >&5
-$as_echo_n "checking for mad... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$mad_CFLAGS"; then
     pkg_cv_mad_CFLAGS="$mad_CFLAGS"
@@ -6822,7 +6822,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6841,7 +6841,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -6936,8 +6936,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for id3tag" >&5
-$as_echo_n "checking for id3tag... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$id3tag_CFLAGS"; then
     pkg_cv_id3tag_CFLAGS="$id3tag_CFLAGS"
@@ -6977,7 +6977,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -6996,7 +6996,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -7093,8 +7093,8 @@ fi
 if test -n "$SV_MODULE_FAILED" && test -n "$PKG_CONFIG"; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for X11" >&5
-$as_echo_n "checking for X11... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SV_MODULE_VERSION_TEST" >&5
+$as_echo_n "checking for $SV_MODULE_VERSION_TEST... " >&6; }
 
 if test -n "$X11_CFLAGS"; then
     pkg_cv_X11_CFLAGS="$X11_CFLAGS"
@@ -7134,7 +7134,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -7153,7 +7153,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
 elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&5
 $as_echo "$as_me: Failed to find optional module $SV_MODULE_MODULE using pkg-config, trying again by old-fashioned means" >&6;}
@@ -8417,6 +8417,28 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
+
+if test -x vext ; then
+   if test -d .hg -o -d .git ; then
+      if ! ./vext install; then
+         as_fn_error $? "Vext failed; please fix any reported errors and try again" "$LINENO" 5
+      fi
+   else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: Vext executable found but not in an Hg or Git working-copy: not running it" >&5
+$as_echo "$as_me: Vext executable found but not in an Hg or Git working-copy: not running it" >&6;}
+      if ! test -d vamp-plugin-sdk ; then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No vamp-plugin-sdk directory present, so external libraries might not have been updated" >&5
+$as_echo "$as_me: WARNING: No vamp-plugin-sdk directory present, so external libraries might not have been updated" >&2;}
+      fi
+   fi
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: No Vext executable found: assuming external libraries are already here" >&5
+$as_echo "$as_me: No Vext executable found: assuming external libraries are already here" >&6;}
+   if ! test -d vamp-plugin-sdk ; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No vamp-plugin-sdk directory present, so external libraries might not have been updated" >&5
+$as_echo "$as_me: WARNING: No vamp-plugin-sdk directory present, so external libraries might not have been updated" >&2;}
+   fi
+fi
 
 if ! $QMAKE -r tony.pro; then
    as_fn_error $? "qmake failed: Command was \"$QMAKE -r\"" "$LINENO" 5
