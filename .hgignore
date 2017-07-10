@@ -21,3 +21,17 @@ re:^aclocal\.m4$
 re:^config\.log$
 re:^config\.pri$
 re:^config\.status$
+vamp-plugin-sdk
+svcore
+svgui
+svapp
+piper-cpp
+dataquay
+bqvec
+bqfft
+bqresample
+bqaudioio
+sv-dependency-builds
+icons/scalable
+chp
+pyin
