@@ -7,9 +7,13 @@ graphical interface based on the Sonic Visualiser libraries, and uses
 the pYIN Vamp plugin to extract pitch track and notes from monophonic
 audio.
 
+![Tony small screenshot](https://code.soundsoftware.ac.uk/attachments/download/1069/tony-screeny-20140328-30pc.png)
+
+Home page and downloads: https://code.soundsoftware.ac.uk/projects/tony
+
 
 Features
-========
+--------
 
  * robust monophonic pitch track extraction (using pYIN)
  * note track extraction
@@ -20,12 +24,12 @@ Features
 
 
 Authors, Citation, License and Use
-==================================
+----------------------------------
 
 Tony was developed at Queen Mary, University of London in
 collaboration with New York University.
 
-Code copyright 2005-2015 Chris Cannam, Queen Mary University of
+Code copyright 2005-2017 Chris Cannam, Queen Mary University of
 London, and the Tony project authors: Matthias Mauch, George Fazekas,
 Justin Salamon, and Rachel Bittner, except where indicated in the
 individual source files. Thanks also to Simon Dixon and Juan Bello.
@@ -52,3 +56,9 @@ General Public License for more details. You should have received a
 copy of the GNU General Public License along with this program. If
 not, see http://www.gnu.org/licenses/.
 
+
+Automated build reports
+-----------------------
+
+ * Linux and macOS CI build: [![Build Status](https://travis-ci.org/sonic-visualiser/tony.svg?branch=master)](https://travis-ci.org/sonic-visualiser/tony)
+ * Windows CI build: [![Build status](https://ci.appveyor.com/api/projects/status/26pygienkigw39p7?svg=true)](https://ci.appveyor.com/project/cannam/tony)
