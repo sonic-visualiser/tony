@@ -6,6 +6,9 @@ Run "vext help" for more documentation.
 
 #>
 
+Set-StrictMode -Version 2.0
+$ErrorActionPreference = "Stop"
+
 $sml = $env:VEXT_SML
 
 $mydir = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -14,10 +17,10 @@ $program = "$mydir/vext.sml"
 # We need either Poly/ML or SML/NJ. No great preference as to which.
 
 if (!$sml) {
-    if (Get-Command "polyml" -ErrorAction SilentlyContinue) {
-       $sml = "poly"
-    } elseif (Get-Command "sml" -ErrorAction SilentlyContinue) {
+    if (Get-Command "sml" -ErrorAction SilentlyContinue) {
        $sml = "smlnj"
+    } elseif (Get-Command "polyml" -ErrorAction SilentlyContinue) {
+       $sml = "poly"
     } else {
        echo @"
 
@@ -29,18 +32,18 @@ ERROR: No supported SML compiler or interpreter found
   Please ensure you have one of the following SML implementations
   installed and present in your PATH, and try again.
 
-    1. Poly/ML
-       - executable name: polyml
-
-    2. Standard ML of New Jersey
+    1. Standard ML of New Jersey
        - executable name: sml
+
+    2. Poly/ML
+       - executable name: polyml
 
 "@
        exit 1
     }
 }
 
-if ($args -match "[^a-z]") {
+if ($args -match "'""") {
     $arglist = '["usage"]'
 } else {
     $arglist = '["' + ($args -join '","') + '"]'
@@ -50,6 +53,10 @@ if ($sml -eq "poly") {
 
     $program = $program -replace "\\","\\\\"
     echo "use ""$program""; vext $arglist" | polyml -q --error-exit | Out-Host
+
+    if (-not $?) {
+        exit $LastExitCode
+    }
 
 } elseif ($sml -eq "smlnj") {
 
@@ -74,28 +81,33 @@ Control.Print.out := {
 };
 "@ -split "[\r\n]+"
 
-   $outro = @"
+    $outro = @"
 val _ = vext $arglist;
 val _ = OS.Process.exit (OS.Process.success);
 "@ -split "[\r\n]+"
 
-   $script = @()
-   $script += $intro
-   $script += $lines
-   $script += $outro
+    $script = @()
+    $script += $intro
+    $script += $lines
+    $script += $outro
 
-   $tmpfile = ([System.IO.Path]::GetTempFileName()) -replace "[.]tmp",".sml"
+    $tmpfile = ([System.IO.Path]::GetTempFileName()) -replace "[.]tmp",".sml"
 
-   $script | Out-File -Encoding "ASCII" $tmpfile
+    $script | Out-File -Encoding "ASCII" $tmpfile
 
-   $env:CM_VERBOSE="false"
+    $env:CM_VERBOSE="false"
 
-   sml $tmpfile $args[1,$args.Length]
+    sml $tmpfile
 
-   del $tmpfile
+    if (-not $?) {
+        del $tmpfile
+        exit $LastExitCode
+    }
+
+    del $tmpfile
 
 } else {
 
-   "Unknown SML implementation name: $sml"
-   exit 2
+    "Unknown SML implementation name: $sml"
+    exit 2
 }
