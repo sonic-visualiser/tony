@@ -23,7 +23,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" = "osx" ]] ; then export PATH=$PATH:/usr/local/opt/qt5/bin ; fi
 
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" = "linux" ]] ; then ./configure ; else ./vext install && qmake -r tony.pro ; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" ]] ; then ./configure ; else ./repoint install && qmake -r tony.pro ; fi
 
 script:
   - make -j3

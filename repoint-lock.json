@@ -1,31 +1,31 @@
 {
   "libraries": {
     "vamp-plugin-sdk": {
-      "pin": "5d9af3140f05"
+      "pin": "328cb056da44"
     },
     "svcore": {
-      "pin": "04ce84f21af3"
+      "pin": "f68911282993"
     },
     "svgui": {
-      "pin": "a9c2e791ab8d"
+      "pin": "51e6125627fa"
     },
     "svapp": {
-      "pin": "72b4870f0e6b"
+      "pin": "7da68349a0c5"
     },
     "piper-cpp": {
-      "pin": "85394095a5b04f99a0785ccd32a5a98c90d984b2"
+      "pin": "28a0ee2cc737a7b50ac62d5996191cd589c047c2"
     },
     "dataquay": {
       "pin": "807b55408d9e"
     },
     "bqvec": {
-      "pin": "e345a5e32c53"
+      "pin": "3c9de9e7f6e8"
     },
     "bqfft": {
-      "pin": "81b50ec12d9a"
+      "pin": "a766fe47501b"
     },
     "bqresample": {
-      "pin": "39a30cdbb421"
+      "pin": "a9a5555d9b6d"
     },
     "bqaudioio": {
       "pin": "d90244c003be"
@@ -34,7 +34,7 @@
       "pin": "a69c1527268d"
     },
     "icons/scalable": {
-      "pin": "3d2cde3b1ab3"
+      "pin": "42521013b9b1"
     },
     "pyin": {
       "pin": "550d5f186abb"

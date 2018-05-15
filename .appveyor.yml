@@ -12,7 +12,7 @@ install:
 before_build:
   - set QTDIR=C:\Qt\5.8\msvc2015_64
   - set PATH=%PATH%;%QTDIR%\bin;C:\Program Files (x86)\SMLNJ\bin
-  - vext install
+  - repoint install
   - qmake -r -tp vc tony.pro
 
 build:
