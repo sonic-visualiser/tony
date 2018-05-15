@@ -2,19 +2,23 @@
 
 .SYNOPSIS
 A simple manager for third-party source code dependencies.
-Run "vext help" for more documentation.
+Run "repoint help" for more documentation.
 
 #>
 
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = "Stop"
+$env:HGPLAIN = "true"
 
-$sml = $env:VEXT_SML
+$sml = $env:REPOINT_SML
 
 $mydir = Split-Path $MyInvocation.MyCommand.Path -Parent
-$program = "$mydir/vext.sml"
+$program = "$mydir/repoint.sml"
 
 # We need either Poly/ML or SML/NJ. No great preference as to which.
+
+# Typical locations
+$env:PATH = "$env:PATH;C:\Program Files (x86)\SMLNJ\bin;C:\Program Files\Poly ML;C:\Program Files (x86)\Poly ML"
 
 if (!$sml) {
     if (Get-Command "sml" -ErrorAction SilentlyContinue) {
@@ -26,7 +30,7 @@ if (!$sml) {
 
 ERROR: No supported SML compiler or interpreter found       
 
-  The Vext external source code manager needs a Standard ML (SML)
+  The Repoint external source code manager needs a Standard ML (SML)
   compiler or interpreter to run.
 
   Please ensure you have one of the following SML implementations
@@ -52,7 +56,7 @@ if ($args -match "'""") {
 if ($sml -eq "poly") {
 
     $program = $program -replace "\\","\\\\"
-    echo "use ""$program""; vext $arglist" | polyml -q --error-exit | Out-Host
+    echo "use ""$program""; repoint $arglist" | polyml -q --error-exit | Out-Host
 
     if (-not $?) {
         exit $LastExitCode
@@ -82,7 +86,7 @@ Control.Print.out := {
 "@ -split "[\r\n]+"
 
     $outro = @"
-val _ = vext $arglist;
+val _ = repoint $arglist;
 val _ = OS.Process.exit (OS.Process.success);
 "@ -split "[\r\n]+"
 
