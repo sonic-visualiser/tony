@@ -81,12 +81,21 @@ dmg="$dmg"-"$version".dmg
 mkdir "$volume" || exit 1
 
 ln -s /Applications "$volume"/Applications
-cp README COPYING CHANGELOG CITATION "$volume/"
+cp README.md "$volume/README.txt"
+cp README.OSC "$volume/README-OSC.txt"
+cp COPYING "$volume/COPYING.txt"
+cp CHANGELOG "$volume/CHANGELOG.txt"
+cp CITATION "$volume/CITATION.txt"
 cp -rp "$source" "$target"
 
 echo "Done"
 
+echo
+echo "Code-signing volume..."
+
 deploy/osx/sign.sh "$volume" || exit 1
+
+echo "Done"
 
 echo
 echo "Making dmg..."
