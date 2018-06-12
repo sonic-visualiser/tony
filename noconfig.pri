@@ -26,6 +26,7 @@ DEFINES += \
 # these.
 
 LIBS += \
+        -lbase \
         -lbz2 \
 	-lrubberband \
 	-lfftw3 \
@@ -52,9 +53,9 @@ win32-g++ {
 
     # This config is currently used for 32-bit Windows builds.
 
-    INCLUDEPATH += sv-dependency-builds/win32-mingw/include
+    INCLUDEPATH += $$PWD/sv-dependency-builds/win32-mingw/include
 
-    LIBS += -Lrelease -Lsv-dependency-builds/win32-mingw/lib -L../tony/sv-dependency-builds/win32-mingw/lib
+    LIBS += -Lrelease -L$$PWD/sv-dependency-builds/win32-mingw/lib
 
     DEFINES += NOMINMAX _USE_MATH_DEFINES CAPNP_LITE
 
@@ -74,7 +75,7 @@ win32-msvc* {
     # we want to do 32-bit builds with MSVC as well, then we'll
     # need to add a way to distinguish the two.
     
-    INCLUDEPATH += sv-dependency-builds/win64-msvc/include
+    INCLUDEPATH += $$PWD/sv-dependency-builds/win64-msvc/include
 
 ## This seems to be intruding even when we're supposed to be release
 #    CONFIG(debug) {
@@ -84,12 +85,13 @@ win32-msvc* {
 #    }
     CONFIG(release) {
         LIBS += -Lrelease \
-            -L../tony/sv-dependency-builds/win64-msvc/lib
+            -L$$PWD/sv-dependency-builds/win64-msvc/lib
     }
 
     DEFINES += NOMINMAX _USE_MATH_DEFINES CAPNP_LITE
 
-    QMAKE_CXXFLAGS_RELEASE += -fp:fast
+    QMAKE_CXXFLAGS_RELEASE += -fp:fast -gl
+    QMAKE_LFLAGS_RELEASE += -ltcg
 
     # No Ogg/FLAC support in the sndfile build on this platform yet
     LIBS -= -lFLAC -logg -lvorbis -lvorbisenc -lvorbisfile
@@ -109,8 +111,8 @@ macx* {
 
     # All Mac builds are 64-bit these days.
 
-    INCLUDEPATH += sv-dependency-builds/osx/include
-    LIBS += -Lsv-dependency-builds/osx/lib
+    INCLUDEPATH += $$PWD/sv-dependency-builds/osx/include
+    LIBS += -L$$PWD/sv-dependency-builds/osx/lib -L$$PWD
 
     QMAKE_CXXFLAGS_RELEASE += -O3 -ffast-math
 
