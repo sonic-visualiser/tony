@@ -31,6 +31,7 @@
 #include "data/model/NoteModel.h"
 #include "view/ViewManager.h"
 #include "base/Preferences.h"
+#include "base/RecordDirectory.h"
 #include "base/AudioLevel.h"
 #include "layer/WaveformLayer.h"
 #include "layer/TimeInstantLayer.h"
@@ -2353,7 +2354,8 @@ MainWindow::browseRecordedAudio()
 {
     if (!m_recordTarget) return;
 
-    QString path = m_recordTarget->getRecordContainerFolder();
+    QString path = RecordDirectory::getRecordContainerDirectory();
+    if (path == "") path = RecordDirectory::getRecordDirectory();
     if (path == "") return;
 
     openLocalFolder(path);

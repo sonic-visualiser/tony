@@ -4,19 +4,19 @@
       "pin": "da86fb0bccb3"
     },
     "svcore": {
-      "pin": "cee5ed3f243a"
+      "pin": "a92e94215863"
     },
     "svgui": {
-      "pin": "91670e4e76a6"
+      "pin": "8068a0bee550"
     },
     "svapp": {
-      "pin": "ca96a514fbbb"
+      "pin": "9e15607531b2"
     },
     "checker": {
-      "pin": "3ccc384c0161"
+      "pin": "2e8a5f665a07"
     },
     "piper-cpp": {
-      "pin": "28a0ee2cc737a7b50ac62d5996191cd589c047c2"
+      "pin": "44cb74e186a703e7e6ce403aa295913a87b88d62"
     },
     "dataquay": {
       "pin": "807b55408d9e"
@@ -31,10 +31,10 @@
       "pin": "a9a5555d9b6d"
     },
     "bqaudioio": {
-      "pin": "d90244c003be"
+      "pin": "138a7a8b546b"
     },
     "sv-dependency-builds": {
-      "pin": "a69c1527268d"
+      "pin": "f1a9b270e043"
     },
     "icons/scalable": {
       "pin": "1c6516ba7fc1"
