@@ -3265,10 +3265,16 @@ MainWindow::ffwd()
 
     // The step is supposed to scale and be as wide as a step of 
     // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
-    int framesPerPixel = m_viewManager->getGlobalZoom();
-
-    double defaultZoom = (720 * 44100) / sr;
-    double scaler = framesPerPixel / defaultZoom;
+    
+    ZoomLevel zoom = m_viewManager->getGlobalZoom();
+    double framesPerPixel = 1.0;
+    if (zoom.zone == ZoomLevel::FramesPerPixel) {
+        framesPerPixel = zoom.level;
+    } else {
+        framesPerPixel = 1.0 / zoom.level;
+    }
+    double defaultFramesPerPixel = (720 * 44100) / sr;
+    double scaler = framesPerPixel / defaultFramesPerPixel;
     RealTime step = m_defaultFfwdRwdStep * scaler;
     
     frame = RealTime::realTime2Frame
@@ -3306,10 +3312,16 @@ MainWindow::rewind()
 
     // The step is supposed to scale and be as wide as a step of 
     // m_defaultFfwdRwdStep seconds at zoom level 720 and sr = 44100
-    int framesPerPixel = m_viewManager->getGlobalZoom();
 
-    double defaultZoom = (720 * 44100) / sr;
-    double scaler = framesPerPixel / defaultZoom;
+    ZoomLevel zoom = m_viewManager->getGlobalZoom();
+    double framesPerPixel = 1.0;
+    if (zoom.zone == ZoomLevel::FramesPerPixel) {
+        framesPerPixel = zoom.level;
+    } else {
+        framesPerPixel = 1.0 / zoom.level;
+    }
+    double defaultFramesPerPixel = (720 * 44100) / sr;
+    double scaler = framesPerPixel / defaultFramesPerPixel;
     RealTime step = m_defaultFfwdRwdStep * scaler;
 
     frame = RealTime::realTime2Frame

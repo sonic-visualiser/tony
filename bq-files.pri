@@ -23,7 +23,11 @@ BQ_HEADERS += \
 	bqaudioio/src/JACKAudioIO.h \
 	bqaudioio/src/Log.h \
 	bqaudioio/src/PortAudioIO.h \
-	bqaudioio/src/PulseAudioIO.h
+	bqaudioio/src/PulseAudioIO.h \
+        bqaudiostream/bqaudiostream/AudioReadStream.h \
+        bqaudiostream/bqaudiostream/AudioReadStreamFactory.h \
+        bqaudiostream/bqaudiostream/Exceptions.h \
+        bqthingfactory/bqthingfactory/ThingFactory.h
 
 BQ_SOURCES += \
 	bqvec/src/Allocators.cpp \
@@ -38,5 +42,8 @@ BQ_SOURCES += \
 	bqaudioio/src/PulseAudioIO.cpp \
 	bqaudioio/src/ResamplerWrapper.cpp \
 	bqaudioio/src/SystemPlaybackTarget.cpp \
-	bqaudioio/src/SystemRecordSource.cpp
+	bqaudioio/src/SystemRecordSource.cpp \
+        bqaudiostream/src/AudioReadStream.cpp \
+        bqaudiostream/src/AudioReadStreamFactory.cpp \
+        bqaudiostream/src/AudioStreamExceptions.cpp
 

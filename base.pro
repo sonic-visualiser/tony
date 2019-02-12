@@ -20,6 +20,10 @@ TARGET = base
 OBJECTS_DIR = o
 MOC_DIR = o
 
+exists(repoint.pri) {
+    include(repoint.pri)
+}
+
 include(bq-files.pri)
 include(vamp-plugin-sdk-files.pri)
 include(svcore/files.pri)

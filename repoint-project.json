@@ -31,11 +31,10 @@
 	    "service": "soundsoftware",
 	    "repository": "vamp-plugin-load-checker"
         },
-        "piper-cpp": {
+        "piper-vamp-cpp": {
             "vcs": "git",
 	    "service": "github",
-	    "owner": "piper-audio",
-            "repository": "piper-vamp-cpp"
+	    "owner": "piper-audio"
         },
         "dataquay": {
             "vcs": "hg",
@@ -58,6 +57,16 @@
             "owner": "breakfastquay"
         },
         "bqaudioio": {
+            "vcs": "hg",
+            "service": "bitbucket",
+            "owner": "breakfastquay"
+        },
+        "bqaudiostream": {
+            "vcs": "hg",
+            "service": "bitbucket",
+            "owner": "breakfastquay"
+        },
+        "bqthingfactory": {
             "vcs": "hg",
             "service": "bitbucket",
             "owner": "breakfastquay"

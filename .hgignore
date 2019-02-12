@@ -26,6 +26,7 @@ svcore
 svgui
 svapp
 piper-cpp
+piper-vamp-cpp
 dataquay
 bqvec
 bqfft
@@ -35,3 +36,4 @@ sv-dependency-builds
 icons/scalable
 chp
 pyin
+glob:.repoint*
