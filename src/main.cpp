@@ -121,47 +121,72 @@ protected:
     }
 };
 
+static QString
+getEnvQStr(QString variable)
+{
+#ifdef Q_OS_WIN32
+    std::wstring wvar = variable.toStdWString();
+    wchar_t *value = _wgetenv(wvar.c_str());
+    if (!value) return QString();
+    else return QString::fromUtf16(value);
+#else
+    std::string var = variable.toStdString();
+    return QString::fromUtf8(qgetenv(var.c_str()));
+#endif
+}
+
+static void
+putEnvQStr(QString assignment)
+{
+#ifdef Q_OS_WIN32
+    std::wstring wassignment = assignment.toStdWString();
+    _wputenv(wstrdup(wassignment));
+#else
+    putenv(strdup(assignment.toUtf8().data()));
+#endif
+}
+
 static void
 setupTonyVampPath()
 {
+    QString tonyVampPath = getEnvQStr("TONY_VAMP_PATH");
+
 #ifdef Q_OS_WIN32
     QChar sep(';');
-    QString programFiles = getenv("ProgramFiles");
-    if (programFiles == "") programFiles = "C:\\Program Files";
-    QString defaultTonyPath(programFiles + "\\Tony");
 #else
     QChar sep(':');
-#ifdef Q_OS_MAC
-    QString defaultTonyPath;
-#else
-    QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
 #endif
-#endif
+    
+    if (tonyVampPath == "") {
+        tonyVampPath = QApplication::applicationDirPath();
 
-    QString tonyVampPath = getenv("TONY_VAMP_PATH");
-    if (tonyVampPath == "") {
-        tonyVampPath = defaultTonyPath;
-    }
-    if (tonyVampPath == "") {
-        // just use the default Vamp path or VAMP_PATH environment
-        // variable -- leave it up to the Vamp SDK
-        return;
+#ifdef Q_OS_WIN32
+        QString programFiles = getEnvQStr("ProgramFiles");
+        if (programFiles == "") programFiles = "C:\\Program Files";
+        QString defaultTonyPath(programFiles + "\\Tony");
+        tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+#endif
+        
+#ifndef Q_OS_MAC
+        QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
+        tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+#endif
     }
 
     std::vector<std::string> vampPathList = 
         Vamp::PluginHostAdapter::getPluginPath();
 
-    QStringList qVampPathList;
-    for (auto p: vampPathList) qVampPathList.push_back(p.c_str());
-    QString vampPath = qVampPathList.join(sep);
-    QString newPath = tonyVampPath + sep + vampPath;
+    for (auto p: vampPathList) {
+        tonyVampPath = tonyVampPath + sep + QString::fromUtf8(p.c_str());
+    }
 
-    cerr << "Setting VAMP_PATH to " << newPath << " for Tony plugins" << endl;
+    SVCERR << "Setting VAMP_PATH to " << tonyVampPath
+           << " for Tony plugins" << endl;
 
-    QString env = "VAMP_PATH=" + newPath;
+    QString env = "VAMP_PATH=" + tonyVampPath;
 
     // Windows lacks setenv, must use putenv (different arg convention)
-    putenv(strdup(env.toLocal8Bit().data()));
+    putEnvQStr(env);
 }
         
 int
@@ -176,9 +201,9 @@ main(int argc, char **argv)
     }
 #endif
 
-    setupTonyVampPath();
-
     TonyApplication application(argc, argv);
+
+    setupTonyVampPath();
 
     QStringList args = application.arguments();
 
