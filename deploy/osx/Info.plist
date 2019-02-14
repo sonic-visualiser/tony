@@ -15,6 +15,12 @@
 	<key>CFBundleShortVersionString</key>
 	<string>TONY_VERSION</string>
 
+	<!-- Provide an explanatory string for microphone usage so
+	     that access is requested. NB this is localised in
+	     *.lproj/InfoPlist.strings files -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Tony needs to use the microphone for recording.</string>
+
 	<!-- enable HiDPI -->
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
