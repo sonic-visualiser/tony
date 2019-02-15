@@ -30,7 +30,7 @@
 
         <Directory Id="APPLICATIONFOLDER" Name="Tony">
 
-          <Component
+          <Component Win64="yes"
               Id="MainExecutable"
               Guid="B0DA872A-E8B9-4C41-B0B0-7702A9EBBD51">
 
@@ -88,7 +88,7 @@
                 Source="..\icons\tony-winicon.ico"/>
           </Component>
             
-          <Component
+          <Component Win64="yes"
               Id="pYin"
               Guid="5C3B7285-B652-4FE5-8A1D-AC92376F8AD5">
             <File
@@ -107,7 +107,7 @@
                 DiskId="1"
                 Source="..\pyin\pyin.n3"/>
           </Component>
-          <Component
+          <Component Win64="yes"
               Id="CHP"
               Guid="3567639C-BFA5-46EC-BA2D-C4899508B0D0">
             <File
@@ -117,7 +117,7 @@
                 Source="release\chp.dll"/>
           </Component>
 
-          <Component
+          <Component Win64="yes"
               Id="Qt5"
               Guid="7DCE15D9-DB56-4ECC-A324-A9B74E30B872">
             <File
@@ -151,37 +151,73 @@
                 Name="Qt5Xml.dll"
                 DiskId="1"
                 Source="release\Qt5Xml.dll"/>
-            <File
-                Id="libgcc"
-                Name="libgcc_s_dw2-1.dll"
-                DiskId="1"
-                Source="release\libgcc_s_dw2-1.dll"/>
-            <File
-                Id="libstdcplusplus"
-                Name="libstdc++-6.dll"
-                DiskId="1"
-                Source="release\libstdc++-6.dll"/>
-            <File
-                Id="libwinpthread"
-                Name="libwinpthread-1.dll"
-                DiskId="1"
-                Source="release\libwinpthread-1.dll"/>
           </Component>
-	    
+
+          <Component Win64="yes"
+                     Id="Sndfile"
+                     Guid="04533516-6460-4155-A0D4-E9BA4D31E95C">
+            <File
+                Id="libsndfile"
+                Name="libsndfile-1.dll"
+                Source="..\sv-dependency-builds\win64-msvc\lib\libsndfile-1.dll"
+                KeyPath="yes"/>
+          </Component>
+
+          <Component Win64="yes"
+               Id="VCRuntime"
+               Guid="251D9513-BBD2-47CF-BE78-EF79446F7683">
+
+            <!-- Redistributables are handled by the Visual Studio
+                 installer (a separate program from VS itself) and are
+                 installed into C:\Program Files (x86)\Microsoft
+                 Visual Studio\2017\Community\VC\Redist\MSVC\...  NB
+                 this is not the same thing as the Windows SDKs, which
+                 consist of build tools etc - they have their own
+                 installers and get installed by default to C:\Program
+                 Files (x86)\Windows Kits\... -->
+               
+               <File
+                   Id="concrt140"
+                   Name="concrt140.dll"
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x64\Microsoft.VC141.CRT\concrt140.DLL"
+                   KeyPath="yes"/>
+               <File
+                   Id="msvcp140"
+                   Name="msvcp140.dll"
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x64\Microsoft.VC141.CRT\msvcp140.DLL"/>
+               <File
+                   Id="vccorlib140"
+                   Name="vccorlib140.dll"
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x64\Microsoft.VC141.CRT\vccorlib140.DLL"/>
+               <File
+                   Id="vcruntime140"
+                   Name="vcruntime140.dll"
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x64\Microsoft.VC141.CRT\vcruntime140.DLL"/>
+          </Component>
+
 	  <Directory Id="Platforms" Name="platforms">
-            <Component
+            <Component Win64="yes"
                 Id="Qt5PlatformPlugins"
-                Guid="F3AAECAE-3B5E-4BA7-8F17-D20F608BE43A">
+                Guid="1FFB773E-6D6D-4C0E-832B-F0FFEA959CA5">
 	      <File
                   Id="qminimal"
                   Name="qminimal.dll"
-                  DiskId="1"
                   Source="release\qminimal.dll"/>
 	      <File
                   Id="qwindows"
                   Name="qwindows.dll"
-                  DiskId="1"
                   Source="release\qwindows.dll"/>
+            </Component>
+	  </Directory>
+
+	  <Directory Id="Styles" Name="styles">
+            <Component Win64="yes"
+                Id="Qt5StylePlugins"
+                Guid="7A676FC1-B139-432C-A7D3-F33984934B79">
+	      <File
+                  Id="qwindowsvistastyle"
+                  Name="qwindowsvistastyle.dll"
+                  Source="release\qwindowsvistastyle.dll"/>
             </Component>
 	  </Directory>
         </Directory>
@@ -212,8 +248,11 @@
       <ComponentRef Id="pYin"/>
       <ComponentRef Id="CHP"/>
       <ComponentRef Id="MainExecutable"/>
+      <ComponentRef Id="Sndfile"/>
       <ComponentRef Id="Qt5"/>
+      <ComponentRef Id="VCRuntime"/>
       <ComponentRef Id="Qt5PlatformPlugins"/>
+      <ComponentRef Id="Qt5StylePlugins"/>
       <ComponentRef Id="ProgramMenuDir"/>
     </Feature>
 
@@ -225,7 +264,7 @@
     <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONFOLDER" />
     <Property Id="ApplicationFolderName" Value="Tony" />
     <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
-    <WixVariable Id="WixUILicenseRtf" Value="..\deploy\win32\License.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="..\deploy\win64\License.rtf" />
     
     <Icon Id="winicon.ico" SourceFile="..\icons\tony-winicon.ico"/>
     <Property Id="ARPPRODUCTICON" Value="winicon.ico" />
