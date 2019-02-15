@@ -15,8 +15,10 @@ SUBDIRS += \
         sub_test_svcore_data_model
 
 SUBDIRS += \
-	sub_tony
-
+	sub_tony \
+        sub_pyin \
+        sub_chp
+        
 sub_base.file = base.pro
         
 sub_test_svcore_base.file = test-svcore-base.pro
@@ -25,5 +27,7 @@ sub_test_svcore_data_fileio.file = test-svcore-data-fileio.pro
 sub_test_svcore_data_model.file = test-svcore-data-model.pro
 
 sub_tony.file = tonyapp.pro
+sub_pyin.file = pyin.pro
+sub_chp.file = chp.pro
 
 CONFIG += ordered

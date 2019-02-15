@@ -60,7 +60,7 @@ win32-g++ {
 
     # This config is currently used for 32-bit Windows builds.
 
-    INCLUDEPATH += $$PWD/sv-dependency-builds/win32-mingw/include
+    INCLUDEPATH += $$PWD/sv-dependency-builds/win32-mingw/include $$PWD/sv-dependency-builds/win32-mingw/include/opus
 
     LIBS += -Lrelease -L$$PWD/sv-dependency-builds/win32-mingw/lib
 

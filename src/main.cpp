@@ -128,7 +128,7 @@ getEnvQStr(QString variable)
     std::wstring wvar = variable.toStdWString();
     wchar_t *value = _wgetenv(wvar.c_str());
     if (!value) return QString();
-    else return QString::fromUtf16(value);
+    else return QString::fromStdWString(std::wstring(value));
 #else
     std::string var = variable.toStdString();
     return QString::fromUtf8(qgetenv(var.c_str()));
@@ -140,7 +140,7 @@ putEnvQStr(QString assignment)
 {
 #ifdef Q_OS_WIN32
     std::wstring wassignment = assignment.toStdWString();
-    _wputenv(wstrdup(wassignment));
+    _wputenv(_wcsdup(wassignment.c_str()));
 #else
     putenv(strdup(assignment.toUtf8().data()));
 #endif
@@ -165,11 +165,11 @@ setupTonyVampPath()
         if (programFiles == "") programFiles = "C:\\Program Files";
         QString defaultTonyPath(programFiles + "\\Tony");
         tonyVampPath = tonyVampPath + sep + defaultTonyPath;
-#endif
-        
+#else
 #ifndef Q_OS_MAC
         QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
         tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+#endif
 #endif
     }
 
