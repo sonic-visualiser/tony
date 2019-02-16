@@ -8,14 +8,25 @@ exists(config.pri) {
     include(noconfig.pri)
 }
 
-INCLUDEPATH += vamp-plugin-sdk
-
-## !!! + vampGetPluginDescriptor export
-
 CONFIG -= qt
 CONFIG += plugin release warn_on
 
 TARGET = chp
+
+INCLUDEPATH += vamp-plugin-sdk
+
+win32-msvc* {
+    LIBS += -EXPORT:vampGetPluginDescriptor
+}
+win32-g++* {
+    LIBS += -Wl,--version-script=pyin/vamp-plugin.map
+}
+linux* {
+    LIBS += -Wl,--version-script=pyin/vamp-plugin.map
+}
+macx* {
+    LIBS += -export_symbols_list pyin/vamp-plugin.list
+}
 
 SOURCES += \
     chp/ConstrainedHarmonicPeak.cpp \
