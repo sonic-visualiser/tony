@@ -13,20 +13,19 @@ CONFIG += plugin release warn_on
 
 TARGET = pyin
 
-#!!! boost path fix plz
-INCLUDEPATH += vamp-plugin-sdk ../boost_1_69_0
+INCLUDEPATH += $$PWD/vamp-plugin-sdk $$PWD/sv-dependency-builds/any/include
 
 win32-msvc* {
     LIBS += -EXPORT:vampGetPluginDescriptor
 }
 win32-g++* {
-    LIBS += -Wl,--version-script=pyin/vamp-plugin.map
+    LIBS += -Wl,--version-script=$$PWD/pyin/vamp-plugin.map
 }
 linux* {
-    LIBS += -Wl,--version-script=pyin/vamp-plugin.map
+    LIBS += -Wl,--version-script=$$PWD/pyin/vamp-plugin.map
 }
 macx* {
-    LIBS += -export_symbols_list pyin/vamp-plugin.list
+    LIBS += -export_symbols_list $$PWD/pyin/vamp-plugin.list
 }
 
 SOURCES += \
