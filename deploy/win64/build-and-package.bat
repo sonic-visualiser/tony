@@ -37,7 +37,7 @@ del signtest.exe
 @echo Rebuilding 32-bit
 
 cd %STARTPWD%
-rem del /q /s build_win32
+del /q /s build_win32
 call .\deploy\win32\build-32.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
 
@@ -49,7 +49,7 @@ signtool sign /v /n "%NAME%" /t http://time.certum.pl /fd sha1 build_win32\relea
 @echo Rebuilding 64-bit
 
 cd %STARTPWD%
-rem del /q /s build_win64
+del /q /s build_win64
 call .\deploy\win64\build-64.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
 
