@@ -62,6 +62,8 @@ win32-g++ {
 
     INCLUDEPATH += $$PWD/sv-dependency-builds/win32-mingw/include $$PWD/sv-dependency-builds/win32-mingw/include/opus
 
+    INCLUDEPATH += /Libraries/boost_1_69_0 $$PWD/../boost_1_69_0
+
     LIBS += -Lrelease -L$$PWD/sv-dependency-builds/win32-mingw/lib
 
     DEFINES += NOMINMAX _USE_MATH_DEFINES CAPNP_LITE
@@ -85,6 +87,8 @@ win32-msvc* {
     # need to add a way to distinguish the two.
     
     INCLUDEPATH += $$PWD/sv-dependency-builds/win64-msvc/include $$PWD/sv-dependency-builds/win64-msvc/include/opus
+
+    INCLUDEPATH += /Libraries/boost_1_69_0 $$PWD/../boost_1_69_0
 
 ## This seems to be intruding even when we're supposed to be release
 #    CONFIG(debug) {

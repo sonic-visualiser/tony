@@ -13,7 +13,7 @@ CONFIG += plugin release warn_on
 
 TARGET = pyin
 
-INCLUDEPATH += $$PWD/vamp-plugin-sdk $$PWD/sv-dependency-builds/any/include
+INCLUDEPATH += $$PWD/vamp-plugin-sdk
 
 win32-msvc* {
     LIBS += -EXPORT:vampGetPluginDescriptor
