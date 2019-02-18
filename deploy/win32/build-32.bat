@@ -46,7 +46,7 @@ build_win32\release\test-svcore-base
 if %errorlevel% neq 0 exit /b %errorlevel%
 build_win32\release\test-svcore-system
 if %errorlevel% neq 0 exit /b %errorlevel%
-build_win32\release\test-svcore-data-fileio svcore/data/fileio/test
+build_win32\release\test-svcore-data-fileio --testdir svcore/data/fileio/test
 if %errorlevel% neq 0 exit /b %errorlevel%
 build_win32\release\test-svcore-data-model
 if %errorlevel% neq 0 exit /b %errorlevel%
