@@ -8,7 +8,7 @@ Changes in Tony 2.0 since the previous release 1.0:
    displays
 
  * The playback speed dial uses a more sensible scale
-	
+
 Changes in Tony 1.0 since the previous release 0.6:
 
  * The underlying pYin analysis plugin has been updated; more analysis
