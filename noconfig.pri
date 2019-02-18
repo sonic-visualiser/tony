@@ -97,14 +97,13 @@ win32-msvc* {
 #            -L../tony/sv-dependency-builds/win64-msvc/lib
 #    }
     CONFIG(release) {
-        LIBS += -Lrelease \
+        LIBS += -NODEFAULTLIB:LIBCMT -Lrelease \
             -L$$PWD/sv-dependency-builds/win64-msvc/lib
     }
 
     DEFINES += NOMINMAX _USE_MATH_DEFINES CAPNP_LITE HAVE_MEDIAFOUNDATION
 
     QMAKE_CXXFLAGS_RELEASE += -fp:fast -gl
-    QMAKE_LFLAGS_RELEASE += -ltcg
 
     LIBS -= -lFLAC -lvorbis -lvorbisenc -lvorbisfile
 
