@@ -18,6 +18,7 @@
         InstallerVersion="100" 
         Languages="1033" 
         Compressed="yes" 
+        Platform="x64"
         SummaryCodepage="1252"/>
 
     <MajorUpgrade DowngradeErrorMessage="A later version of Tony is already installed. Setup will now exit."/>
