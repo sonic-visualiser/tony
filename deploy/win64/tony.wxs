@@ -91,8 +91,8 @@
           </Component>
             
           <Component Win64="yes"
-	      Id="SVFileAssociation"
-	      Guid="F07C5CC1-0209-4C1A-8D52-C40B50A2B964">
+	      Id="TonyFileAssociation"
+	      Guid="8ec2bed5-74fe-4f9c-af31-109fc86f16dc">
             
             <CreateFolder/>
 
@@ -273,6 +273,7 @@
       <ComponentRef Id="pYin"/>
       <ComponentRef Id="CHP"/>
       <ComponentRef Id="MainExecutable"/>
+      <ComponentRef Id="TonyFileAssociation"/>
       <ComponentRef Id="Sndfile"/>
       <ComponentRef Id="Qt5"/>
       <ComponentRef Id="VCRuntime"/>
