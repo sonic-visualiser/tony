@@ -44,7 +44,8 @@ echo
 echo "Copying in plugins from pyin/pyin.dylib and chp/chp.dylib."
 echo "(make sure they're present, up-to-date and compiled with optimisation!)"
 
-cp pyin/pyin.dylib chp/chp.dylib "$source/Contents/Resources/"
+cp libpyin.dylib "$source/Contents/Resources/pyin.dylib"
+cp libchp.dylib "$source/Contents/Resources/chp.dylib"
 
 echo
 echo "Copying in frameworks and plugins from Qt installation directory."

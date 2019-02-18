@@ -25,7 +25,7 @@ linux* {
     LIBS += -Wl,--version-script=$$PWD/pyin/vamp-plugin.map
 }
 macx* {
-    LIBS += -export_symbols_list $$PWD/pyin/vamp-plugin.list
+    LIBS += -exported_symbols_list $$PWD/pyin/vamp-plugin.list
 }
 
 SOURCES += \
