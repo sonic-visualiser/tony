@@ -166,7 +166,9 @@ setupTonyVampPath()
         QString defaultTonyPath(programFiles + "\\Tony");
         tonyVampPath = tonyVampPath + sep + defaultTonyPath;
 #else
-#ifndef Q_OS_MAC
+#ifdef Q_OS_MAC
+        tonyVampPath = tonyVampPath + "/../Resources:" + tonyVampPath;
+#else
         QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
         tonyVampPath = tonyVampPath + sep + defaultTonyPath;
 #endif

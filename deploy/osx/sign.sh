@@ -13,11 +13,13 @@ if [ -z "$dir" ] || [ ! -d "$dir" ]; then
 	exit 2
 fi
 
+entitlements=deploy/osx/Entitlements.plist
+
 for app in "$dir"/*.app; do
     find "$app" -name \*.dylib -print | while read fr; do
 	codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime "$fr"
     done
-    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime "$app/Contents/MacOS/Sonic Visualiser"
-    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime "$app"
+    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime --entitlements "$entitlements" "$app/Contents/MacOS/Tony"
+    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime --entitlements "$entitlements" "$app"
 done
 

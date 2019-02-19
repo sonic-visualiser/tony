@@ -28,21 +28,8 @@ case "$stem" in
     *) echo "Error: Version stem $stem (of version $version) is neither two- nor three-part number"; exit 1 ;;
 esac
 
-if file "$source/Contents/MacOS/$app" | grep -q script; then
-    echo
-    echo "Executable is already a script, leaving it alone."
-else
-    echo
-    echo "Moving aside executable, adding script."
-
-    mv "$source/Contents/MacOS/$app" "$source/Contents/MacOS/$app.bin" || exit 1
-    cp "deploy/osx/$app.sh" "$source/Contents/MacOS/$app" || exit 1
-    chmod +x "$source/Contents/MacOS/$app"
-fi
-
 echo
-echo "Copying in plugins from pyin/pyin.dylib and chp/chp.dylib."
-echo "(make sure they're present, up-to-date and compiled with optimisation!)"
+echo "Copying in plugins from libpyin.dylib and libchp.dylib."
 
 cp libpyin.dylib "$source/Contents/Resources/pyin.dylib"
 cp libchp.dylib "$source/Contents/Resources/chp.dylib"
@@ -83,7 +70,6 @@ mkdir "$volume" || exit 1
 
 ln -s /Applications "$volume"/Applications
 cp README.md "$volume/README.txt"
-cp README.OSC "$volume/README-OSC.txt"
 cp COPYING "$volume/COPYING.txt"
 cp CHANGELOG "$volume/CHANGELOG.txt"
 cp CITATION "$volume/CITATION.txt"
