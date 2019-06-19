@@ -679,8 +679,10 @@ Analyser::layersCreated(Document::LayerCreationAsyncHandle handle,
                 t->setPresentationName("candidate");
                 m_document->addLayerToView(m_pane, t);
                 m_reAnalysisCandidates.push_back(t);
+                /*
                 cerr << "New re-analysis candidate model has "
-                     << ((SparseTimeValueModel *)t->getModel())->getPoints().size() << " point(s)" << endl;
+                     << ((SparseTimeValueModel *)t->getModel())->getAllEvents().size() << " point(s)" << endl;
+                */
             }
         }
 
@@ -768,12 +770,12 @@ Analyser::shiftOctave(Selection sel, bool up)
         layer->deleteSelection(sel);
 
         Clipboard shifted;
-        foreach (Clipboard::Point p, clip.getPoints()) {
-            if (p.haveValue()) {
-                Clipboard::Point sp = p.withValue(p.getValue() * factor);
-                shifted.addPoint(sp);
+        foreach (Event e, clip.getPoints()) {
+            if (e.hasValue()) {
+                Event se = e.withValue(e.getValue() * factor);
+                shifted.addPoint(se);
             } else {
-                shifted.addPoint(p);
+                shifted.addPoint(e);
             }
         }
         
@@ -863,10 +865,10 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
     // Remove all pitches <= 0Hz -- we now save absent pitches as 0Hz
     // values when exporting a pitch track, so we need to exclude them
     // here when importing again
-    Clipboard::PointList after;
+    EventVector after;
     int excl = 0;
-    for (auto &p: clip.getPoints()) {
-        if (p.haveValue() && p.getValue() > 0.f) {
+    for (const auto &p: clip.getPoints()) {
+        if (p.hasValue() && p.getValue() > 0.f) {
             after.push_back(p);
         } else {
             ++excl;

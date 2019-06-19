@@ -26,7 +26,6 @@
 #include "view/PaneStack.h"
 #include "data/model/WaveFileModel.h"
 #include "data/model/NoteModel.h"
-#include "data/model/FlexiNoteModel.h"
 #include "layer/FlexiNoteLayer.h"
 #include "data/model/NoteModel.h"
 #include "view/ViewManager.h"
@@ -1314,18 +1313,22 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     Layer *layer = m_analyser->getLayer(Analyser::Notes);
     if (!layer) return;
 
-    FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer->getModel());
+    NoteModel *model = qobject_cast<NoteModel *>(layer->getModel());
     if (!model) return;
 
-    FlexiNoteModel::PointList points = model->getPoints();
+    //!!! This seems like a strange and inefficient way to do this -
+    //!!! there is almost certainly a better way making use of
+    //!!! EventSeries api
+    
+    EventVector points = model->getAllEvents();
     if (points.empty()) return;
 
-    FlexiNoteModel::PointList::iterator i = points.begin();
+    EventVector::iterator i = points.begin();
     std::set<sv_frame_t> snapFrames;
     snapFrames.insert(0);
     while (i != points.end()) {
-        snapFrames.insert(i->frame);
-        snapFrames.insert(i->frame + i->duration + 1);
+        snapFrames.insert(i->getFrame());
+        snapFrames.insert(i->getFrame() + i->getDuration() + 1);
         ++i;
     }
     std::set<sv_frame_t>::iterator i2;
@@ -2293,7 +2296,7 @@ MainWindow::exportNoteLayer()
     Layer *layer = m_analyser->getLayer(Analyser::Notes);
     if (!layer) return;
 
-    FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer->getModel());
+    NoteModel *model = qobject_cast<NoteModel *>(layer->getModel());
     if (!model) return;
 
     FileFinder::FileType type = FileFinder::LayerFileNonSV;
@@ -2650,7 +2653,7 @@ void
 MainWindow::formNoteFromSelection()
 {
     Layer *layer0 = m_analyser->getLayer(Analyser::Notes);
-    FlexiNoteModel *model = qobject_cast<FlexiNoteModel *>(layer0->getModel());
+    NoteModel *model = qobject_cast<NoteModel *>(layer0->getModel());
 
     FlexiNoteLayer *layer =
         qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
@@ -2664,14 +2667,18 @@ MainWindow::formNoteFromSelection()
             (tr("Form Note from Selection"), true);
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            if (!model->getNotesWithin(k->getStartFrame(), k->getEndFrame()).empty()) {
+            //!!! This fails in the case where an existing note spans
+            //!!! one end of the selection but does not reach the
+            //!!! other end - it doesn't get extended
+            if (!model->getEventsSpanning(k->getStartFrame(),
+                                          k->getEndFrame() - k->getStartFrame()).empty()) {
                 layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
                 layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
                 layer->mergeNotes(m_analyser->getPane(), *k, false);
             } else {
                 layer->addNoteOn(k->getStartFrame(), 100, 100);
                 layer->addNoteOff(k->getEndFrame(), 100);
-                layer->mergeNotes(m_analyser->getPane(), *k, false); // only so the note adapts in case of exisitng pitch track
+                layer->mergeNotes(m_analyser->getPane(), *k, false); // only so the note adapts in case of existing pitch track
             }
         }
 
