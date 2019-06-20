@@ -2652,11 +2652,10 @@ MainWindow::deleteNotes()
 void
 MainWindow::formNoteFromSelection()
 {
+    Pane *pane = m_analyser->getPane();
     Layer *layer0 = m_analyser->getLayer(Analyser::Notes);
     NoteModel *model = qobject_cast<NoteModel *>(layer0->getModel());
-
-    FlexiNoteLayer *layer =
-        qobject_cast<FlexiNoteLayer *>(m_analyser->getLayer(Analyser::Notes));
+    FlexiNoteLayer *layer = qobject_cast<FlexiNoteLayer *>(layer0);
     if (!layer) return;
 
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
@@ -2665,21 +2664,37 @@ MainWindow::formNoteFromSelection()
     
         CommandHistory::getInstance()->startCompoundOperation
             (tr("Form Note from Selection"), true);
+
         for (MultiSelection::SelectionList::iterator k = selections.begin();
              k != selections.end(); ++k) {
-            //!!! This fails in the case where an existing note spans
-            //!!! one end of the selection but does not reach the
-            //!!! other end - it doesn't get extended
-            if (!model->getEventsSpanning(k->getStartFrame(),
-                                          k->getEndFrame() - k->getStartFrame()).empty()) {
-                layer->splitNotesAt(m_analyser->getPane(), k->getStartFrame());
-                layer->splitNotesAt(m_analyser->getPane(), k->getEndFrame());
-                layer->mergeNotes(m_analyser->getPane(), *k, false);
-            } else {
-                layer->addNoteOn(k->getStartFrame(), 100, 100);
-                layer->addNoteOff(k->getEndFrame(), 100);
-                layer->mergeNotes(m_analyser->getPane(), *k, false); // only so the note adapts in case of existing pitch track
+
+            // Chop existing events at start and end frames; remember
+            // the first starting pitch, to use as default for new
+            // note; delete existing events; create new note; ask
+            // layer to merge, just in order to adapt the note to the
+            // existing pitch track if possible. This way we should
+            // handle all the possible cases of existing notes that
+            // may or may not overlap the start or end times
+            
+            sv_frame_t start = k->getStartFrame();
+            sv_frame_t end = k->getEndFrame();
+
+            EventVector existing =
+                model->getEventsStartingWithin(start, end - start);
+
+            int defaultPitch = 100;
+            if (!existing.empty()) {
+                defaultPitch = int(roundf(existing.begin()->getValue()));
             }
+            
+            layer->splitNotesAt(pane, start);
+            layer->splitNotesAt(pane, end);
+            layer->deleteSelection(*k);
+            
+            layer->addNoteOn(start, defaultPitch, 100);
+            layer->addNoteOff(end, defaultPitch);
+            
+            layer->mergeNotes(pane, *k, false);
         }
 
         CommandHistory::getInstance()->endCompoundOperation();     
