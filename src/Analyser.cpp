@@ -41,7 +41,6 @@ using std::vector;
 
 Analyser::Analyser() :
     m_document(0),
-    m_fileModel(0),
     m_paneStack(0),
     m_pane(0),
     m_currentCandidate(-1),
@@ -69,7 +68,7 @@ Analyser::~Analyser()
 }
 
 QString
-Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
+Analyser::newFileLoaded(Document *doc, ModelId model,
 			PaneStack *paneStack, Pane *pane)
 {
     m_document = doc;
@@ -77,7 +76,9 @@ Analyser::newFileLoaded(Document *doc, WaveFileModel *model,
     m_paneStack = paneStack;
     m_pane = pane;
 
-    if (!m_fileModel) return "Internal error: Analyser::newFileLoaded() called with no model present";
+    if (!ModelById::isa<WaveFileModel>(m_fileModel)) {
+        return "Internal error: Analyser::newFileLoaded() called with no model, or a non-WaveFileModel";
+    }
     
     connect(doc, SIGNAL(layerAboutToBeDeleted(Layer *)),
             this, SLOT(layerAboutToBeDeleted(Layer *)));
@@ -97,7 +98,7 @@ Analyser::analyseExistingFile()
 
     if (!m_pane) return "Internal error: Analyser::analyseExistingFile() called with no pane present";
 
-    if (!m_fileModel) return "Internal error: Analyser::analyseExistingFile() called with no model present";
+    if (m_fileModel.isNone()) return "Internal error: Analyser::analyseExistingFile() called with no model present";
     
     if (m_layers[PitchTrack]) {
         m_document->removeLayerFromView(m_pane, m_layers[PitchTrack]);
@@ -229,7 +230,7 @@ Analyser::layerCompletionChanged()
 QString
 Analyser::addVisualisations()
 {
-    if (!m_fileModel) return "Internal error: Analyser::addVisualisations() called with no model present";
+    if (m_fileModel.isNone()) return "Internal error: Analyser::addVisualisations() called with no model present";
 
     // A spectrogram, off by default. Must go at the back because it's
     // opaque
@@ -329,6 +330,11 @@ Analyser::addWaveform()
 QString
 Analyser::addAnalyses()
 {
+    auto waveFileModel = ModelById::getAs<WaveFileModel>(m_fileModel);
+    if (!waveFileModel) {
+        return "Internal error: Analyser::addAnalyses() called with no model present";
+    }
+    
     // As with the spectrogram above, if these layers exist we use
     // them
     TimeValueLayer *existingPitch = 0;
@@ -395,7 +401,7 @@ Analyser::addAnalyses()
     settings.endGroup();
 
     Transform t = tf->getDefaultTransformFor
-        (base + f0out, m_fileModel->getSampleRate());
+        (base + f0out, waveFileModel->getSampleRate());
     t.setStepSize(256);
     t.setBlockSize(2048);
 
@@ -508,6 +514,11 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
     QMutexLocker locker(&m_asyncMutex);
 
+    auto waveFileModel = ModelById::getAs<WaveFileModel>(m_fileModel);
+    if (!waveFileModel) {
+        return "Internal error: Analyser::reAnalyseSelection() called with no model present";
+    }
+    
     if (!m_reAnalysingSelection.isEmpty()) {
         if (sel == m_reAnalysingSelection && range == m_reAnalysingRange) {
             cerr << "selection & range are same as current analysis, ignoring" << endl;
@@ -558,7 +569,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     }
 
     Transform t = tf->getDefaultTransformFor
-        (base + out, m_fileModel->getSampleRate());
+        (base + out, waveFileModel->getSampleRate());
     t.setStepSize(256);
     t.setBlockSize(2048);
 
@@ -580,8 +591,8 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     } else {
         endSample   -= 9*grid; // MM says: not sure what the CHP plugin does there
     }
-    RealTime start = RealTime::frame2RealTime(startSample, m_fileModel->getSampleRate()); 
-    RealTime end = RealTime::frame2RealTime(endSample, m_fileModel->getSampleRate());
+    RealTime start = RealTime::frame2RealTime(startSample, waveFileModel->getSampleRate()); 
+    RealTime end = RealTime::frame2RealTime(endSample, waveFileModel->getSampleRate());
 
     RealTime duration;
 
@@ -602,7 +613,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     transforms.push_back(t);
     
     m_currentAsyncHandle =
-        m_document->createDerivedLayersAsync(transforms, m_fileModel, this);
+        m_document->createDerivedLayersAsync(transforms, ModelId, this);
 
     return "";
 }

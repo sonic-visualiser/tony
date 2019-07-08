@@ -26,8 +26,8 @@
 #include "framework/Document.h"
 #include "base/Selection.h"
 #include "base/Clipboard.h"
+#include "data/model/WaveFileModel.h"
 
-class WaveFileModel;
 class Pane;
 class PaneStack;
 class Layer;
@@ -43,11 +43,15 @@ public:
     Analyser();
     virtual ~Analyser();
 
-    // Process new main model, add derived layers; return "" on success or error string on failure
-    QString newFileLoaded(Document *newDocument, WaveFileModel *model,
-                          PaneStack *paneStack, Pane *pane);
+    // Process new main model, add derived layers; return "" on
+    // success or error string on failure
+    QString newFileLoaded(Document *newDocument,
+                          ModelId model,
+                          PaneStack *paneStack,
+                          Pane *pane);
 
-    // Remove any derived layers, process the main model, add derived layers; return "" on success or error string on failure
+    // Remove any derived layers, process the main model, add derived
+    // layers; return "" on success or error string on failure
     QString analyseExistingFile();
 
     // Discard any layers etc associated with the current document
@@ -90,8 +94,11 @@ public:
         }
     }
 
-    WaveFileModel *getMainModel() const {
+    ModelId getMainModelId() const {
         return m_fileModel;
+    }
+    std::shared_ptr<WaveFileModel> getMainModel() const {
+        return ModelById::getAs<WaveFileModel>(m_fileModel);
     }
 
     float getGain(Component c) const;
@@ -223,7 +230,7 @@ protected slots:
 
 protected:
     Document *m_document;
-    WaveFileModel *m_fileModel;
+    ModelId m_fileModel;
     PaneStack *m_paneStack;
     Pane *m_pane;
 

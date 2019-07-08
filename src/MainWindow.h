@@ -134,10 +134,10 @@ protected slots:
     virtual void layerRemoved(Layer *);
     virtual void layerInAView(Layer *, bool);
 
-    virtual void mainModelChanged(WaveFileModel *);
+    virtual void mainModelChanged(ModelId);
     virtual void mainModelGainChanged(float);
-    virtual void modelAdded(Model *);
-    virtual void modelAboutToBeDeleted(Model *);
+    virtual void modelAdded(ModelId);
+    virtual void modelAboutToBeDeleted(ModelId);
 
     virtual void modelGenerationFailed(QString, QString);
     virtual void modelGenerationWarning(QString, QString);
