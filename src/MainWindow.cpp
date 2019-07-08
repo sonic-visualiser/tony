@@ -1313,7 +1313,7 @@ MainWindow::moveByOneNote(bool right, bool doSelect)
     Layer *layer = m_analyser->getLayer(Analyser::Notes);
     if (!layer) return;
 
-    NoteModel *model = qobject_cast<NoteModel *>(layer->getModel());
+    auto model = ModelById::getAs<NoteModel>(layer->getModel());
     if (!model) return;
 
     //!!! This seems like a strange and inefficient way to do this -
@@ -2111,7 +2111,8 @@ MainWindow::saveSessionAs()
 QString
 MainWindow::exportToSVL(QString path, Layer *layer)
 {
-    Model *model = layer->getModel();
+    auto model = ModelById::get(layer->getModel());
+    if (!model) return "Internal error: No model in layer";
 
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -2202,18 +2203,19 @@ MainWindow::importPitchLayer(FileSource source)
 
                 SVDEBUG << "MainWindow::importPitchLayer: Have model" << endl;
 
+                ModelId modelId = ModelById::add
+                    (std::shared_ptr<Model>(model));
+                
                 CommandHistory::getInstance()->startCompoundOperation
                     (tr("Import Pitch Track"), true);
 
-                Layer *newLayer = m_document->createImportedLayer(model);
+                Layer *newLayer = m_document->createImportedLayer(modelId);
 
                 m_analyser->takePitchTrackFrom(newLayer);
 
                 m_document->deleteLayer(newLayer);
 
                 CommandHistory::getInstance()->endCompoundOperation();
-
-                //!!! swap all data in to existing layer instead of this
 
                 if (!source.isRemote()) {
                     registerLastOpenedFilePath
@@ -2239,8 +2241,7 @@ MainWindow::exportPitchLayer()
     Layer *layer = m_analyser->getLayer(Analyser::PitchTrack);
     if (!layer) return;
 
-    SparseTimeValueModel *model =
-        qobject_cast<SparseTimeValueModel *>(layer->getModel());
+    auto model = ModelById::getAs<SparseTimeValueModel>(layer->getModel());
     if (!model) return;
 
     FileFinder::FileType type = FileFinder::LayerFileNoMidiNonSV;
@@ -2263,7 +2264,7 @@ MainWindow::exportPitchLayer()
 
     } else if (suffix == "ttl" || suffix == "n3") {
 
-        RDFExporter exporter(path, model);
+        RDFExporter exporter(path, model.get());
         exporter.write();
         if (!exporter.isOK()) {
             error = exporter.getError();
@@ -2273,7 +2274,7 @@ MainWindow::exportPitchLayer()
 
         DataExportOptions options = DataExportFillGaps;
         
-        CSVFileWriter writer(path, model,
+        CSVFileWriter writer(path, model.get(),
                              ((suffix == "csv") ? "," : "\t"),
                              options);
         writer.write();
@@ -2296,7 +2297,7 @@ MainWindow::exportNoteLayer()
     Layer *layer = m_analyser->getLayer(Analyser::Notes);
     if (!layer) return;
 
-    NoteModel *model = qobject_cast<NoteModel *>(layer->getModel());
+    auto model = ModelById::getAs<NoteModel>(layer->getModel());
     if (!model) return;
 
     FileFinder::FileType type = FileFinder::LayerFileNonSV;
@@ -2317,7 +2318,7 @@ MainWindow::exportNoteLayer()
 
     } else if (suffix == "mid" || suffix == "midi") {
      
-        MIDIFileWriter writer(path, model, model->getSampleRate());
+        MIDIFileWriter writer(path, model.get(), model->getSampleRate());
         writer.write();
         if (!writer.isOK()) {
             error = writer.getError();
@@ -2325,7 +2326,7 @@ MainWindow::exportNoteLayer()
 
     } else if (suffix == "ttl" || suffix == "n3") {
 
-        RDFExporter exporter(path, model);
+        RDFExporter exporter(path, model.get());
         exporter.write();
         if (!exporter.isOK()) {
             error = exporter.getError();
@@ -2335,7 +2336,7 @@ MainWindow::exportNoteLayer()
 
         DataExportOptions options = DataExportOmitLevels;
         
-        CSVFileWriter writer(path, model,
+        CSVFileWriter writer(path, model.get(),
                              ((suffix == "csv") ? "," : "\t"),
                              options);
         writer.write();
@@ -2654,9 +2655,9 @@ MainWindow::formNoteFromSelection()
 {
     Pane *pane = m_analyser->getPane();
     Layer *layer0 = m_analyser->getLayer(Analyser::Notes);
-    NoteModel *model = qobject_cast<NoteModel *>(layer0->getModel());
+    auto model = ModelById::getAs<NoteModel>(layer0->getModel());
     FlexiNoteLayer *layer = qobject_cast<FlexiNoteLayer *>(layer0);
-    if (!layer) return;
+    if (!layer || !model) return;
 
     MultiSelection::SelectionList selections = m_viewManager->getSelections();
 
@@ -2960,23 +2961,17 @@ MainWindow::layerInAView(Layer *layer, bool inAView)
 }
 
 void
-MainWindow::modelAdded(Model *model)
+MainWindow::modelAdded(ModelId model)
 {
     MainWindowBase::modelAdded(model);
-    DenseTimeValueModel *dtvm = qobject_cast<DenseTimeValueModel *>(model);
+    auto dtvm = ModelById::getAs<DenseTimeValueModel>(model);
     if (dtvm) {
         cerr << "A dense time-value model (such as an audio file) has been loaded" << endl;
     }
 }
 
 void
-MainWindow::modelAboutToBeDeleted(Model *model)
-{
-    MainWindowBase::modelAboutToBeDeleted(model);
-}
-
-void
-MainWindow::mainModelChanged(WaveFileModel *model)
+MainWindow::mainModelChanged(ModelId model)
 {
     m_panLayer->setModel(model);
 
@@ -3023,7 +3018,7 @@ MainWindow::analyseNow()
 void
 MainWindow::analyseNewMainModel()
 {
-    WaveFileModel *model = getMainModel();
+    auto model = getMainModel();
 
     cerr << "MainWindow::analyseNewMainModel: main model is " << model << endl;
 
@@ -3073,7 +3068,7 @@ MainWindow::analyseNewMainModel()
                 this, SLOT(regionOutlined(QRect)));
 
         QString error = m_analyser->newFileLoaded
-            (m_document, getMainModel(), m_paneStack, pane);
+            (m_document, getMainModelId(), m_paneStack, pane);
         if (error != "") {
             QMessageBox::warning
                 (this,
@@ -3083,13 +3078,11 @@ MainWindow::analyseNewMainModel()
         }
     }
 
-    if (!m_withSpectrogram) 
-    {
+    if (!m_withSpectrogram) {
         m_analyser->setVisible(Analyser::Spectrogram, false);
     }
 
-    if (!m_withSonification) 
-    {
+    if (!m_withSonification) {
         m_analyser->setAudible(Analyser::PitchTrack, false);
         m_analyser->setAudible(Analyser::Notes, false);
     }

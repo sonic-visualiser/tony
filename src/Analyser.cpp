@@ -197,32 +197,36 @@ Analyser::getInitialAnalysisCompletion()
 void
 Analyser::layerCompletionChanged()
 {
-    if (getInitialAnalysisCompletion() == 100) {
+    if (getInitialAnalysisCompletion() < 100) {
+        return;
+    }
 
-        emit initialAnalysisCompleted();
+    emit initialAnalysisCompleted();
 
-        if (m_layers[Audio]) {
+    if (!m_layers[Audio]) {
+        return;
+    }
 
-            // Extend pitch-track and note layers so as to nominally
-            // end at the same time as the audio. This affects any
-            // time-filling done on export etc.
-            
-            sv_frame_t endFrame = m_layers[Audio]->getModel()->getEndFrame();
+    // Extend pitch-track and note layers so as to nominally end at
+    // the same time as the audio. This affects any time-filling done
+    // on export etc.
+
+    auto audioModel = ModelById::get(m_layers[Audio]->getModel());
+    sv_frame_t endFrame = audioModel->getEndFrame();
         
-            if (m_layers[PitchTrack]) {
-                SparseTimeValueModel *model = qobject_cast<SparseTimeValueModel *>
-                    (m_layers[PitchTrack]->getModel());
-                if (model) {
-                    model->extendEndFrame(endFrame);
-                }
-            }
-            if (m_layers[Notes]) {
-                NoteModel *model = qobject_cast<NoteModel *>
-                    (m_layers[Notes]->getModel());
-                if (model) {
-                    model->extendEndFrame(endFrame);
-                }
-            }
+    if (m_layers[PitchTrack]) {
+        auto model = ModelById::getAs<SparseTimeValueModel>
+            (m_layers[PitchTrack]->getModel());
+        if (model) {
+            model->extendEndFrame(endFrame);
+        }
+    }
+
+    if (m_layers[Notes]) {
+        auto model = ModelById::getAs<NoteModel>
+            (m_layers[Notes]->getModel());
+        if (model) {
+            model->extendEndFrame(endFrame);
         }
     }
 }
@@ -315,7 +319,7 @@ Analyser::addWaveform()
     waveform->setShowMeans(false); // too small & pale for this
     waveform->setBaseColour
         (ColourDatabase::getInstance()->getColourIndex(tr("Grey")));
-    PlayParameters *params = waveform->getPlayParameters();
+    auto params = waveform->getPlayParameters();
     if (params) {
         params->setPlayPan(-1);
         params->setPlayGain(1);
@@ -463,7 +467,7 @@ Analyser::addAnalyses()
         qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
     if (pitchLayer) {
         pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
-        PlayParameters *params = pitchLayer->getPlayParameters();
+        auto params = pitchLayer->getPlayParameters();
         if (params) {
             params->setPlayPan(1);
             params->setPlayGain(0.5);
@@ -476,7 +480,7 @@ Analyser::addAnalyses()
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
     if (flexiNoteLayer) {
         flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
-        PlayParameters *params = flexiNoteLayer->getPlayParameters();
+        auto params = flexiNoteLayer->getPlayParameters();
         if (params) {
             params->setPlayPan(1);
             params->setPlayGain(0.5);
@@ -613,7 +617,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     transforms.push_back(t);
     
     m_currentAsyncHandle =
-        m_document->createDerivedLayersAsync(transforms, ModelId, this);
+        m_document->createDerivedLayersAsync(transforms, m_fileModel, this);
 
     return "";
 }
@@ -681,7 +685,7 @@ Analyser::layersCreated(Document::LayerCreationAsyncHandle handle,
         for (int i = 0; i < (int)all.size(); ++i) {
             TimeValueLayer *t = qobject_cast<TimeValueLayer *>(all[i]);
             if (t) {
-                PlayParameters *params = t->getPlayParameters();
+                auto params = t->getPlayParameters();
                 if (params) {
                     params->setPlayAudible(false);
                 }
@@ -861,16 +865,20 @@ void
 Analyser::takePitchTrackFrom(Layer *otherLayer)
 {
     Layer *myLayer = m_layers[PitchTrack];
-    if (!myLayer) return;
+    if (!myLayer || !otherLayer) return;
+
+    auto myModel = ModelById::get(myLayer->getModel());
+    auto otherModel = ModelById::get(otherLayer->getModel());
+    if (!myModel || !otherModel) return;
 
     Clipboard clip;
-
-    Selection sel = Selection(myLayer->getModel()->getStartFrame(),
-                              myLayer->getModel()->getEndFrame());
+    
+    Selection sel = Selection(myModel->getStartFrame(),
+                              myModel->getEndFrame());
     myLayer->deleteSelection(sel);
 
-    sel = Selection(otherLayer->getModel()->getStartFrame(),
-                    otherLayer->getModel()->getEndFrame());
+    sel = Selection(otherModel->getStartFrame(),
+                    otherModel->getEndFrame());
     otherLayer->copy(m_pane, sel, clip);
 
     // Remove all pitches <= 0Hz -- we now save absent pitches as 0Hz
@@ -986,7 +994,7 @@ bool
 Analyser::isAudible(Component c) const
 {
     if (m_layers[c]) {
-        PlayParameters *params = m_layers[c]->getPlayParameters();
+        auto params = m_layers[c]->getPlayParameters();
         if (!params) return false;
         return params->isPlayAudible();
     } else {
@@ -998,7 +1006,7 @@ void
 Analyser::setAudible(Component c, bool a)
 {
     if (m_layers[c]) {
-        PlayParameters *params = m_layers[c]->getPlayParameters();
+        auto params = m_layers[c]->getPlayParameters();
         if (!params) return;
         params->setPlayAudible(a);
         saveState(c);
@@ -1009,7 +1017,7 @@ float
 Analyser::getGain(Component c) const
 {
     if (m_layers[c]) {
-        PlayParameters *params = m_layers[c]->getPlayParameters();
+        auto params = m_layers[c]->getPlayParameters();
         if (!params) return 1.f;
         return params->getPlayGain();
     } else {
@@ -1021,7 +1029,7 @@ void
 Analyser::setGain(Component c, float gain)
 {
     if (m_layers[c]) {
-        PlayParameters *params = m_layers[c]->getPlayParameters();
+        auto params = m_layers[c]->getPlayParameters();
         if (!params) return;
         params->setPlayGain(gain);
         saveState(c);
@@ -1032,7 +1040,7 @@ float
 Analyser::getPan(Component c) const
 {
     if (m_layers[c]) {
-        PlayParameters *params = m_layers[c]->getPlayParameters();
+        auto params = m_layers[c]->getPlayParameters();
         if (!params) return 1.f;
         return params->getPlayPan();
     } else {
@@ -1044,7 +1052,7 @@ void
 Analyser::setPan(Component c, float pan)
 {
     if (m_layers[c]) {
-        PlayParameters *params = m_layers[c]->getPlayParameters();
+        auto params = m_layers[c]->getPlayParameters();
         if (!params) return;
         params->setPlayPan(pan);
         saveState(c);

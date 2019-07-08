@@ -137,7 +137,6 @@ protected slots:
     virtual void mainModelChanged(ModelId);
     virtual void mainModelGainChanged(float);
     virtual void modelAdded(ModelId);
-    virtual void modelAboutToBeDeleted(ModelId);
 
     virtual void modelGenerationFailed(QString, QString);
     virtual void modelGenerationWarning(QString, QString);
