@@ -27,7 +27,7 @@
 
 #include <QMetaType>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QMessageBox>
 #include <QTranslator>
 #include <QLocale>
@@ -284,8 +284,8 @@ main(int argc, char **argv)
         QObject::connect(gui, SIGNAL(hideSplash()), splash, SLOT(hide()));
     }
 
-    QDesktopWidget *desktop = QApplication::desktop();
-    QRect available = desktop->availableGeometry();
+    QScreen *screen = QApplication::primaryScreen();
+    QRect available = screen->availableGeometry();
 
     int width = (available.width() * 2) / 3;
     int height = available.height() / 2;

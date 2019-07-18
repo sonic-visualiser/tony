@@ -15,6 +15,8 @@ TARGET = pyin
 
 INCLUDEPATH += $$PWD/vamp-plugin-sdk
 
+QMAKE_CXXFLAGS -= -Werror
+
 win32-msvc* {
     LIBS += -EXPORT:vampGetPluginDescriptor
 }
