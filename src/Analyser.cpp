@@ -195,7 +195,7 @@ Analyser::getInitialAnalysisCompletion()
 }
 
 void
-Analyser::layerCompletionChanged()
+Analyser::layerCompletionChanged(ModelId)
 {
     if (getInitialAnalysisCompletion() < 100) {
         return;
@@ -472,8 +472,8 @@ Analyser::addAnalyses()
             params->setPlayPan(1);
             params->setPlayGain(0.5);
         }
-        connect(pitchLayer, SIGNAL(modelCompletionChanged()),
-                this, SLOT(layerCompletionChanged()));
+        connect(pitchLayer, SIGNAL(modelCompletionChanged(ModelId)),
+                this, SLOT(layerCompletionChanged(ModelId)));
     }
     
     FlexiNoteLayer *flexiNoteLayer = 
@@ -485,8 +485,8 @@ Analyser::addAnalyses()
             params->setPlayPan(1);
             params->setPlayGain(0.5);
         }
-        connect(flexiNoteLayer, SIGNAL(modelCompletionChanged()),
-                this, SLOT(layerCompletionChanged()));
+        connect(flexiNoteLayer, SIGNAL(modelCompletionChanged(ModelId)),
+                this, SLOT(layerCompletionChanged(ModelId)));
         connect(flexiNoteLayer, SIGNAL(reAnalyseRegion(sv_frame_t, sv_frame_t, float, float)),
                 this, SLOT(reAnalyseRegion(sv_frame_t, sv_frame_t, float, float)));
         connect(flexiNoteLayer, SIGNAL(materialiseReAnalysis()),

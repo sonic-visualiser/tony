@@ -27,7 +27,6 @@
 #include "data/model/WaveFileModel.h"
 #include "data/model/NoteModel.h"
 #include "layer/FlexiNoteLayer.h"
-#include "data/model/NoteModel.h"
 #include "view/ViewManager.h"
 #include "base/Preferences.h"
 #include "base/RecordDirectory.h"
