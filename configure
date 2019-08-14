@@ -583,7 +583,7 @@ PACKAGE_BUGREPORT=
 PACKAGE_URL=
 
 ac_unique_file="Tony"
-ac_unique_file="src/main.cpp"
+ac_unique_file="main/main.cpp"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

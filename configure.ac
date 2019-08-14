@@ -1,7 +1,7 @@
 
 AC_INIT([Tony], [], cannam@all-day-breakfast.com)
 
-AC_CONFIG_SRCDIR(src/main.cpp)
+AC_CONFIG_SRCDIR(main/main.cpp)
 
 # Autoconf will set CXXFLAGS; we don't usually want it to, because we
 # either define our own flags (at least if GCC is in use) or else use

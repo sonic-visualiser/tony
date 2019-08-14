@@ -36,14 +36,14 @@ for (file, SVAPP_SOURCES)    { SOURCES += $$sprintf("svapp/%1",    $$file) }
 for (file, SVGUI_HEADERS)    { HEADERS += $$sprintf("svgui/%1",    $$file) }
 for (file, SVAPP_HEADERS)    { HEADERS += $$sprintf("svapp/%1",    $$file) }
 
-HEADERS += src/MainWindow.h \
-           src/NetworkPermissionTester.h \
-           src/Analyser.h
+HEADERS += main/MainWindow.h \
+           main/NetworkPermissionTester.h \
+           main/Analyser.h
 
-SOURCES += src/main.cpp \
-           src/Analyser.cpp \
-           src/NetworkPermissionTester.cpp \
-           src/MainWindow.cpp
+SOURCES += main/main.cpp \
+           main/Analyser.cpp \
+           main/NetworkPermissionTester.cpp \
+           main/MainWindow.cpp
 
 
 
