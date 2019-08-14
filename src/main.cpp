@@ -205,6 +205,10 @@ main(int argc, char **argv)
 
     TonyApplication application(argc, argv);
 
+    QApplication::setOrganizationName("sonic-visualiser");
+    QApplication::setOrganizationDomain("sonicvisualiser.org");
+    QApplication::setApplicationName("Tony");
+
     setupTonyVampPath();
 
     QStringList args = application.arguments();
@@ -232,10 +236,6 @@ main(int argc, char **argv)
     if (args.contains("--no-sonification")) sonification = false;
 
     if (args.contains("--no-spectrogram")) spectrogram = false;
-
-    QApplication::setOrganizationName("QMUL");
-    QApplication::setOrganizationDomain("qmul.ac.uk");
-    QApplication::setApplicationName("Tony");
 
     InteractiveFileFinder::getInstance()->setApplicationSessionExtension("ton");
 
