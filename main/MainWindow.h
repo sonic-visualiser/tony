@@ -153,10 +153,10 @@ protected slots:
     virtual void mouseEnteredWidget();
     virtual void mouseLeftWidget();
 
-    virtual void website();
     virtual void help();
     virtual void about();
     virtual void keyReference();
+    virtual void whatsNew();
 
     virtual void newerVersionAvailable(QString);
 
@@ -217,6 +217,7 @@ protected:
     ActivityLog   *m_activityLog;
     KeyReference  *m_keyReference;
     VersionTester *m_versionTester;
+    QString        m_newerVersionIs;
 
     sv_frame_t m_selectionAnchor;
 

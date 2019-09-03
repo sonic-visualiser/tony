@@ -1,143 +1,143 @@
 
 Changes in Tony 2.0 since the previous release 1.0:
 
- * Tony now has a Record button, allowing you to record audio from the
+ - Tony now has a Record button, allowing you to record audio from the
    microphone and analyse it
 
- * Graphical rendering and icons now properly support hi-dpi/Retina
+ - Graphical rendering and icons now properly support hi-dpi/Retina
    displays
 
- * The playback speed dial uses a more sensible scale
+ - The playback speed dial uses a more sensible scale
 
 Changes in Tony 1.0 since the previous release 0.6:
 
- * The underlying pYin analysis plugin has been updated; more analysis
+ - The underlying pYin analysis plugin has been updated; more analysis
    options are available
 
- * Notes can be dragged up and down using the mouse in edit mode. When
+ - Notes can be dragged up and down using the mouse in edit mode. When
    you drag a note, the pitch track underneath it snaps to the nearest
    spectral peaks (if any are found). Releasing the note makes the
    note snap back to the (possibly now moved) underlying pitch values.
 
- * Exported pitch track CSV files now contain one row for every
+ - Exported pitch track CSV files now contain one row for every
    processing frame in the file, and those with no identified pitch
    have the pitch recorded as 0. This is useful for some evaluation
    and post-processing tools, and it's easier to filter out the 0
    values if you don't need them than add them afterwards if you do
 
- * Exported note track CSV files now omit the (meaningless, in this
+ - Exported note track CSV files now omit the (meaningless, in this
    context) velocity column
 
- * Level and pan for a layer (audio, pitch track, notes) are now shown
+ - Level and pan for a layer (audio, pitch track, notes) are now shown
    in a little matrix widget, which is quicker to read than the
    previous pair of rotary dials; click on it to pop up an editable
    version
 
- * Horizontal scrolling using a Mac trackpad now works properly
+ - Horizontal scrolling using a Mac trackpad now works properly
 
- * Tony now finds plugins in its own installation directory by default
+ - Tony now finds plugins in its own installation directory by default
    (can be overridden with TONY_VAMP_PATH environment variable)
 
- * Bug fixes
+ - Bug fixes
 
 Changes in Tony 0.6 since the previous release 0.5:
 
- * The play pointer no longer tracks to the centre of the main pane
+ - The play pointer no longer tracks to the centre of the main pane
    when dragging, and is now always visible. Play pointer / playhead
    behaviour is generally expected to be much more sensible and
    intuitive in this release than in prior ones
 
- * Many keyboard shortcuts have been added and improved, including the
+ - Many keyboard shortcuts have been added and improved, including the
    shortcuts for incremental note-by-note selection and moving the
    play pointer
 
- * Audio files are now implicitly normalised to peak == 1.0 when
+ - Audio files are now implicitly normalised to peak == 1.0 when
    loading
 
- * Tony now has an Analysis menu which contains various configuration
+ - Tony now has an Analysis menu which contains various configuration
    settings that affect pitch analysis
 
- * There is now an option to save the session directly to the same
+ - There is now an option to save the session directly to the same
    directory as the original audio file, for rapid saving when
    annotating many audio files in sequence
 
- * The extents of the "active" note are now more clearly shown when
+ - The extents of the "active" note are now more clearly shown when
    mousing over the note track
 
- * There is a new function to delete the notes (without deleting pitch
+ - There is a new function to delete the notes (without deleting pitch
    measurements) within the selection
 
- * Numerous bug fixes
+ - Numerous bug fixes
 
 Changes in Tony 0.5 since the previous release 0.4:
 
- * The start and end of the recording are now shaded in grey so you
+ - The start and end of the recording are now shaded in grey so you
    can see where they are
 
- * There are new save/open session functions on the File menu; the
+ - There are new save/open session functions on the File menu; the
    session file extension is .ton, and save/open session should work
 
- * The note edit tool (which was largely broken in 0.4 after lots of
+ - The note edit tool (which was largely broken in 0.4 after lots of
    work on pitch track editing) now works again
 
- * New note editing menu actions: split note, merge notes, form note
+ - New note editing menu actions: split note, merge notes, form note
    from selection, snap notes to pitch track
 
- * Editing the pitch track (when notes are present) causes the notes
+ - Editing the pitch track (when notes are present) causes the notes
    to be automatically updated to the new pitch track
 
- * The Key and Mouse Reference help window has been updated so as to
+ - The Key and Mouse Reference help window has been updated so as to
    show Tony-specific actions properly
 
- * The undo/redo command bundling has been tidied up and some related
+ - The undo/redo command bundling has been tidied up and some related
    crashes fixed
 	
 Changes in Tony 0.4 since the previous release 0.3:
 
- * The main pitch tracker (pYIN) now uses a non-FFT Yin method in
+ - The main pitch tracker (pYIN) now uses a non-FFT Yin method in
    order to produce unbiased timestamps
 
- * Pitch estimation within a constrained frequency range now uses a
+ - Pitch estimation within a constrained frequency range now uses a
    harmonic spectrum plugin (CHP) that tracks peaks within the range
    in a way more in line with user expectations than pYIN
 
- * The layer show/hide controls have been merged into the layer type
+ - The layer show/hide controls have been merged into the layer type
    icons, saving toolbar space
 
- * Adjustment of the displayed frequency range has been crudely added
+ - Adjustment of the displayed frequency range has been crudely added
 
- * Fix crash on loading a second file and inability to export pitch
+ - Fix crash on loading a second file and inability to export pitch
    track after using selection strip
 
 Changes in Tony 0.3 since the previous release 0.2:
 
- * Key shortcuts for editing have been revised to be more consistent
+ - Key shortcuts for editing have been revised to be more consistent
    on OS/X and across different Qt versions
 
- * Reduce visual clutter in selection areas
+ - Reduce visual clutter in selection areas
 
- * Fixes to OS/X deployment
+ - Fixes to OS/X deployment
 
 Changes in Tony 0.2 since the previous release 0.1:
 
- * Waveform is now displayed in a shadow layer at bottom of main pane
+ - Waveform is now displayed in a shadow layer at bottom of main pane
 
- * A selection strip has been added at the bottom of the window, so
+ - A selection strip has been added at the bottom of the window, so
    selections can be made without changing tool mode
 
- * Double-click in selection strip now selects a region associated
+ - Double-click in selection strip now selects a region associated
    with a single note
 
- * Pitches can be moved up and down by octaves, and to different pitch
+ - Pitches can be moved up and down by octaves, and to different pitch
    candidates, within the selected area
 
- * Cancelling a selection by hitting Esc restores the pre-selection
+ - Cancelling a selection by hitting Esc restores the pre-selection
    pitch track
 
- * A frequency range can be selected with shift-click in the main
+ - A frequency range can be selected with shift-click in the main
    window to prompt the pitch tracker to run only within that range
 
- * Arbitrary-frequency playback and pitch track resynthesis now supported
+ - Arbitrary-frequency playback and pitch track resynthesis now supported
 
- * Layers can now be hidden, and playback toggled, individually, and
+ - Layers can now be hidden, and playback toggled, individually, and
    there are now gain and pain controls for each playable layer type

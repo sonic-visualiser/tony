@@ -85,6 +85,8 @@
 #include <QScrollArea>
 #include <QPainter>
 #include <QWidgetAction>
+#include <QTextEdit>
+#include <QDialogButtonBox>
 
 #include <iostream>
 #include <cstdio>
@@ -930,25 +932,24 @@ MainWindow::setupHelpMenu()
     QString name = QApplication::applicationName();
     QAction *action;
 
-    action = new QAction(tr("&Key and Mouse Reference"), this);
-    action->setShortcut(tr("F2"));
-    action->setStatusTip(tr("Open a window showing the keystrokes you can use in %1").arg(name));
-    connect(action, SIGNAL(triggered()), this, SLOT(keyReference()));
-    m_keyReference->registerShortcut(action);
-    menu->addAction(action);
-
     action = new QAction(il.load("help"),
-                                  tr("&Help Reference"), this); 
+                         tr("&Help Reference"), this); 
     action->setShortcut(tr("F1"));
     action->setStatusTip(tr("Open the %1 reference manual").arg(name)); 
     connect(action, SIGNAL(triggered()), this, SLOT(help()));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
 
+    action = new QAction(tr("&Key and Mouse Reference"), this);
+    action->setShortcut(tr("F2"));
+    action->setStatusTip(tr("Open a window showing the keystrokes you can use in %1").arg(name));
+    connect(action, SIGNAL(triggered()), this, SLOT(keyReference()));
+    m_keyReference->registerShortcut(action);
+    menu->addAction(action);
     
-    action = new QAction(tr("%1 on the &Web").arg(name), this); 
-    action->setStatusTip(tr("Open the %1 website").arg(name)); 
-    connect(action, SIGNAL(triggered()), this, SLOT(website()));
+    action = new QAction(tr("What's &New In This Release?"), this); 
+    action->setStatusTip(tr("List the changes in this release (and every previous release) of %1").arg(name)); 
+    connect(action, SIGNAL(triggered()), this, SLOT(whatsNew()));
     menu->addAction(action);
     
     action = new QAction(tr("&About %1").arg(name), this); 
@@ -3199,17 +3200,66 @@ MainWindow::mouseLeftWidget()
 }
 
 void
-MainWindow::website()
-{
-    //!!! todo: URL!
-    openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/"));
-}
-
-void
 MainWindow::help()
 {
     //!!! todo: help URL!
     openHelpUrl(tr("http://code.soundsoftware.ac.uk/projects/tony/wiki/Reference"));
+}
+
+void
+MainWindow::whatsNew()
+{
+    QFile changelog(":CHANGELOG");
+    changelog.open(QFile::ReadOnly);
+    QByteArray content = changelog.readAll();
+    QString text = QString::fromUtf8(content);
+
+    QDialog *d = new QDialog(this);
+    d->setWindowTitle(tr("What's New"));
+        
+    QGridLayout *layout = new QGridLayout;
+    d->setLayout(layout);
+
+    int row = 0;
+    
+    QLabel *iconLabel = new QLabel;
+    iconLabel->setPixmap(QApplication::windowIcon().pixmap(64, 64));
+    layout->addWidget(iconLabel, row, 0);
+    
+    layout->addWidget
+        (new QLabel(tr("<h3>What's New in %1</h3>")
+                    .arg(QApplication::applicationName())),
+         row++, 1);
+    layout->setColumnStretch(2, 10);
+
+    QTextEdit *textEdit = new QTextEdit;
+    layout->addWidget(textEdit, row++, 1, 1, 2);
+
+    if (m_newerVersionIs != "") {
+        layout->addWidget(new QLabel(tr("<b>Note:</b> A newer version of %1 is available.<br>(Version %2 is available; you are using version %3)").arg(QApplication::applicationName()).arg(m_newerVersionIs).arg(TONY_VERSION)), row++, 1, 1, 2);
+    }
+    
+    QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Ok);
+    layout->addWidget(bb, row++, 0, 1, 3);
+    connect(bb, SIGNAL(accepted()), d, SLOT(accept()));
+
+    text.replace('\r', "");
+    text.replace(QRegExp("(.)\n +(.)"), "\\1 \\2");
+    text.replace(QRegExp("\n - ([^\n]+)"), "\n<li>\\1</li>");
+    text.replace(QRegExp(": *\n"), ":\n<ul>\n");
+    text.replace(QRegExp("</li>\n\\s*\n"), "</li>\n</ul>\n\n");
+    text.replace(QRegExp("\n(\\w[^:\n]+:)"), "\n<p><b>\\1</b></p>");
+//    text.replace(QRegExp("<li>([^,.\n]+)([,.] +\\w)"), "<li><b>\\1</b>\\2");
+    
+    textEdit->setHtml(text);
+    textEdit->setReadOnly(true);
+
+    d->setMinimumSize(m_viewManager->scalePixelSize(520),
+                      m_viewManager->scalePixelSize(450));
+    
+    d->exec();
+
+    delete d;
 }
 
 void
@@ -3234,7 +3284,7 @@ MainWindow::about()
         .arg(QT_VERSION_STR);
 
     aboutText += 
-        "<p>Copyright &copy; 2005&ndash;2015 Chris Cannam, Queen Mary University of London, and the Tony project authors: Matthias Mauch, George Fazekas, Justin Salamon, and Rachel Bittner.</p>"
+        "<p>Copyright &copy; 2005&ndash;2019 Chris Cannam, Queen Mary University of London, and the Tony project authors: Matthias Mauch, George Fazekas, Justin Salamon, and Rachel Bittner.</p>"
         "<p>pYIN analysis plugin written by Matthias Mauch.</p>"
         "<p>This program is free software; you can redistribute it and/or "
         "modify it under the terms of the GNU General Public License as "
@@ -3242,7 +3292,43 @@ MainWindow::about()
         "License, or (at your option) any later version.<br>See the file "
         "COPYING included with this distribution for more information.</p>";
     
-    QMessageBox::about(this, tr("About %1").arg(QApplication::applicationName()), aboutText);
+    // use our own dialog so we can influence the size
+
+    QDialog *d = new QDialog(this);
+
+    d->setWindowTitle(tr("About %1").arg(QApplication::applicationName()));
+        
+    QGridLayout *layout = new QGridLayout;
+    d->setLayout(layout);
+
+    int row = 0;
+    
+    QLabel *iconLabel = new QLabel;
+    iconLabel->setPixmap(QApplication::windowIcon().pixmap(64, 64));
+    layout->addWidget(iconLabel, row, 0, Qt::AlignTop);
+
+    QLabel *mainText = new QLabel();
+    layout->addWidget(mainText, row, 1, 1, 2);
+
+    layout->setRowStretch(row, 10);
+    layout->setColumnStretch(1, 10);
+
+    ++row;
+
+    QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Ok);
+    layout->addWidget(bb, row++, 0, 1, 3);
+    connect(bb, SIGNAL(accepted()), d, SLOT(accept()));
+
+    mainText->setWordWrap(true);
+    mainText->setOpenExternalLinks(true);
+    mainText->setText(aboutText);
+
+    d->setMinimumSize(m_viewManager->scalePixelSize(420),
+                      m_viewManager->scalePixelSize(200));
+    
+    d->exec();
+
+    delete d;
 }
 
 void
@@ -3254,6 +3340,8 @@ MainWindow::keyReference()
 void
 MainWindow::newerVersionAvailable(QString version)
 {
+    m_newerVersionIs = version;
+    
     //!!! nicer URL would be nicer
     QSettings settings;
     settings.beginGroup("NewerVersionWarning");
