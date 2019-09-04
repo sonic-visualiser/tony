@@ -42,6 +42,8 @@
 #include <signal.h>
 #include <cstdlib>
 
+#include "../version.h"
+
 #include <vamp-hostsdk/PluginHostAdapter.h>
 
 static QMutex cleanupMutex;
@@ -194,8 +196,14 @@ setupTonyVampPath()
 int
 main(int argc, char **argv)
 {
-    svSystemSpecificInitialisation();
+    if (argc == 2 && (QString(argv[1]) == "--version" ||
+                      QString(argv[1]) == "-v")) {
+        cerr << TONY_VERSION << endl;
+        exit(0);
+    }
 
+    svSystemSpecificInitialisation();
+    
 #ifdef Q_OS_MAC
     if (QSysInfo::MacintoshVersion > QSysInfo::MV_10_8) {
         // Fix for OS/X 10.9 font problem
