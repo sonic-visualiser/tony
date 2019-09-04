@@ -1645,7 +1645,7 @@ MainWindow::newSession()
     createDocument();
     m_document->setAutoAlignment(true);
 
-    Pane *pane = m_paneStack->addPane();
+    Pane *pane = m_paneStack->addPane(true);
     pane->setPlaybackFollow(PlaybackScrollPage);
 
     m_viewManager->setGlobalCentreFrame
@@ -3039,8 +3039,8 @@ MainWindow::analyseNewMainModel()
     Pane *selectionStrip = 0;
 
     if (pc < 2) {
-        pane = m_paneStack->addPane();
-        selectionStrip = m_paneStack->addPane();
+        pane = m_paneStack->addPane(true);
+        selectionStrip = m_paneStack->addPane(true);
         m_document->addLayerToView
             (selectionStrip,
              m_document->createMainModelLayer(LayerFactory::TimeRuler));
