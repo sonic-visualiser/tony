@@ -13,13 +13,35 @@ if [ -z "$dir" ] || [ ! -d "$dir" ]; then
 	exit 2
 fi
 
-entitlements=deploy/osx/Entitlements.plist
+if /bin/false; then
 
-for app in "$dir"/*.app; do
-    find "$app" -name \*.dylib -print | while read fr; do
-	codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime "$fr"
+    echo
+    echo "Experimentally attempting sandboxing + hardened runtime (this won't work)"
+    echo
+
+    entitlements=deploy/osx/Entitlements.plist
+
+    for app in "$dir"/*.app; do
+	find "$app" -name \*.dylib -print | while read fr; do
+	    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime "$fr"
+	done
+	codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime --entitlements "$entitlements" "$app/Contents/MacOS/Tony"
+	codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime --entitlements "$entitlements" "$app"
     done
-    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime --entitlements "$entitlements" "$app/Contents/MacOS/Tony"
-    codesign -s "Developer ID Application: Chris Cannam" -fv --deep --options runtime --entitlements "$entitlements" "$app"
-done
+
+else
+
+    echo
+    echo "Not applying sandboxing or hardened runtime"
+    echo
+
+    for app in "$dir"/*.app; do
+	find "$app" -name \*.dylib -print | while read fr; do
+	    codesign -s "Developer ID Application: Chris Cannam" -fv --deep "$fr"
+	done
+	codesign -s "Developer ID Application: Chris Cannam" -fv --deep "$app/Contents/MacOS/Tony"
+	codesign -s "Developer ID Application: Chris Cannam" -fv --deep "$app"
+    done
+
+fi
 
