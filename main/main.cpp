@@ -151,7 +151,7 @@ putEnvQStr(QString assignment)
 static void
 setupTonyVampPath()
 {
-    QString tonyVampPath = getEnvQStr("TONY_VAMP_PATH");
+    QString myVampPath = getEnvQStr("TONY_VAMP_PATH");
 
 #ifdef Q_OS_WIN32
     QChar sep(';');
@@ -159,7 +159,7 @@ setupTonyVampPath()
     QChar sep(':');
 #endif
     
-    if (tonyVampPath == "") {
+    if (myVampPath == "") {
         
         QString appName = QApplication::applicationName();
         QString myDir = QApplication::applicationDirPath();
@@ -186,17 +186,10 @@ setupTonyVampPath()
 #endif
     }
 
-    std::vector<std::string> vampPathList = 
-        Vamp::PluginHostAdapter::getPluginPath();
-
-    for (auto p: vampPathList) {
-        tonyVampPath = tonyVampPath + sep + QString::fromUtf8(p.c_str());
-    }
-
-    SVCERR << "Setting VAMP_PATH to " << tonyVampPath
+    SVCERR << "Setting VAMP_PATH to " << myVampPath
            << " for Tony plugins" << endl;
 
-    QString env = "VAMP_PATH=" + tonyVampPath;
+    QString env = "VAMP_PATH=" + myVampPath;
 
     // Windows lacks setenv, must use putenv (different arg convention)
     putEnvQStr(env);
