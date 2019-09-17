@@ -160,19 +160,28 @@ setupTonyVampPath()
 #endif
     
     if (tonyVampPath == "") {
-        tonyVampPath = QApplication::applicationDirPath();
+        
+        QString appName = QApplication::applicationName();
+        QString myDir = QApplication::applicationDirPath();
+        QString binaryName = QFileInfo(QCoreApplication::arguments().at(0))
+            .fileName();
 
 #ifdef Q_OS_WIN32
         QString programFiles = getEnvQStr("ProgramFiles");
         if (programFiles == "") programFiles = "C:\\Program Files";
-        QString defaultTonyPath(programFiles + "\\Tony");
-        tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+        QString pfPath(programFiles + "\\" + appName);
+        myVampPath = myDir + sep + pfPath;
 #else
 #ifdef Q_OS_MAC
-        tonyVampPath = tonyVampPath + "/../Resources:" + tonyVampPath;
+        myVampPath = myDir + "/../Resources";
 #else
-        QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
-        tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+        if (binaryName != "") {
+            myVampPath =
+                myDir + "/../lib/" + binaryName + sep;
+        }
+        myVampPath = myVampPath +
+            myDir + "/../lib/" + appName + sep +
+            myDir;
 #endif
 #endif
     }
