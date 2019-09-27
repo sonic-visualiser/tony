@@ -283,9 +283,9 @@ Analyser::addVisualisations()
 
     spectrogram->setColourMap((int)ColourMapper::BlackOnWhite);
     spectrogram->setNormalization(ColumnNormalization::Hybrid);
-    // This magical-looking scale factor happens to get us an
-    // identical display to Tony v1.0
-    spectrogram->setGain(100.f / 4096.f);
+    // This magical scale factor happens to get us a similar display
+    // to Tony v1.0
+    spectrogram->setGain(0.25f);
     m_document->addLayerToView(m_pane, spectrogram);
     spectrogram->setLayerDormant(m_pane, true);
 

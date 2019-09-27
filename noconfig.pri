@@ -93,8 +93,8 @@ win32-msvc* {
 ## This seems to be intruding even when we're supposed to be release
 #    CONFIG(debug) {
 #        LIBS += -NODEFAULTLIB:MSVCRT -Ldebug \
-#            -L../tony/sv-dependency-builds/win64-msvc/lib/debug \
-#            -L../tony/sv-dependency-builds/win64-msvc/lib
+#            -L$$PWD/sv-dependency-builds/win64-msvc/lib/debug \
+#            -L$$PWD/sv-dependency-builds/win64-msvc/lib
 #    }
     CONFIG(release) {
         LIBS += -NODEFAULTLIB:LIBCMT -Lrelease \
@@ -103,8 +103,8 @@ win32-msvc* {
 
     DEFINES += NOMINMAX _USE_MATH_DEFINES CAPNP_LITE HAVE_MEDIAFOUNDATION
 
-    QMAKE_CXXFLAGS_RELEASE += -fp:fast -gl
-
+    QMAKE_CXXFLAGS_RELEASE += -fp:fast
+ 
     LIBS -= -lFLAC -lvorbis -lvorbisenc -lvorbisfile
 
     # These have different names

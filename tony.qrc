@@ -18,6 +18,7 @@
     <file>icons/scalable/filesavesv.svg</file>
     <file>icons/scalable/ffwd-end.svg</file>
     <file>icons/scalable/ffwd.svg</file>
+    <file>icons/scalable/help.svg</file>
     <file>icons/scalable/navigate.svg</file>
     <file>icons/scalable/move.svg</file>
     <file>icons/scalable/pause.svg</file>
@@ -141,5 +142,9 @@
     <file>samples/stick.wav</file>
     <file>samples/strike.wav</file>
     <file>samples/tap.wav</file>
+    <file>README.md</file>
+    <file>CHANGELOG</file>
+    <file>COPYING</file>
+    <file>CITATION</file>
 </qresource>
 </RCC>

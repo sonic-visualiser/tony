@@ -42,6 +42,8 @@
 #include <signal.h>
 #include <cstdlib>
 
+#include "../version.h"
+
 #include <vamp-hostsdk/PluginHostAdapter.h>
 
 static QMutex cleanupMutex;
@@ -149,7 +151,7 @@ putEnvQStr(QString assignment)
 static void
 setupTonyVampPath()
 {
-    QString tonyVampPath = getEnvQStr("TONY_VAMP_PATH");
+    QString myVampPath = getEnvQStr("TONY_VAMP_PATH");
 
 #ifdef Q_OS_WIN32
     QChar sep(';');
@@ -157,35 +159,37 @@ setupTonyVampPath()
     QChar sep(':');
 #endif
     
-    if (tonyVampPath == "") {
-        tonyVampPath = QApplication::applicationDirPath();
+    if (myVampPath == "") {
+        
+        QString appName = QApplication::applicationName();
+        QString myDir = QApplication::applicationDirPath();
+        QString binaryName = QFileInfo(QCoreApplication::arguments().at(0))
+            .fileName();
 
 #ifdef Q_OS_WIN32
         QString programFiles = getEnvQStr("ProgramFiles");
         if (programFiles == "") programFiles = "C:\\Program Files";
-        QString defaultTonyPath(programFiles + "\\Tony");
-        tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+        QString pfPath(programFiles + "\\" + appName);
+        myVampPath = myDir + sep + pfPath;
 #else
 #ifdef Q_OS_MAC
-        tonyVampPath = tonyVampPath + "/../Resources:" + tonyVampPath;
+        myVampPath = myDir + "/../Resources";
 #else
-        QString defaultTonyPath("/usr/local/lib/tony:/usr/lib/tony");
-        tonyVampPath = tonyVampPath + sep + defaultTonyPath;
+        if (binaryName != "") {
+            myVampPath =
+                myDir + "/../lib/" + binaryName + sep;
+        }
+        myVampPath = myVampPath +
+            myDir + "/../lib/" + appName + sep +
+            myDir;
 #endif
 #endif
     }
 
-    std::vector<std::string> vampPathList = 
-        Vamp::PluginHostAdapter::getPluginPath();
-
-    for (auto p: vampPathList) {
-        tonyVampPath = tonyVampPath + sep + QString::fromUtf8(p.c_str());
-    }
-
-    SVCERR << "Setting VAMP_PATH to " << tonyVampPath
+    SVCERR << "Setting VAMP_PATH to " << myVampPath
            << " for Tony plugins" << endl;
 
-    QString env = "VAMP_PATH=" + tonyVampPath;
+    QString env = "VAMP_PATH=" + myVampPath;
 
     // Windows lacks setenv, must use putenv (different arg convention)
     putEnvQStr(env);
@@ -194,8 +198,14 @@ setupTonyVampPath()
 int
 main(int argc, char **argv)
 {
-    svSystemSpecificInitialisation();
+    if (argc == 2 && (QString(argv[1]) == "--version" ||
+                      QString(argv[1]) == "-v")) {
+        cerr << TONY_VERSION << endl;
+        exit(0);
+    }
 
+    svSystemSpecificInitialisation();
+    
 #ifdef Q_OS_MAC
     if (QSysInfo::MacintoshVersion > QSysInfo::MV_10_8) {
         // Fix for OS/X 10.9 font problem
