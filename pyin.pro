@@ -9,7 +9,7 @@ exists(config.pri) {
 }
 
 CONFIG -= qt
-CONFIG += plugin release warn_on
+CONFIG += plugin no_plugin_name_prefix release warn_on
 
 TARGET = pyin
 
