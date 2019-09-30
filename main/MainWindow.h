@@ -229,6 +229,8 @@ protected:
     QString exportToSVL(QString path, Layer *layer);
     FileOpenStatus importPitchLayer(FileSource source);
 
+    QString getReleaseText() const;
+
     virtual void setupMenus();
     virtual void setupFileMenu();
     virtual void setupEditMenu();

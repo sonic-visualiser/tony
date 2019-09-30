@@ -3262,6 +3262,33 @@ MainWindow::whatsNew()
     delete d;
 }
 
+QString
+MainWindow::getReleaseText() const
+{
+    bool debug = false;
+    QString version = "(unknown version)";
+
+#ifdef BUILD_DEBUG
+    debug = true;
+#endif // BUILD_DEBUG
+#ifdef TONY_VERSION
+#ifdef SVNREV
+    version = tr("Release %1 : Revision %2").arg(TONY_VERSION).arg(SVNREV);
+#else // !SVNREV
+    version = tr("Release %1").arg(TONY_VERSION);
+#endif // SVNREV
+#else // !TONY_VERSION
+#ifdef SVNREV
+    version = tr("Unreleased : Revision %1").arg(SVNREV);
+#endif // SVNREV
+#endif // TONY_VERSION
+
+    return tr("%1 : %2 configuration, %3-bit build")
+        .arg(version)
+        .arg(debug ? tr("Debug") : tr("Release"))
+        .arg(sizeof(void *) * 8);
+}
+
 void
 MainWindow::about()
 {
@@ -3277,9 +3304,7 @@ MainWindow::about()
 
     aboutText += tr("<h3>About Tony</h3>");
     aboutText += tr("<p>Tony is a program for interactive note and pitch analysis and annotation.</p>");
-    aboutText += tr("<p>%1 : %2 configuration</p>")
-        .arg(version)
-        .arg(debug ? tr("Debug") : tr("Release"));
+    aboutText += QString("<p><small>%1</small></p>").arg(getReleaseText());
     aboutText += tr("<p>Using Qt framework version %1.</p>")
         .arg(QT_VERSION_STR);
 
