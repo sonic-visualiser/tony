@@ -61,6 +61,7 @@ signalHandler(int /* signal */)
         cleanedUp = true;
     }
     cleanupMutex.unlock();
+    cerr << "signalHandler: cleaned up" << endl;
     exit(0);
 }
 
