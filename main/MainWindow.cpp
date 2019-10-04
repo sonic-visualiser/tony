@@ -96,7 +96,9 @@ using std::vector;
 
 
 MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpectrogram) :
-    MainWindowBase(options),
+    MainWindowBase(options,
+                   int(PaneStack::Option::NoPropertyStacks) |
+                   int(PaneStack::Option::NoPaneAccessories)),
     m_overview(0),
     m_mainMenusCreated(false),
     m_playbackMenu(0),
@@ -190,8 +192,6 @@ MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpe
     // We have a pane stack: it comes with the territory. However, we
     // have a fixed and known number of panes in it -- it isn't
     // variable
-    m_paneStack->setLayoutStyle(PaneStack::NoPropertyStacks);
-    m_paneStack->setShowPaneAccessories(false);
     connect(m_paneStack, SIGNAL(doubleClickSelectInvoked(sv_frame_t)),
             this, SLOT(doubleClickSelectInvoked(sv_frame_t)));
     scroll->setWidget(m_paneStack);
@@ -1645,7 +1645,7 @@ MainWindow::newSession()
     createDocument();
     m_document->setAutoAlignment(true);
 
-    Pane *pane = m_paneStack->addPane(true);
+    Pane *pane = m_paneStack->addPane();
     pane->setPlaybackFollow(PlaybackScrollPage);
 
     m_viewManager->setGlobalCentreFrame
@@ -3020,9 +3020,9 @@ MainWindow::analyseNewMainModel()
 {
     auto model = getMainModel();
 
-    cerr << "MainWindow::analyseNewMainModel: main model is " << model << endl;
+    SVDEBUG << "MainWindow::analyseNewMainModel: main model is " << model << endl;
 
-    cerr << "(document is " << m_document << ", it says main model is " << m_document->getMainModel() << ")" << endl;
+    SVDEBUG << "(document is " << m_document << ", it says main model is " << m_document->getMainModel() << ")" << endl;
     
     if (!model) {
         cerr << "no main model!" << endl;
@@ -3039,8 +3039,9 @@ MainWindow::analyseNewMainModel()
     Pane *selectionStrip = 0;
 
     if (pc < 2) {
-        pane = m_paneStack->addPane(true);
-        selectionStrip = m_paneStack->addPane(true);
+        SVDEBUG << "MainWindow::analyseNewMainModel: Adding pane and selection strip (ruler)" << endl;
+        pane = m_paneStack->addPane();
+        selectionStrip = m_paneStack->addPane();
         m_document->addLayerToView
             (selectionStrip,
              m_document->createMainModelLayer(LayerFactory::TimeRuler));
