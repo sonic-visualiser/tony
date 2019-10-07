@@ -13,7 +13,7 @@ if [ -z "$dir" ] || [ ! -d "$dir" ]; then
 	exit 2
 fi
 
-if /bin/false; then
+if false; then
 
     echo
     echo "Experimentally attempting sandboxing + hardened runtime (this won't work)"
