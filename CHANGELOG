@@ -1,5 +1,5 @@
 
-Changes in Tony 2.0 since the previous release 1.0:
+Changes in Tony 2.0 (Oct 2015) since the previous release 1.0:
 
  - Tony now has a Record button, allowing you to record audio from the
    microphone and analyse it
@@ -9,7 +9,7 @@ Changes in Tony 2.0 since the previous release 1.0:
 
  - The playback speed dial uses a more sensible scale
 
-Changes in Tony 1.0 since the previous release 0.6:
+Changes in Tony 1.0 (April 2015) since the previous release 0.6:
 
  - The underlying pYin analysis plugin has been updated; more analysis
    options are available
@@ -40,7 +40,7 @@ Changes in Tony 1.0 since the previous release 0.6:
 
  - Bug fixes
 
-Changes in Tony 0.6 since the previous release 0.5:
+Changes in Tony 0.6 (June 2014) since the previous release 0.5:
 
  - The play pointer no longer tracks to the centre of the main pane
    when dragging, and is now always visible. Play pointer / playhead
@@ -69,7 +69,7 @@ Changes in Tony 0.6 since the previous release 0.5:
 
  - Numerous bug fixes
 
-Changes in Tony 0.5 since the previous release 0.4:
+Changes in Tony 0.5 (April 2014) since the previous release 0.4:
 
  - The start and end of the recording are now shaded in grey so you
    can see where they are
@@ -92,7 +92,7 @@ Changes in Tony 0.5 since the previous release 0.4:
  - The undo/redo command bundling has been tidied up and some related
    crashes fixed
 	
-Changes in Tony 0.4 since the previous release 0.3:
+Changes in Tony 0.4 (March 2014) since the previous release 0.3:
 
  - The main pitch tracker (pYIN) now uses a non-FFT Yin method in
    order to produce unbiased timestamps
@@ -109,7 +109,7 @@ Changes in Tony 0.4 since the previous release 0.3:
  - Fix crash on loading a second file and inability to export pitch
    track after using selection strip
 
-Changes in Tony 0.3 since the previous release 0.2:
+Changes in Tony 0.3 (March 2014) since the previous release 0.2:
 
  - Key shortcuts for editing have been revised to be more consistent
    on OS/X and across different Qt versions
@@ -118,7 +118,7 @@ Changes in Tony 0.3 since the previous release 0.2:
 
  - Fixes to OS/X deployment
 
-Changes in Tony 0.2 since the previous release 0.1:
+Changes in Tony 0.2 (March 2014) since the previous release 0.1:
 
  - Waveform is now displayed in a shadow layer at bottom of main pane
 
