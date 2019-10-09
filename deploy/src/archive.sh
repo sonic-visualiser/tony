@@ -1,15 +1,26 @@
 #!/bin/bash
 
-tag=`hg tags | grep '^v[0-9]' | head -1 | awk '{ print $1; }'`
+set -eu
 
-v=`echo "$tag" |sed 's/v//'`
+tag=`hg tags | grep '^v' | head -1 | awk '{ print $1; }'`
 
-if test -z "$v" ; then
-    echo "No suitable tag found!?"
-    exit 1
-fi
+v=`echo "$tag" | sed 's/v//' | sed 's/_.*$//'`
 
-echo "Packaging up version $v from tag $tag..."
+current=$(hg id | awk '{ print $1; }')
 
-hg archive -r"$tag" --subrepos --exclude sv-dependency-builds --exclude pyin/testdata --exclude testdata /tmp/tony-"$v".tar.gz
+case "$current" in
+    *+) echo "ERROR: Current working copy has been modified - unmodified copy required so we can update to tag and back again safely"; exit 2;;
+    *);;
+esac
+          
+echo
+echo -n "Packaging up version $v from tag $tag... "
 
+hg update -r"$tag"
+
+./repoint archive /tmp/tony-"$v".tar.gz --exclude sv-dependency-builds repoint.pri
+
+hg update -r"$current"
+
+echo Done
+echo
