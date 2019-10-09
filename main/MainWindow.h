@@ -158,6 +158,8 @@ protected slots:
     virtual void keyReference();
     virtual void whatsNew();
 
+    virtual void betaReleaseWarning();
+    
     virtual void newerVersionAvailable(QString);
 
     virtual void selectionChangedByUser();

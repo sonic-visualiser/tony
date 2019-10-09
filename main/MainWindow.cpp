@@ -1264,6 +1264,8 @@ MainWindow::setupToolbars()
     Pane::registerShortcuts(*m_keyReference);
 
     updateLayerStatuses();
+    
+    QTimer::singleShot(500, this, SLOT(betaReleaseWarning()));
 }
 
 
@@ -3201,6 +3203,14 @@ MainWindow::mouseLeftWidget()
 }
 
 void
+MainWindow::betaReleaseWarning()
+{
+    QMessageBox::information
+        (this, tr("Beta release"),
+         tr("<b>This is a beta release of %1</b><p>Please see the \"What's New\" option in the Help menu for a list of changes since the last proper release.</p>").arg(QApplication::applicationName()));
+}
+
+void
 MainWindow::help()
 {
     //!!! todo: help URL!
@@ -3293,14 +3303,6 @@ MainWindow::getReleaseText() const
 void
 MainWindow::about()
 {
-    bool debug = false;
-    QString version = "(unknown version)";
-
-#ifdef BUILD_DEBUG
-    debug = true;
-#endif
-    version = tr("Release %1").arg(TONY_VERSION);
-
     QString aboutText;
 
     aboutText += tr("<h3>About Tony</h3>");

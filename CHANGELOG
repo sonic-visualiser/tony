@@ -1,4 +1,18 @@
 
+Changes in Tony 2.1 (Oct 2019) since the previous release 2.0:
+
+ - Fix problems reopening session files
+
+ - Add support for reading the Opus audio codec on all platforms
+
+ - Add support for WMA and AAC formats on 64-bit Windows. (AAC was
+   already supported on macOS.) Note that AAC support on Windows does
+   not support "gapless" import, i.e. removing the encoder gaps at
+   start and end of the stream
+
+ - Update platform builds with newer libraries and updated platform
+   support
+
 Changes in Tony 2.0 (23 Oct 2015) since the previous release 1.0:
 
  - Tony now has a Record button, allowing you to record audio from the
