@@ -45,5 +45,6 @@ SOURCES += main/main.cpp \
            main/NetworkPermissionTester.cpp \
            main/MainWindow.cpp
 
-
-
+macx* {
+    QMAKE_POST_LINK += deploy/osx/deploy.sh Tony
+}

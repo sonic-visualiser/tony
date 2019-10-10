@@ -15,9 +15,9 @@ SUBDIRS += \
         sub_test_svcore_data_model
 
 SUBDIRS += \
-	sub_tony \
         sub_pyin \
-        sub_chp
+        sub_chp \
+	sub_tony
         
 sub_base.file = base.pro
         

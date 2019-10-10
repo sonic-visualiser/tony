@@ -50,3 +50,4 @@ Makefile.*
 *.dylib
 test-svcore-*
 *.dmg
+.notarization-uuid
