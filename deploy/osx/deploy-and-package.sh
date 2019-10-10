@@ -38,6 +38,9 @@ cp CHANGELOG "$volume/CHANGELOG.txt"
 cp CITATION "$volume/CITATION.txt"
 cp -rp "$source" "$target"
 
+# update file timestamps so as to make the build date apparent
+find "$volume" -exec touch \{\} \;
+
 echo "Done"
 
 echo
@@ -56,6 +59,11 @@ hdiutil create -srcfolder "$volume" "$dmg" -volname "$volume" &&
 	rm -r "$volume"
 
 echo "Done"
+
+echo
+echo "Signing dmg..."
+
+codesign -s "Developer ID Application: Chris Cannam" -fv "$dmg"
 
 echo
 echo "Submitting dmg for notarization..."
