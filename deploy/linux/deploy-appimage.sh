@@ -108,7 +108,7 @@ done
 
 cp "$program.desktop" "$targetdir/"
 
-cp "icons/$program-icon.svg" "$targetdir/$program.svg"
+cp "icons/$program-icon.svg" "$targetdir/$program-icon.svg"
 
 cp "deploy/linux/AppRun" "$targetdir/"
 
