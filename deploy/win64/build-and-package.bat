@@ -34,19 +34,7 @@ del signtest.exe
 )
 
 @echo ""
-@echo Rebuilding 32-bit
-
-cd %STARTPWD%
-del /q /s build_win32
-call .\deploy\win32\build-32.bat
-if %errorlevel% neq 0 exit /b %errorlevel%
-
-if "%ARG%" == "sign" (
-@echo Signing 32-bit executables and libraries
-signtool sign /v /n "%NAME%" /t http://time.certum.pl /fd sha1 build_win32\release\*.exe build_win32\release\*.dll
-)
-
-@echo Rebuilding 64-bit
+@echo Rebuilding 
 
 cd %STARTPWD%
 del /q /s build_win64
@@ -60,23 +48,7 @@ signtool sign /v /n "%NAME%" /t http://time.certum.pl /fd sha1 build_win32\relea
 
 set PATH=%PATH%;"C:\Program Files (x86)\WiX Toolset v3.11\bin"
 
-@echo Packaging 32-bit
-
-cd %STARTPWD%\build_win32
-del tony.msi
-candle -v ..\deploy\win32\tony.wxs
-light -b . -ext WixUIExtension -ext WixUtilExtension -v tony.wixobj
-if %errorlevel% neq 0 exit /b %errorlevel%
-del tony.wixobj
-del tony.wixpdb
-
-if "%ARG%" == "sign" (
-@echo Signing 32-bit package
-signtool sign /v /n "%NAME%" /t http://time.certum.pl /fd sha1 tony.msi
-signtool verify /pa tony.msi
-)
-
-@echo Packaging 64-bit
+@echo Packaging 
 
 cd %STARTPWD%\build_win64
 del tony.msi
