@@ -32,10 +32,11 @@ case "$stem" in
 esac
 
 echo
-echo "Copying in plugins from libpyin.dylib and libchp.dylib."
+echo "Copying in Vamp plugins."
 
-cp libpyin.dylib "$source/Contents/Resources/pyin.dylib"
-cp libchp.dylib "$source/Contents/Resources/chp.dylib"
+for plugin in chp pyin ; do 
+    cp "$plugin.dylib" "$source/Contents/Resources/"
+done
 
 echo
 echo "Copying in frameworks and plugins from Qt installation directory."
