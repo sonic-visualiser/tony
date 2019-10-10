@@ -18,7 +18,7 @@ echo -n "Packaging up version $v from tag $tag... "
 
 hg update -r"$tag"
 
-./repoint archive /tmp/tony-"$v".tar.gz --exclude sv-dependency-builds repoint.pri
+./repoint archive /tmp/tony-"$v".tar.gz --exclude sv-dependency-builds repoint.pri testdata
 
 hg update -r"$current"
 
