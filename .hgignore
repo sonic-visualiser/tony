@@ -51,3 +51,5 @@ Makefile.*
 test-svcore-*
 *.dmg
 .notarization-uuid
+Dockerfile*.gen
+
