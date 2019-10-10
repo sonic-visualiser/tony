@@ -21,6 +21,7 @@ RUN apt-get update && \
     libsndfile-dev \
     libsord-dev \
     libxml2-utils \
+    libboost-all-dev \
     libgl1-mesa-dev \
     raptor-utils \
     librubberband-dev \
