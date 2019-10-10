@@ -177,6 +177,7 @@ setupTonyVampPath()
 #else
 #ifdef Q_OS_MAC
         myVampPath = myDir + "/../Resources";
+        (void)sep; // unused
 #else
         if (binaryName != "") {
             myVampPath =
@@ -208,13 +209,6 @@ main(int argc, char **argv)
     }
 
     svSystemSpecificInitialisation();
-    
-#ifdef Q_OS_MAC
-    if (QSysInfo::MacintoshVersion > QSysInfo::MV_10_8) {
-        // Fix for OS/X 10.9 font problem
-        QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
-    }
-#endif
 
     TonyApplication application(argc, argv);
 
