@@ -50,3 +50,5 @@ Makefile.*
 *.dylib
 test-svcore-*
 *.dmg
+Dockerfile*.gen
+
