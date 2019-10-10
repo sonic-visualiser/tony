@@ -73,7 +73,6 @@ add_dependencies() {
 }
 
 add_dependencies "$program"
-add_dependencies "$checker"
 
 for p in $plugins ; do
     add_dependencies "$p.so"
