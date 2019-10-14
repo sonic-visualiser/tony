@@ -285,5 +285,8 @@
     <Icon Id="winicon.ico" SourceFile="..\icons\tony-winicon.ico"/>
     <Property Id="ARPPRODUCTICON" Value="winicon.ico" />
         
+    <WixVariable Id="WixUIBannerBmp" Value="..\deploy\win64\top.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="..\deploy\win64\main.bmp"/>
+
   </Product>
 </Wix>
