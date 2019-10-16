@@ -28,7 +28,9 @@ class MainWindow : public MainWindowBase
     Q_OBJECT
 
 public:
-    MainWindow(SoundOptions options, bool withSonification = true, bool withSpectrogram = true);
+    MainWindow(AudioMode audioMode,
+               bool withSonification = true, 
+               bool withSpectrogram = true);
     virtual ~MainWindow();
 
 signals:

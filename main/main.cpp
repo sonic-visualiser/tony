@@ -282,10 +282,14 @@ main(int argc, char **argv)
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<PropertyContainer::PropertyName>("PropertyContainer::PropertyName");
 
-    MainWindow::SoundOptions options = MainWindow::WithEverything;
-    if (!audioOutput) options = 0;
+    MainWindow::AudioMode audioMode = 
+        MainWindow::AUDIO_PLAYBACK_NOW_RECORD_LATER;
+
+    if (!audioOutput) {
+        audioMode = MainWindow::AUDIO_NONE;
+    } 
     
-    MainWindow *gui = new MainWindow(options, sonification, spectrogram);
+    MainWindow *gui = new MainWindow(audioMode, sonification, spectrogram);
     application.setMainWindow(gui);
     if (splash) {
         QObject::connect(gui, SIGNAL(hideSplash()), splash, SLOT(hide()));

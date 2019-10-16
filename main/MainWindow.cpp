@@ -95,8 +95,11 @@
 using std::vector;
 
 
-MainWindow::MainWindow(SoundOptions options, bool withSonification, bool withSpectrogram) :
-    MainWindowBase(options,
+MainWindow::MainWindow(AudioMode audioMode,
+                       bool withSonification, 
+                       bool withSpectrogram) :
+    MainWindowBase(audioMode,
+                   MainWindowBase::MIDI_NONE,
                    int(PaneStack::Option::NoPropertyStacks) |
                    int(PaneStack::Option::NoPaneAccessories)),
     m_overview(0),
