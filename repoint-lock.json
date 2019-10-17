@@ -4,13 +4,13 @@
       "pin": "0b6802e3b755"
     },
     "svcore": {
-      "pin": "c7e9e63c7bae"
+      "pin": "871a2050236b"
     },
     "svgui": {
-      "pin": "bdf284b29722"
+      "pin": "e6362cf5ff1d"
     },
     "svapp": {
-      "pin": "fe268c16ae28"
+      "pin": "ec8f21a20fa7"
     },
     "checker": {
       "pin": "c8c17e51aab0"
@@ -31,7 +31,7 @@
       "pin": "c2fb51b31fe4"
     },
     "bqaudioio": {
-      "pin": "8c4162878ae6"
+      "pin": "9f275ac85af1"
     },
     "bqaudiostream": {
       "pin": "a0926b93e771"
