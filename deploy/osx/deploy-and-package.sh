@@ -55,7 +55,7 @@ echo "Making dmg..."
 
 rm -f "$dmg"
 
-hdiutil create -srcfolder "$volume" "$dmg" -volname "$volume" && 
+hdiutil create -srcfolder "$volume" "$dmg" -volname "$volume" -fs HFS+ && 
 	rm -r "$volume"
 
 echo "Done"
