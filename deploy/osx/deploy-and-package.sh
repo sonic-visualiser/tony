@@ -9,7 +9,7 @@ version=`perl -p -e 's/^[^"]*"([^"]*)".*$/$1/' version.h`
 source="$app.app"
 volume="$app"-"$version"
 target="$volume"/"$app".app
-dmg="$app"-"$version".dmg
+dmg="$volume".dmg
 
 if [ -d "$volume" ]; then
     echo "Target directory $volume already exists, not overwriting"
