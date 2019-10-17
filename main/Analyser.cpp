@@ -912,8 +912,8 @@ Analyser::getEnclosingSelectionScope(sv_frame_t f, sv_frame_t &f0, sv_frame_t &f
         return;
     }
     
-    flexiNoteLayer->snapToFeatureFrame(m_pane, f0i, res, Layer::SnapLeft);
-    flexiNoteLayer->snapToFeatureFrame(m_pane, f1i, res, Layer::SnapRight);
+    flexiNoteLayer->snapToFeatureFrame(m_pane, f0i, res, Layer::SnapLeft, -1);
+    flexiNoteLayer->snapToFeatureFrame(m_pane, f1i, res, Layer::SnapRight, -1);
 
     f0 = (f0i < 0 ? 0 : f0i);
     f1 = (f1i < 0 ? 0 : f1i);
