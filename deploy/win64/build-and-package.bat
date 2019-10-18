@@ -66,5 +66,6 @@ signtool verify /pa tony.msi
 
 set PATH=%ORIGINALPATH%
 
+cd %STARTPWD%
 @echo Done
 
