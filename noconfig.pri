@@ -62,7 +62,7 @@ win32-g++ {
 
     INCLUDEPATH += $$PWD/sv-dependency-builds/win32-mingw/include $$PWD/sv-dependency-builds/win32-mingw/include/opus
 
-    INCLUDEPATH += /Libraries/boost_1_69_0 $$PWD/../boost_1_69_0
+    INCLUDEPATH += /Libraries/boost_1_71_0 /Libraries/boost_1_69_0 $$PWD/../boost_1_69_0
 
     LIBS += -Lrelease -L$$PWD/sv-dependency-builds/win32-mingw/lib
 
