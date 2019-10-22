@@ -9,12 +9,14 @@ if not exist %QTDIR% (
 @   exit /b 2
 )
 
-if not exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" (
+set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
+
+if not exist %vcvarsall% (
 @   echo "Could not find MSVC vars batch file"
 @   exit /b 2
 )
 
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
+call %vcvarsall% amd64
 
 set ORIGINALPATH=%PATH%
 set PATH=%PATH%;C:\Program Files (x86)\SMLNJ\bin;%QTDIR%\bin
