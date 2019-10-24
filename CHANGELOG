@@ -1,5 +1,5 @@
 
-Changes in Tony 2.1 (Oct 2019) since the previous release 2.0:
+Changes in Tony 2.1 (25 Oct 2019) since the previous release 2.0:
 
  - Fix problems reopening session files
 
@@ -9,6 +9,9 @@ Changes in Tony 2.1 (Oct 2019) since the previous release 2.0:
    already supported on macOS.) Note that AAC support on Windows does
    not support "gapless" import, i.e. removing the encoder gaps at
    start and end of the stream
+
+ - Fix sluggishness in starting and stopping playback when using
+   PulseAudio v13.0+
 
  - Update platform builds with newer libraries and updated platform
    support
