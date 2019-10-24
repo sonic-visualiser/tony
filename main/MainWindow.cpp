@@ -1268,7 +1268,7 @@ MainWindow::setupToolbars()
 
     updateLayerStatuses();
     
-    QTimer::singleShot(500, this, SLOT(betaReleaseWarning()));
+//    QTimer::singleShot(500, this, SLOT(betaReleaseWarning()));
 }
 
 

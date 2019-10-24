@@ -29,7 +29,7 @@ Authors, Citation, License and Use
 Tony was developed at Queen Mary, University of London in
 collaboration with New York University.
 
-Code copyright 2005-2017 Chris Cannam, Queen Mary University of
+Code copyright 2005-2019 Chris Cannam, Queen Mary University of
 London, and the Tony project authors: Matthias Mauch, George Fazekas,
 Justin Salamon, and Rachel Bittner, except where indicated in the
 individual source files. Thanks also to Simon Dixon and Juan Bello.
