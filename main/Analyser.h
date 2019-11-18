@@ -121,6 +121,13 @@ public:
     };
 
     /**
+     * Return the QSettings keys, and their default values, that
+     * affect analysis behaviour. These all live within the Analyser
+     * group in QSettings.
+     */
+    static std::map<QString, QVariant> getAnalysisSettings();
+    
+    /**
      * Analyse the selection and schedule asynchronous adds of
      * candidate layers for the region it contains. Returns "" on
      * success or a user-readable error string on failure. If the

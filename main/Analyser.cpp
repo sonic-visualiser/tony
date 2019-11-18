@@ -67,6 +67,16 @@ Analyser::~Analyser()
 {
 }
 
+std::map<QString, QVariant>
+Analyser::getAnalysisSettings()
+{
+    return { { "precision-analysis", false },
+             { "lowamp-analysis", true },
+             { "onset-analysis", true },
+             { "prune-analysis", true }
+    };
+}
+
 QString
 Analyser::newFileLoaded(Document *doc, ModelId model,
 			PaneStack *paneStack, Pane *pane)
@@ -398,10 +408,27 @@ Analyser::addAnalyses()
 
     QSettings settings;
     settings.beginGroup("Analyser");
-    bool precise = settings.value("precision-analysis", false).toBool();
-    bool lowamp = settings.value("lowamp-analysis", false).toBool();
-    bool onset = settings.value("onset-analysis", true).toBool(); // should these be the same as in MainWindow.cpp?
-    bool prune = settings.value("prune-analysis", true).toBool();
+
+    bool precise = false, lowamp = true, onset = true, prune = true;
+    
+    std::map<QString, bool &> flags {
+        { "precision-analysis", precise },
+        { "lowamp-analysis", lowamp },
+        { "onset-analysis", onset },
+        { "prune-analysis", prune }
+    };
+
+    auto keyMap = getAnalysisSettings();
+    
+    for (auto p: flags) {
+        auto ki = keyMap.find(p.first);
+        if (ki != keyMap.end()) {
+            p.second = settings.value(ki->first, ki->second).toBool();
+        } else {
+            throw std::logic_error("Internal error: One or more analysis settings keys not found in map: check addAnalyses and getAnalysisSettings");
+        }
+    }
+
     settings.endGroup();
 
     Transform t = tf->getDefaultTransformFor

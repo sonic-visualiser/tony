@@ -813,14 +813,16 @@ MainWindow::setupAnalysisMenu()
 void
 MainWindow::resetAnalyseOptions()
 {
-    //!!! oh no, we need to update the menu states as well...
     QSettings settings;
     settings.beginGroup("Analyser");
+
     settings.setValue("auto-analysis", true);
-    settings.setValue("precision-analysis", false);
-    settings.setValue("lowamp-analysis", true);
-    settings.setValue("onset-analysis", true);
-    settings.setValue("prune-analysis", true);
+    
+    auto keyMap = Analyser::getAnalysisSettings();
+    for (auto p: keyMap) {
+        settings.setValue(p.first, p.second);
+    }
+
     settings.endGroup();
     updateAnalyseStates();
 }
@@ -830,18 +832,30 @@ MainWindow::updateAnalyseStates()
 {
     QSettings settings;
     settings.beginGroup("Analyser");
-    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
-    bool precise = settings.value("precision-analysis", false).toBool();
-    bool lowamp = settings.value("lowamp-analysis", true).toBool();
-    bool onset = settings.value("onset-analysis", true).toBool();
-    bool prune = settings.value("prune-analysis", true).toBool();
-    settings.endGroup();
 
+    bool autoAnalyse = settings.value("auto-analysis", true).toBool();
     m_autoAnalyse->setChecked(autoAnalyse);
-    m_precise->setChecked(precise);
-    m_lowamp->setChecked(lowamp);
-    m_onset->setChecked(onset);
-    m_prune->setChecked(prune);
+
+    std::map<QString, QAction *> actions {
+        { "precision-analysis", m_precise },
+        { "lowamp-analysis", m_lowamp },
+        { "onset-analysis", m_onset },
+        { "prune-analysis", m_prune }
+    };
+
+    auto keyMap = Analyser::getAnalysisSettings();
+    
+    for (auto p: actions) {
+        auto ki = keyMap.find(p.first);
+        if (ki != keyMap.end()) {
+            p.second->setChecked(settings.value
+                                 (ki->first, ki->second).toBool());
+        } else {
+            throw std::logic_error("Internal error: One or more analysis settings keys not found in map returned by Analyser: check updateAnalyseStates and getAnalysisSettings");
+        }
+    }
+
+    settings.endGroup();
 }
 
 void
@@ -856,6 +870,9 @@ MainWindow::autoAnalysisToggled()
     settings.beginGroup("Analyser");
     settings.setValue("auto-analysis", set);
     settings.endGroup();
+
+    // make result visible explicitly, in case e.g. we just set the wrong key
+    updateAnalyseStates();
 }
 
 void
@@ -872,6 +889,9 @@ MainWindow::precisionAnalysisToggled()
     settings.endGroup();
 
     // don't run analyseNow() automatically -- it's a destructive operation
+
+    // make result visible explicitly, in case e.g. we just set the wrong key
+    updateAnalyseStates();
 }
 
 void
@@ -888,6 +908,9 @@ MainWindow::lowampAnalysisToggled()
     settings.endGroup();
 
     // don't run analyseNow() automatically -- it's a destructive operation
+
+    // make result visible explicitly, in case e.g. we just set the wrong key
+    updateAnalyseStates();
 }
 
 void
@@ -904,6 +927,9 @@ MainWindow::onsetAnalysisToggled()
     settings.endGroup();
 
     // don't run analyseNow() automatically -- it's a destructive operation
+
+    // make result visible explicitly, in case e.g. we just set the wrong key
+    updateAnalyseStates();
 }
 
 void
@@ -920,6 +946,9 @@ MainWindow::pruneAnalysisToggled()
     settings.endGroup();
 
     // don't run analyseNow() automatically -- it's a destructive operation
+
+    // make result visible explicitly, in case e.g. we just set the wrong key
+    updateAnalyseStates();
 }
 
 void
