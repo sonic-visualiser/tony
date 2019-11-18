@@ -244,6 +244,11 @@ main(int argc, char **argv)
 
     if (args.contains("--no-spectrogram")) spectrogram = false;
 
+    if (args.contains("--first-run")) {
+        QSettings settings;
+        settings.clear();
+    }
+
     InteractiveFileFinder::getInstance()->setApplicationSessionExtension("ton");
 
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
