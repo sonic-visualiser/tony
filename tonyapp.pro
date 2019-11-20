@@ -21,11 +21,11 @@ linux* {
 
     tony_bins.path = $$PREFIX_PATH/bin/
     tony_bins.files = tony
-    tony_bins.CONFIG = no_check_exist
+    tony_bins.CONFIG = no_check_exist executable
 
     tony_support.path = $$PREFIX_PATH/lib/tony/
     tony_support.files = chp.so pyin.so
-    tony_support.CONFIG = no_check_exist
+    tony_support.CONFIG = no_check_exist executable
 
     tony_desktop.path = $$PREFIX_PATH/share/applications/
     tony_desktop.files = tony.desktop
