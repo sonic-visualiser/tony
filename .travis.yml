@@ -31,5 +31,5 @@ before_script:
 
 script:
   - make -j3
-  - sudo make install
-  - /usr/local/bin/tony -v
+  - if [[ "$TRAVIS_OS_NAME" = "linux" ]] ; then sudo make install ; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" ]] ; then /usr/local/bin/tony -v ; fi
