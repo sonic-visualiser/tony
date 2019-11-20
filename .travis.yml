@@ -31,4 +31,5 @@ before_script:
 
 script:
   - make -j3
-
+  - sudo make install
+  - /usr/local/bin/tony -v
