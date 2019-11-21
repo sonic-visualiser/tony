@@ -2,9 +2,9 @@
 Changes in Tony 2.1.1 (Nov 2019) since the previous release 2.1:
 
  - Fix incorrect state of "Penalise Soft Pitches" option in Analysis
-   menu. On first run this was displayed as if enabled, but the option
+   menu. Previously this was displayed as if enabled, but the option
    was not actually active when performing the analysis, until the
-   option was toggled or "Reset Options to Default" was used.
+   option was toggled or "Reset Options to Default" was used
 
  - Fix failure to open playback device when using macOS Catalina with
    certain audio devices
