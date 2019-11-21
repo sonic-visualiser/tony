@@ -3,7 +3,7 @@ rem  To build from clean, delete the folder build_win64
 
 set STARTPWD=%CD%
 
-set QTDIR=C:\Qt\5.13.1\msvc2017_64
+set QTDIR=C:\Qt\5.13.2\msvc2017_64
 if not exist %QTDIR% (
 @   echo Could not find 64-bit Qt in %QTDIR%
 @   exit /b 2
