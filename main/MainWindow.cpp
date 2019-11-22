@@ -1761,7 +1761,7 @@ MainWindow::openFile()
     if (orig == "") orig = ".";
     else orig = QFileInfo(orig).absoluteDir().canonicalPath();
 
-    QString path = getOpenFileName(FileFinder::AnyFile);
+    QString path = getOpenFileName(FileFinder::SessionOrAudioFile);
 
     if (path.isEmpty()) return;
 
