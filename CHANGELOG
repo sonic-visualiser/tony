@@ -1,6 +1,8 @@
 
 Changes in Tony 2.1.1 (Nov 2019) since the previous release 2.1:
 
+ - Fix incorrect note numbering in display
+
  - Fix incorrect state of "Penalise Soft Pitches" option in Analysis
    menu. Previously this was displayed as if enabled, but the option
    was not actually active when performing the analysis, until the
