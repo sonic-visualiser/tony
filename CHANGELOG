@@ -15,9 +15,9 @@ Changes in Tony 2.1.1 (Nov 2019) since the previous release 2.1:
    use it if available, but it isn't required
 
  - Fix failure to make installed executables executable when
-   installing from the source package
-   
-	
+   compiling and installing the source package
+
+
 Changes in Tony 2.1 (25 Oct 2019) since the previous release 2.0:
 
  - Fix problems reopening session files
