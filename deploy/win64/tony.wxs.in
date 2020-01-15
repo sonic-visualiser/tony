@@ -1,11 +1,13 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+  @W@
+
   <Product
       Name="Tony" 
       Id="*"
       Language="1033"
       Codepage="1252" 
-      Version="2.1"
+      Version="@VERSION@"
       UpgradeCode="3F073027-A65B-4688-906C-5F64597C5BB1"
       Manufacturer="Queen Mary, University of London">
     
@@ -179,6 +181,20 @@
           </Component>
 
           <Component Win64="yes"
+                     Id="OpenSSL"
+                     Guid="e8c8341a-55af-4113-b083-5217400cf5c2">
+            <File
+                Id="libssl"
+                Name="libssl-1_1-x64.dll"
+                Source="C:\OpenSSL-v111-Win64\bin\libssl-1_1-x64.dll"
+                KeyPath="yes"/>
+            <File
+                Id="libcrypto"
+                Name="libcrypto-1_1-x64.dll"
+                Source="c:\OpenSSL-v111-Win64\bin\libcrypto-1_1-x64.dll"/>
+          </Component>
+
+          <Component Win64="yes"
                Id="VCRuntime"
                Guid="251D9513-BBD2-47CF-BE78-EF79446F7683">
 
@@ -194,24 +210,24 @@
                <File
                    Id="concrt140"
                    Name="concrt140.dll"
-                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.23.27820\x64\Microsoft.VC142.CRT\concrt140.DLL"
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\@REDIST_VER@\x64\Microsoft.VC142.CRT\concrt140.DLL"
                    KeyPath="yes"/>
                <File
                    Id="msvcp140"
                    Name="msvcp140.dll"
-                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.23.27820\x64\Microsoft.VC142.CRT\msvcp140.DLL"/>
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\@REDIST_VER@\x64\Microsoft.VC142.CRT\msvcp140.DLL"/>
                <File
                    Id="vccorlib140"
                    Name="vccorlib140.dll"
-                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.23.27820\x64\Microsoft.VC142.CRT\vccorlib140.DLL"/>
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\@REDIST_VER@\x64\Microsoft.VC142.CRT\vccorlib140.DLL"/>
                <File
                    Id="vcruntime140"
                    Name="vcruntime140.dll"
-                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.23.27820\x64\Microsoft.VC142.CRT\vcruntime140.DLL"/>
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\@REDIST_VER@\x64\Microsoft.VC142.CRT\vcruntime140.DLL"/>
                <File
                    Id="vcruntime140_1"
                    Name="vcruntime140_1.dll"
-                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.23.27820\x64\Microsoft.VC142.CRT\vcruntime140_1.DLL"/>
+                   Source="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\@REDIST_VER@\x64\Microsoft.VC142.CRT\vcruntime140_1.DLL"/>
           </Component>
 
 	  <Directory Id="Platforms" Name="platforms">
@@ -269,6 +285,7 @@
       <ComponentRef Id="MainExecutable"/>
       <ComponentRef Id="TonyFileAssociation"/>
       <ComponentRef Id="Sndfile"/>
+      <ComponentRef Id="OpenSSL"/>
       <ComponentRef Id="Qt5"/>
       <ComponentRef Id="VCRuntime"/>
       <ComponentRef Id="Qt5PlatformPlugins"/>
