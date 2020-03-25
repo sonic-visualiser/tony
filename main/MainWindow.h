@@ -146,7 +146,9 @@ protected slots:
     virtual void modelRegenerationWarning(QString, QString, QString);
     virtual void alignmentFailed(QString);
 
-    virtual void rightButtonMenuRequested(Pane *, QPoint point);
+    virtual void paneRightButtonMenuRequested(Pane *, QPoint point);
+    virtual void panePropertiesRightButtonMenuRequested(Pane *, QPoint point);
+    virtual void layerPropertiesRightButtonMenuRequested(Pane *, Layer *, QPoint point);
 
     virtual void setupRecentFilesMenu();
 

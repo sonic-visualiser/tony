@@ -1901,7 +1901,7 @@ MainWindow::closeEvent(QCloseEvent *e)
         return;
     }
 
-    if (!m_abandoning && !checkSaveModified()) {
+    if (!checkSaveModified()) {
 //        cerr << "Ignoring close event" << endl;
         e->ignore();
         return;
@@ -2368,7 +2368,7 @@ MainWindow::exportNoteLayer()
 
     } else {
 
-        DataExportOptions options = DataExportOmitLevels;
+        DataExportOptions options = DataExportOmitLevel;
         
         CSVFileWriter writer(path, model.get(),
                              ((suffix == "csv") ? "," : "\t"),
@@ -3198,11 +3198,21 @@ MainWindow::alignmentFailed(QString message)
 }
 
 void
-MainWindow::rightButtonMenuRequested(Pane *pane, QPoint position)
+MainWindow::paneRightButtonMenuRequested(Pane *pane, QPoint position)
 {
 //    cerr << "MainWindow::rightButtonMenuRequested(" << pane << ", " << position.x() << ", " << position.y() << ")" << endl;
     m_paneStack->setCurrentPane(pane);
     m_rightButtonMenu->popup(position);
+}
+
+void
+MainWindow::panePropertiesRightButtonMenuRequested(Pane *, QPoint)
+{
+}
+
+void
+MainWindow::layerPropertiesRightButtonMenuRequested(Pane *, Layer *, QPoint)
+{
 }
 
 void

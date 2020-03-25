@@ -1,25 +1,25 @@
 {
   "libraries": {
     "vamp-plugin-sdk": {
-      "pin": "c42e50a5c297"
+      "pin": "74c5b0bfa108"
     },
     "svcore": {
-      "pin": "ee3b248bda25"
+      "pin": "a4dce53b3353"
     },
     "svgui": {
-      "pin": "76e4302a3fc2"
+      "pin": "01a41a37bd26"
     },
     "svapp": {
-      "pin": "55f317633b93"
+      "pin": "7b1d30af4b38"
     },
     "checker": {
-      "pin": "c8c17e51aab0"
+      "pin": "ef64b3f171d9"
     },
     "piper-vamp-cpp": {
-      "pin": "0e3328c6091f59c912e25bc392a7dc75182be1c7"
+      "pin": "f381235a4ba88eac2fa31fc1f7f613cca9707f63"
     },
     "dataquay": {
-      "pin": "b82360a98f49"
+      "pin": "35098262cadd"
     },
     "bqvec": {
       "pin": "cd235ecbeb31"
@@ -31,7 +31,7 @@
       "pin": "c2fb51b31fe4"
     },
     "bqaudioio": {
-      "pin": "9f275ac85af1"
+      "pin": "4fe94361597f"
     },
     "bqaudiostream": {
       "pin": "a0926b93e771"
@@ -40,13 +40,13 @@
       "pin": "7686116dcdd5"
     },
     "sv-dependency-builds": {
-      "pin": "d0c2a83c1364"
+      "pin": "08ae793730bd"
     },
     "icons/scalable": {
-      "pin": "be45984f7915"
+      "pin": "fd0ace21dce3"
     },
     "pyin": {
-      "pin": "3faac48d491d"
+      "pin": "a7d9c6142f8f"
     },
     "chp": {
       "pin": "de970142809f"
