@@ -1,5 +1,11 @@
 
-CONFIG += c++14
+win32-msvc* {
+    # Necessary for WinRT header used to determine background colour
+    CONFIG += c++17
+}
+!win32-msvc* {
+    CONFIG += c++14
+}
 
 CONFIG += release
 
