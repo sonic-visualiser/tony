@@ -121,7 +121,7 @@ win32-msvc* {
     DEFINES -= HAVE_LIBLO
     LIBS -= -llo
     
-    LIBS += -lmfplat -lmfreadwrite -lmfuuid -lpropsys -ladvapi32 -lwinmm -lws2_32
+    LIBS += -lWindowsApp -lmfplat -lmfreadwrite -lmfuuid -lpropsys -ladvapi32 -lwinmm -lws2_32
 }
 
 macx* {
