@@ -123,7 +123,6 @@ protected slots:
 
     virtual void sampleRateMismatch(sv_samplerate_t, sv_samplerate_t, bool);
     virtual void audioOverloadPluginDisabled();
-    virtual void audioTimeStretchMultiChannelDisabled();
 
     virtual void documentModified();
     virtual void documentRestored();
