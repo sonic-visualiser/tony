@@ -3176,7 +3176,7 @@ MainWindow::modelRegenerationWarning(QString layerName,
 }
 
 void
-MainWindow::alignmentFailed(QString message)
+MainWindow::alignmentFailed(ModelId, QString message)
 {
     QMessageBox::warning
         (this,

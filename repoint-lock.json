@@ -1,16 +1,16 @@
 {
   "libraries": {
     "vamp-plugin-sdk": {
-      "pin": "8ffb8985ae8f"
+      "pin": "0e32c328b02a"
     },
     "svcore": {
-      "pin": "db489a1ece9b"
+      "pin": "258e356b1a7b"
     },
     "svgui": {
-      "pin": "6616e1899daa"
+      "pin": "fe9a643b83bf"
     },
     "svapp": {
-      "pin": "83ae68de4401"
+      "pin": "7bded7599874"
     },
     "checker": {
       "pin": "e839338d3869"
