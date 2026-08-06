@@ -5,7 +5,7 @@
     An intonation analysis and annotation tool
     Centre for Digital Music, Queen Mary, University of London.
     This file copyright 2006-2012 Chris Cannam and QMUL.
-    
+
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
     published by the Free Software Foundation; either version 2 of the
@@ -19,6 +19,7 @@
 #include <QObject>
 #include <QRect>
 #include <QMutex>
+#include <QtGlobal>
 
 #include <map>
 #include <vector>
@@ -35,6 +36,8 @@ class Layer;
 class TimeValueLayer;
 class Layer;
 }
+
+class RealtimeAnalyser;
 
 class Analyser : public QObject,
                  public sv::Document::LayerCreationHandler
@@ -56,9 +59,12 @@ public:
     // layers; return "" on success or error string on failure
     QString analyseExistingFile();
 
+    // Completes analysis from the last position to the end
+    QString analyseRecordingToEnd(sv::sv_frame_t record_duration);
+
     // Discard any layers etc associated with the current document
     void fileClosed();
-		       
+
     void setIntelligentActions(bool);
 
     bool getDisplayFrequencyExtents(double &min, double &max);
@@ -128,7 +134,14 @@ public:
      * group in QSettings.
      */
     static std::map<QString, QVariant> getAnalysisSettings();
-    
+
+    /**
+     * Analyse the selection and schedule asynchronous adds of
+     * candidate layers for the region it contains. Returns "" on
+     * success or a user-readable error string on failure.
+     */
+    QString analyseRecording(sv::Selection sel);
+
     /**
      * Analyse the selection and schedule asynchronous adds of
      * candidate layers for the region it contains. Returns "" on
@@ -232,6 +245,8 @@ signals:
     void initialAnalysisCompleted();
 
 protected slots:
+    void updatePitchTrack(sv::ModelId);
+    void updateNoteLayer(sv::ModelId);
     void layerAboutToBeDeleted(sv::Layer *);
     void layerCompletionChanged(sv::ModelId);
     void reAnalyseRegion(sv::sv_frame_t, sv::sv_frame_t, float, float);
@@ -247,12 +262,16 @@ protected:
 
     sv::Clipboard m_preAnalysis;
     sv::Selection m_reAnalysingSelection;
+    sv::sv_frame_t m_analysedFrames = 0;
     FrequencyRange m_reAnalysingRange;
     std::vector<sv::Layer *> m_reAnalysisCandidates;
+
+    RealtimeAnalyser *m_realtimeAnalyser = nullptr;
+
     int m_currentCandidate;
     bool m_candidatesVisible;
     sv::Document::LayerCreationAsyncHandle m_currentAsyncHandle;
-    QMutex m_asyncMutex;
+    mutable QMutex m_asyncMutex;
 
     QString doAllAnalyses(bool withPitchTrack);
 
@@ -263,13 +282,20 @@ protected:
     void discardPitchCandidates();
 
     void stackLayers();
-    
+
     // Document::LayerCreationHandler method
     void layersCreated(sv::Document::LayerCreationAsyncHandle,
                        std::vector<sv::Layer *>, std::vector<sv::Layer *>);
 
     void saveState(Component c) const;
     void loadState(Component c);
+
+    static constexpr const char* PYIN_PLUGIN_NAME = "pYIN";
+    static constexpr const char* PYIN_TRANSFORM_BASE = "vamp:pyin:pyin:";
+    static constexpr const char* PYIN_F0_OUT = "smoothedpitchtrack";
+    static constexpr const char* PYIN_NOTE_OUT = "notes";
+
+
 };
 
 #endif

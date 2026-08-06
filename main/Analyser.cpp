@@ -5,7 +5,7 @@
     An intonation analysis and annotation tool
     Centre for Digital Music, Queen Mary, University of London.
     This file copyright 2006-2012 Chris Cannam and QMUL.
-    
+
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
     published by the Free Software Foundation; either version 2 of the
@@ -14,6 +14,9 @@
 */
 
 #include "Analyser.h"
+#include "RealtimeAnalyser.h"
+
+#include <algorithm>
 
 #include "transform/TransformFactory.h"
 #include "transform/ModelTransformer.h"
@@ -44,9 +47,9 @@ using std::endl;
 using namespace sv;
 
 Analyser::Analyser() :
-    m_document(0),
-    m_paneStack(0),
-    m_pane(0),
+    m_document(nullptr),
+    m_paneStack(nullptr),
+    m_pane(nullptr),
     m_currentCandidate(-1),
     m_candidatesVisible(false),
     m_currentAsyncHandle(0)
@@ -65,10 +68,18 @@ Analyser::Analyser() :
          QString("<layer verticalScale=\"%1\"/>")
          .arg(int(FlexiNoteLayer::AutoAlignScale)));
     settings.endGroup();
+
+    m_realtimeAnalyser = new RealtimeAnalyser(this);
+    connect(m_realtimeAnalyser, &RealtimeAnalyser::layersChanged,
+            this, &Analyser::layersChanged,
+            Qt::QueuedConnection);
 }
 
 Analyser::~Analyser()
 {
+    if (m_realtimeAnalyser) {
+        m_realtimeAnalyser->cleanup();
+    }
 }
 
 std::map<QString, QVariant>
@@ -83,19 +94,43 @@ Analyser::getAnalysisSettings()
 
 QString
 Analyser::newFileLoaded(Document *doc, ModelId model,
-			PaneStack *paneStack, Pane *pane)
+                        PaneStack *paneStack, Pane *pane)
 {
+    if (m_document && m_document != doc) {
+        disconnect(m_document, nullptr, this, nullptr);
+    }
+
+    // Clean up any in-flight realtime analysis layers/callbacks tied to the previous document
+    if (m_realtimeAnalyser) {
+        m_realtimeAnalyser->cleanup();
+    }
+
     m_document = doc;
     m_fileModel = model;
     m_paneStack = paneStack;
     m_pane = pane;
 
+    // Realtime analysis progress is relative to this model. Recording a
+    // second time reaches us through here rather than through
+    // fileClosed(), so without this reset the first chunk of the new
+    // recording would be analysed from the *previous* recording's end
+    // frame -- which Selection silently turns into a large backwards
+    // range, wiping the new pitch track.
+    m_analysedFrames = 0;
+
+    if (m_realtimeAnalyser) {
+        // Targets are (re)created later in addAnalyses(); set minimal context now
+        m_realtimeAnalyser->setContext(m_document, m_fileModel, m_pane, nullptr, nullptr);
+        m_realtimeAnalyser->invalidateGeneration();
+    }
+
     if (!ModelById::isa<WaveFileModel>(m_fileModel)) {
         return "Internal error: Analyser::newFileLoaded() called with no model, or a non-WaveFileModel";
     }
-    
-    connect(doc, SIGNAL(layerAboutToBeDeleted(Layer *)),
-            this, SLOT(layerAboutToBeDeleted(Layer *)));
+
+    connect(doc, &Document::layerAboutToBeDeleted,
+            this, &Analyser::layerAboutToBeDeleted,
+            Qt::UniqueConnection);
 
     QSettings settings;
     settings.beginGroup("Analyser");
@@ -113,17 +148,47 @@ Analyser::analyseExistingFile()
     if (!m_pane) return "Internal error: Analyser::analyseExistingFile() called with no pane present";
 
     if (m_fileModel.isNone()) return "Internal error: Analyser::analyseExistingFile() called with no model present";
-    
+
     if (m_layers[PitchTrack]) {
         m_document->removeLayerFromView(m_pane, m_layers[PitchTrack]);
-        m_layers[PitchTrack] = 0;
+        m_layers[PitchTrack] = nullptr;
     }
     if (m_layers[Notes]) {
         m_document->removeLayerFromView(m_pane, m_layers[Notes]);
-        m_layers[Notes] = 0;
+        m_layers[Notes] = nullptr;
     }
 
     return doAllAnalyses(true);
+}
+
+QString
+Analyser::analyseRecordingToEnd(sv_frame_t record_duration)
+{
+    if (!m_document) return "Internal error: Analyser::analyseRecordingToEnd() called with no document present";
+
+    if (!m_pane) return "Internal error: Analyser::analyseRecordingToEnd() called with no pane present";
+
+    if (m_fileModel.isNone()) return "Internal error: Analyser::analyseRecordingToEnd() called with no model present";
+
+    // We start with a 2500-frame overlap to ensure we capture instrument attacks in time (~56ms)
+    const sv_frame_t overlap = 2500;
+    const sv_frame_t startPosition = std::max(m_analysedFrames - overlap,
+                                              sv_frame_t(0));
+    const sv_frame_t endPosition = record_duration;
+
+    if (endPosition <= startPosition) {
+        // Nothing new to analyse. Selection would silently swap the two
+        // frames and hand us a large backwards range, so bail out
+        // instead of leaving that to be discovered downstream.
+        return "";
+    }
+
+    QString error = analyseRecording(Selection(startPosition, endPosition));
+    if (error != "") return error;
+
+    m_analysedFrames = endPosition;
+
+    return "";
 }
 
 QString
@@ -170,10 +235,31 @@ void
 Analyser::fileClosed()
 {
     cerr << "Analyser::fileClosed" << endl;
+
+    if (m_currentAsyncHandle && m_document) {
+        m_document->cancelAsyncLayerCreation(m_currentAsyncHandle);
+    }
+    m_currentAsyncHandle = 0;
+
+    if (m_realtimeAnalyser) {
+        // cleanup() already abandons outstanding work and bumps the
+        // generation, so it is safe to drop the context straight after
+        m_realtimeAnalyser->cleanup();
+        m_realtimeAnalyser->clearContext();
+    }
+
     m_layers.clear();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;
     m_reAnalysingSelection = Selection();
+    m_reAnalysingRange = FrequencyRange();
+    m_candidatesVisible = false;
+    m_analysedFrames = 0;
+
+    m_document = nullptr;
+    m_paneStack = nullptr;
+    m_pane = nullptr;
+    m_fileModel = ModelId();
 }
 
 bool
@@ -204,7 +290,7 @@ Analyser::getInitialAnalysisCompletion()
         int c = m_layers[Notes]->getCompletion(m_pane);
         if (c < completion) completion = c;
     }
-    
+
     return completion;
 }
 
@@ -227,7 +313,7 @@ Analyser::layerCompletionChanged(ModelId)
 
     auto audioModel = ModelById::get(m_layers[Audio]->getModel());
     sv_frame_t endFrame = audioModel->getEndFrame();
-        
+
     if (m_layers[PitchTrack]) {
         auto model = ModelById::getAs<SparseTimeValueModel>
             (m_layers[PitchTrack]->getModel());
@@ -255,7 +341,7 @@ Analyser::addVisualisations()
 
 /* This is roughly what we'd do for a constant-Q spectrogram, but it
    currently has issues with y-axis alignment
-  
+
     TransformFactory *tf = TransformFactory::getInstance();
 
     QString name = "Constant-Q";
@@ -264,7 +350,7 @@ Analyser::addVisualisations()
 
     QString notFound = tr("Transform \"%1\" not found, spectrogram will not be enabled.<br><br>Is the %2 Vamp plugin correctly installed?");
     if (!tf->haveTransform(base + out)) {
-	return notFound.arg(base + out).arg(name);
+        return notFound.arg(base + out).arg(name);
     }
 
     Transform transform = tf->getDefaultTransformFor
@@ -275,7 +361,7 @@ Analyser::addVisualisations()
         (m_document->createDerivedLayer(transform, m_fileModel));
 
     if (!spectrogram) return tr("Transform \"%1\" did not run correctly (no layer or wrong layer type returned)").arg(base + out);
-*/    
+*/
 
     // As with all the visualisation layers, if we already have one in
     // the pane we do not create another, just record its
@@ -338,21 +424,96 @@ Analyser::addWaveform()
         params->setPlayPan(-1);
         params->setPlayGain(1);
     }
-    
+
     m_document->addLayerToView(m_pane, waveform);
 
     m_layers[Audio] = waveform;
     return "";
 }
 
+std::map<QString, bool> getAnalysisSettingsFromSettings()
+{
+    std::map<QString, bool> analysisSettings;
+
+    QSettings settings;
+    settings.beginGroup("Analyser");
+
+    analysisSettings["precision-analysis"] = settings.value("precision-analysis", false).toBool();
+    analysisSettings["lowamp-analysis"] = settings.value("lowamp-analysis", true).toBool();
+    analysisSettings["onset-analysis"] = settings.value("onset-analysis", true).toBool();
+    analysisSettings["prune-analysis"] = settings.value("prune-analysis", true).toBool();
+
+    settings.endGroup();
+
+    return analysisSettings;
+}
+
+static void setAnalysisSettings(Transform& transform)
+{
+    const auto analysisSettings = getAnalysisSettingsFromSettings();
+
+    if (analysisSettings.count("precision-analysis") > 0) {
+        bool precise = analysisSettings.at("precision-analysis");
+        if (precise) {
+            cerr << "setting parameters for precise mode" << endl;
+            transform.setParameter("precisetime", 1);
+        }
+        else {
+            cerr << "setting parameters for vague mode" << endl;
+            transform.setParameter("precisetime", 0);
+        }
+    }
+
+    if (analysisSettings.count("lowamp-analysis") > 0) {
+        bool lowamp = analysisSettings.at("lowamp-analysis");
+        if (lowamp) {
+            cerr << "setting parameters for lowamp suppression" << endl;
+            transform.setParameter("lowampsuppression", 0.2f);
+        }
+        else {
+            cerr << "setting parameters for no lowamp suppression" << endl;
+            transform.setParameter("lowampsuppression", 0.0f);
+        }
+    }
+
+    if (analysisSettings.count("onset-analysis") > 0) {
+        bool onset = analysisSettings.at("onset-analysis");
+        if (onset) {
+            cerr << "setting parameters for increased onset sensitivity" << endl;
+            transform.setParameter("onsetsensitivity", 0.7f);
+        }
+        else {
+            cerr << "setting parameters for non-increased onset sensitivity" << endl;
+            transform.setParameter("onsetsensitivity", 0.0f);
+        }
+    }
+
+    if (analysisSettings.count("prune-analysis") > 0) {
+        bool prune = analysisSettings.at("prune-analysis");
+        if (prune) {
+            cerr << "setting parameters for duration pruning" << endl;
+            transform.setParameter("prunethresh", 0.1f);
+        }
+        else {
+            cerr << "setting parameters for no duration pruning" << endl;
+            transform.setParameter("prunethresh", 0.0f);
+        }
+    }
+}
+
 QString
 Analyser::addAnalyses()
 {
+    if (m_realtimeAnalyser) {
+        // Prevent stale callbacks touching soon-to-be-replaced pitch/note layers
+        m_realtimeAnalyser->invalidateGeneration();
+        m_realtimeAnalyser->cleanup();
+    }
     auto waveFileModel = ModelById::getAs<WaveFileModel>(m_fileModel);
     if (!waveFileModel) {
         return "Internal error: Analyser::addAnalyses() called with no model present";
     }
-    
+
     // As with the spectrogram above, if these layers exist we use
     // them
     TimeValueLayer *existingPitch = 0;
@@ -373,20 +534,15 @@ Analyser::addAnalyses()
     } else {
         if (existingPitch) {
             m_document->removeLayerFromView(m_pane, existingPitch);
-            m_layers[PitchTrack] = 0;
+            m_layers[PitchTrack] = nullptr;
         }
         if (existingNotes) {
             m_document->removeLayerFromView(m_pane, existingNotes);
-            m_layers[Notes] = 0;
+            m_layers[Notes] = nullptr;
         }
     }
 
     TransformFactory *tf = TransformFactory::getInstance();
-    
-    QString plugname = "pYIN";
-    QString base = "vamp:pyin:pyin:";
-    QString f0out = "smoothedpitchtrack";
-    QString noteout = "notes";
 
     Transforms transforms;
 
@@ -401,81 +557,28 @@ Analyser::addAnalyses()
         m_document->addLayerToView(m_pane, lx);
     }
 */
+    auto f0_transform = QString(PYIN_TRANSFORM_BASE) + QString(PYIN_F0_OUT);
+    auto note_transform = QString(PYIN_TRANSFORM_BASE) + QString(PYIN_NOTE_OUT);
 
     QString notFound = tr("Transform \"%1\" not found. Unable to analyse audio file.<br><br>Is the %2 Vamp plugin correctly installed?");
-    if (!tf->haveTransform(base + f0out)) {
-	return notFound.arg(base + f0out).arg(plugname);
+    if (!tf->haveTransform(f0_transform)) {
+        return notFound.arg(f0_transform).arg(PYIN_PLUGIN_NAME);
     }
-    if (!tf->haveTransform(base + noteout)) {
-	return notFound.arg(base + noteout).arg(plugname);
+    if (!tf->haveTransform(note_transform)) {
+        return notFound.arg(note_transform).arg(PYIN_PLUGIN_NAME);
     }
-
-    QSettings settings;
-    settings.beginGroup("Analyser");
-
-    bool precise = false, lowamp = true, onset = true, prune = true;
-    
-    std::map<QString, bool &> flags {
-        { "precision-analysis", precise },
-        { "lowamp-analysis", lowamp },
-        { "onset-analysis", onset },
-        { "prune-analysis", prune }
-    };
-
-    auto keyMap = getAnalysisSettings();
-    
-    for (auto p: flags) {
-        auto ki = keyMap.find(p.first);
-        if (ki != keyMap.end()) {
-            p.second = settings.value(ki->first, ki->second).toBool();
-        } else {
-            throw std::logic_error("Internal error: One or more analysis settings keys not found in map: check addAnalyses and getAnalysisSettings");
-        }
-    }
-
-    settings.endGroup();
 
     Transform t = tf->getDefaultTransformFor
-        (base + f0out, waveFileModel->getSampleRate());
+        (f0_transform, waveFileModel->getSampleRate());
     t.setStepSize(256);
     t.setBlockSize(2048);
 
-    if (precise) {
-        cerr << "setting parameters for precise mode" << endl;
-        t.setParameter("precisetime", 1);
-    } else {
-        cerr << "setting parameters for vague mode" << endl;
-        t.setParameter("precisetime", 0);
-    }
-
-    if (lowamp) {
-        cerr << "setting parameters for lowamp suppression" << endl;
-        t.setParameter("lowampsuppression", 0.2f);
-    } else {
-        cerr << "setting parameters for no lowamp suppression" << endl;
-        t.setParameter("lowampsuppression", 0.0f);
-    }
-
-    if (onset) {
-        cerr << "setting parameters for increased onset sensitivity" << endl;
-        t.setParameter("onsetsensitivity", 0.7f);
-    } else {
-        cerr << "setting parameters for non-increased onset sensitivity" << endl;
-        t.setParameter("onsetsensitivity", 0.0f);
-    }
-
-    if (prune) {
-        cerr << "setting parameters for duration pruning" << endl;
-        t.setParameter("prunethresh", 0.1f);
-    } else {
-        cerr << "setting parameters for no duration pruning" << endl;
-        t.setParameter("prunethresh", 0.0f);
-    }
+    setAnalysisSettings(t);
 
     transforms.push_back(t);
 
-    t.setOutput(noteout);
-    
+    t.setOutput(PYIN_NOTE_OUT);
+
     transforms.push_back(t);
 
     std::vector<Layer *> layers =
@@ -485,16 +588,20 @@ Analyser::addAnalyses()
 
         FlexiNoteLayer *f = qobject_cast<FlexiNoteLayer *>(layers[i]);
         TimeValueLayer *t = qobject_cast<TimeValueLayer *>(layers[i]);
-        
-        if (f) m_layers[Notes] = f;
-        if (t) m_layers[PitchTrack] = t;
-        
+
+        if (f) {
+            m_layers[Notes] = f;
+        }
+        else if (t) {
+            m_layers[PitchTrack] = t;
+        }
+
         m_document->addLayerToView(m_pane, layers[i]);
     }
-    
+
     ColourDatabase *cdb = ColourDatabase::getInstance();
-    
-    TimeValueLayer *pitchLayer = 
+
+    TimeValueLayer *pitchLayer =
         qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
     if (pitchLayer) {
         pitchLayer->setBaseColour(cdb->getColourIndex(tr("Black")));
@@ -506,8 +613,8 @@ Analyser::addAnalyses()
         connect(pitchLayer, SIGNAL(modelCompletionChanged(ModelId)),
                 this, SLOT(layerCompletionChanged(ModelId)));
     }
-    
-    FlexiNoteLayer *flexiNoteLayer = 
+
+    FlexiNoteLayer *flexiNoteLayer =
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
     if (flexiNoteLayer) {
         flexiNoteLayer->setBaseColour(cdb->getColourIndex(tr("Bright Blue")));
@@ -523,7 +630,13 @@ Analyser::addAnalyses()
         connect(flexiNoteLayer, SIGNAL(materialiseReAnalysis()),
                 this, SLOT(materialiseReAnalysis()));
     }
-    
+
+    if (m_realtimeAnalyser) {
+        auto *pitchLayer = qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
+        auto *noteLayer  = qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+        m_realtimeAnalyser->setContext(m_document, m_fileModel, m_pane, pitchLayer, noteLayer);
+    }
+
     return "";
 }
 
@@ -544,6 +657,35 @@ Analyser::materialiseReAnalysis()
     switchPitchCandidate(m_reAnalysingSelection, true); // or false, doesn't matter
 }
 
+void
+Analyser::updatePitchTrack(sv::ModelId)
+{
+    // Implementation for updatePitchTrack slot
+    emit layersChanged();
+}
+
+void
+Analyser::updateNoteLayer(sv::ModelId)
+{
+    // Implementation for updateNoteLayer slot
+    emit layersChanged();
+}
+
+QString
+Analyser::analyseRecording(Selection sel)
+{
+    if (!m_realtimeAnalyser) {
+        return "Internal error: Analyser::analyseRecording() called with no realtime analyser present";
+    }
+
+    auto *pitchLayer = qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
+    auto *noteLayer  = qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+
+    m_realtimeAnalyser->setContext(m_document, m_fileModel, m_pane, pitchLayer, noteLayer);
+    return m_realtimeAnalyser->analyseChunk(sel);
+}
+
+
 QString
 Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 {
@@ -553,7 +695,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     if (!waveFileModel) {
         return "Internal error: Analyser::reAnalyseSelection() called with no model present";
     }
-    
+
     if (!m_reAnalysingSelection.isEmpty()) {
         if (sel == m_reAnalysingSelection && range == m_reAnalysingRange) {
             cerr << "selection & range are same as current analysis, ignoring" << endl;
@@ -584,12 +726,12 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     }
 
     TransformFactory *tf = TransformFactory::getInstance();
-    
-    QString plugname1 = "pYIN";
+
     QString plugname2 = "CHP";
 
     QString base = "vamp:pyin:localcandidatepyin:";
     QString out = "pitchtrackcandidates";
+
 
     if (range.isConstrained()) {
         base = "vamp:chp:constrainedharmonicpeak:";
@@ -600,9 +742,9 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
 
     QString notFound = tr("Transform \"%1\" not found. Unable to perform interactive analysis.<br><br>Are the %2 and %3 Vamp plugins correctly installed?");
     if (!tf->haveTransform(base + out)) {
-	return notFound.arg(base + out).arg(plugname1).arg(plugname2);
+        return notFound.arg(base + out).arg(PYIN_PLUGIN_NAME).arg(plugname2);
     }
-
+       
     Transform t = tf->getDefaultTransformFor
         (base + out, waveFileModel->getSampleRate());
     t.setStepSize(256);
@@ -626,7 +768,7 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
     } else {
         endSample   -= 9*grid; // MM says: not sure what the CHP plugin does there
     }
-    RealTime start = RealTime::frame2RealTime(startSample, waveFileModel->getSampleRate()); 
+    RealTime start = RealTime::frame2RealTime(startSample, waveFileModel->getSampleRate());
     RealTime end = RealTime::frame2RealTime(endSample, waveFileModel->getSampleRate());
 
     RealTime duration;
@@ -641,12 +783,12 @@ Analyser::reAnalyseSelection(Selection sel, FrequencyRange range)
         cerr << "Analyser::reAnalyseSelection: duration <= 0, not analysing" << endl;
         return "";
     }
-    
+
     t.setStartTime(start);
     t.setDuration(duration);
 
     transforms.push_back(t);
-    
+
     m_currentAsyncHandle =
         m_document->createDerivedLayersAsync(transforms, m_fileModel, this);
 
@@ -660,7 +802,7 @@ Analyser::arePitchCandidatesShown() const
 }
 
 void
-Analyser::showPitchCandidates(bool shown) 
+Analyser::showPitchCandidates(bool shown)
 {
     if (m_candidatesVisible == shown) return;
 
@@ -687,7 +829,7 @@ Analyser::layersCreated(Document::LayerCreationAsyncHandle handle,
     {
         QMutexLocker locker(&m_asyncMutex);
 
-        if (handle != m_currentAsyncHandle || 
+        if (handle != m_currentAsyncHandle ||
             m_reAnalysingSelection == Selection()) {
             // We don't want these!
             for (int i = 0; i < (int)primary.size(); ++i) {
@@ -750,14 +892,14 @@ Analyser::haveHigherPitchCandidate() const
     if (m_reAnalysisCandidates.empty()) return false;
     return (m_currentCandidate < 0 ||
             (m_currentCandidate + 1 < (int)m_reAnalysisCandidates.size()));
-}    
+}
 
 bool
 Analyser::haveLowerPitchCandidate() const
 {
     if (m_reAnalysisCandidates.empty()) return false;
     return (m_currentCandidate < 0 || m_currentCandidate >= 1);
-}    
+}
 
 void
 Analyser::switchPitchCandidate(Selection sel, bool up)
@@ -803,14 +945,14 @@ void
 Analyser::shiftOctave(Selection sel, bool up)
 {
     float factor = (up ? 2.f : 0.5f);
-    
+
     vector<Layer *> actOn;
 
     Layer *pitchTrack = m_layers[PitchTrack];
     if (pitchTrack) actOn.push_back(pitchTrack);
 
     foreach (Layer *layer, actOn) {
-        
+
         Clipboard clip;
         layer->copy(m_pane, sel, clip);
         layer->deleteSelection(sel);
@@ -824,7 +966,7 @@ Analyser::shiftOctave(Selection sel, bool up)
                 shifted.addPoint(e);
             }
         }
-        
+
         layer->paste(m_pane, shifted, 0, false);
     }
 }
@@ -849,7 +991,7 @@ Analyser::abandonReAnalysis(Selection sel)
     if (!myLayer) return;
     myLayer->deleteSelection(sel);
     myLayer->paste(m_pane, m_preAnalysis, 0, false);
-}    
+}
 
 void
 Analyser::clearReAnalysis()
@@ -880,7 +1022,7 @@ void
 Analyser::layerAboutToBeDeleted(Layer *doomed)
 {
     cerr << "Analyser::layerAboutToBeDeleted(" << doomed << ")" << endl;
-    
+
     vector<Layer *> notDoomed;
 
     foreach (Layer *layer, m_reAnalysisCandidates) {
@@ -903,7 +1045,7 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
     if (!myModel || !otherModel) return;
 
     Clipboard clip;
-    
+
     Selection sel = Selection(myModel->getStartFrame(),
                               myModel->getEndFrame());
     myLayer->deleteSelection(sel);
@@ -932,7 +1074,7 @@ Analyser::takePitchTrackFrom(Layer *otherLayer)
 void
 Analyser::getEnclosingSelectionScope(sv_frame_t f, sv_frame_t &f0, sv_frame_t &f1)
 {
-    FlexiNoteLayer *flexiNoteLayer = 
+    FlexiNoteLayer *flexiNoteLayer =
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
 
     sv_frame_t f0i = f, f1i = f;
@@ -942,7 +1084,7 @@ Analyser::getEnclosingSelectionScope(sv_frame_t f, sv_frame_t &f0, sv_frame_t &f
         f0 = f1 = f;
         return;
     }
-    
+
     flexiNoteLayer->snapToFeatureFrame(m_pane, f0i, res, Layer::SnapLeft, -1);
     flexiNoteLayer->snapToFeatureFrame(m_pane, f1i, res, Layer::SnapRight, -1);
 
@@ -976,11 +1118,11 @@ Analyser::loadState(Component c)
 }
 
 void
-Analyser::setIntelligentActions(bool on) 
+Analyser::setIntelligentActions(bool on)
 {
     std::cerr << "toggle setIntelligentActions " << on << std::endl;
 
-    FlexiNoteLayer *flexiNoteLayer = 
+    FlexiNoteLayer *flexiNoteLayer =
         qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
     if (flexiNoteLayer) {
         flexiNoteLayer->setIntelligentActions(on);
@@ -1055,7 +1197,7 @@ Analyser::getGain(Component c) const
         return 1.f;
     }
 }
-    
+
 void
 Analyser::setGain(Component c, float gain)
 {
@@ -1078,7 +1220,7 @@ Analyser::getPan(Component c) const
         return 1.f;
     }
 }
-    
+
 void
 Analyser::setPan(Component c, float pan)
 {
@@ -1089,6 +1231,3 @@ Analyser::setPan(Component c, float pan)
         saveState(c);
     }
 }
-
-
-    
