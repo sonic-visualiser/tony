@@ -191,6 +191,18 @@ elif system == 'darwin'
   general_link_args += [
     '-mmacosx-version-min=10.15'
   ]
+
+  # Qt's qyieldcpu.h (through 6.9.x at least) calls the ACLE intrinsic
+  # __yield() under __has_builtin(__yield) without including
+  # <arm_acle.h>. Apple clang 21 reports the builtin as available but
+  # makes the resulting implicit declaration an error, so every
+  # translation unit that reaches <QtCore/qatomic.h> fails to compile.
+  # Force-including the ACLE header supplies the declaration.
+  if architecture == 'aarch64' and meson.get_compiler('cpp').has_header('arm_acle.h')
+    general_defines += [
+      '-include', 'arm_acle.h'
+    ]
+  endif
   
   feature_defines = [
     '-DHAVE_BZ2',
