@@ -14,6 +14,7 @@
 */
 
 #include "Analyser.h"
+#include "RecordingPreview.h"
 
 #include "transform/TransformFactory.h"
 #include "transform/ModelTransformer.h"
@@ -47,10 +48,14 @@ Analyser::Analyser() :
     m_document(0),
     m_paneStack(0),
     m_pane(0),
+    m_recordingPreview(new RecordingPreview(this)),
     m_currentCandidate(-1),
     m_candidatesVisible(false),
     m_currentAsyncHandle(0)
 {
+    connect(m_recordingPreview, SIGNAL(previewUpdated()),
+            this, SIGNAL(layersChanged()));
+
     QSettings settings;
     settings.beginGroup("LayerDefaults");
     settings.setValue
@@ -77,7 +82,8 @@ Analyser::getAnalysisSettings()
     return { { "precision-analysis", false },
              { "lowamp-analysis", true },
              { "onset-analysis", true },
-             { "prune-analysis", true }
+             { "prune-analysis", true },
+             { "record-preview", false }
     };
 }
 
@@ -127,6 +133,53 @@ Analyser::analyseExistingFile()
 }
 
 QString
+Analyser::beginRecordingPreview()
+{
+    if (!m_document) return "Internal error: Analyser::beginRecordingPreview() called with no document present";
+
+    if (!m_pane) return "Internal error: Analyser::beginRecordingPreview() called with no pane present";
+
+    if (m_fileModel.isNone()) return "Internal error: Analyser::beginRecordingPreview() called with no model present";
+
+    // The preview draws into the pitch track, so we need one. If
+    // auto-analysis is switched off there won't be one yet, but asking
+    // to see analysis while recording is a clear enough request for it.
+    if (!m_layers[PitchTrack]) {
+        QString error = addAnalyses();
+        if (error != "") return error;
+    }
+
+    TimeValueLayer *pitchLayer =
+        qobject_cast<TimeValueLayer *>(m_layers[PitchTrack]);
+    if (!pitchLayer) {
+        return "Internal error: Analyser::beginRecordingPreview() has no pitch track layer";
+    }
+
+    FlexiNoteLayer *noteLayer =
+        qobject_cast<FlexiNoteLayer *>(m_layers[Notes]);
+
+    return m_recordingPreview->begin(m_fileModel, pitchLayer, noteLayer);
+}
+
+void
+Analyser::recordingPreviewReachedFrame(sv_frame_t frame)
+{
+    m_recordingPreview->recordedTo(frame);
+}
+
+bool
+Analyser::isRecordingPreviewActive() const
+{
+    return m_recordingPreview->isActive();
+}
+
+void
+Analyser::endRecordingPreview()
+{
+    m_recordingPreview->end();
+}
+
+QString
 Analyser::doAllAnalyses(bool withPitchTrack)
 {
     m_reAnalysingSelection = Selection();
@@ -170,6 +223,7 @@ void
 Analyser::fileClosed()
 {
     cerr << "Analyser::fileClosed" << endl;
+    m_recordingPreview->abandon();
     m_layers.clear();
     m_reAnalysisCandidates.clear();
     m_currentCandidate = -1;

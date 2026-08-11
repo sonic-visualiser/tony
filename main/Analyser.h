@@ -36,6 +36,8 @@ class TimeValueLayer;
 class Layer;
 }
 
+class RecordingPreview;
+
 class Analyser : public QObject,
                  public sv::Document::LayerCreationHandler
 {
@@ -55,6 +57,31 @@ public:
     // Remove any derived layers, process the main model, add derived
     // layers; return "" on success or error string on failure
     QString analyseExistingFile();
+
+    /**
+     * Start filling in the pitch track as a recording is made, so that
+     * the performer can see something as they go. Everything this adds
+     * is removed again by endRecordingPreview(), because the pitch and
+     * note layers are regenerated in full when recording stops. Returns
+     * "" on success or an error string on failure.
+     */
+    QString beginRecordingPreview();
+
+    /**
+     * Note that the recording being previewed has reached the given
+     * frame.
+     */
+    void recordingPreviewReachedFrame(sv::sv_frame_t frame);
+
+    /**
+     * Return true if a recording preview is currently running.
+     */
+    bool isRecordingPreviewActive() const;
+
+    /**
+     * Stop previewing and remove everything the preview added.
+     */
+    void endRecordingPreview();
 
     // Discard any layers etc associated with the current document
     void fileClosed();
@@ -244,6 +271,8 @@ protected:
     sv::Pane *m_pane;
 
     mutable std::map<Component, sv::Layer *> m_layers;
+
+    RecordingPreview *m_recordingPreview;
 
     sv::Clipboard m_preAnalysis;
     sv::Selection m_reAnalysingSelection;

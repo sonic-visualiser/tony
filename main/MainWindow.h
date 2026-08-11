@@ -89,6 +89,8 @@ protected slots:
     virtual void analyseNow();
     virtual void resetAnalyseOptions();
     virtual void autoAnalysisToggled();
+    virtual void recordPreviewToggled();
+    virtual void recordStatusChanged(bool);
     virtual void precisionAnalysisToggled();
     virtual void lowampAnalysisToggled();
     virtual void onsetAnalysisToggled();
@@ -205,6 +207,7 @@ protected:
     bool           m_intelligentActionOn; // GF: !!! temporary
 
     QAction       *m_autoAnalyse;
+    QAction       *m_recordPreview;
     QAction       *m_precise;
     QAction       *m_lowamp;
     QAction       *m_onset;
@@ -231,6 +234,10 @@ protected:
     bool m_withSonification;
     bool m_withSpectrogram;
 
+    // Preview is started on the first duration update rather than when
+    // recording starts; this stops us retrying every update if it fails
+    bool m_recordPreviewAttempted;
+
     Analyser::FrequencyRange m_pendingConstraint;
 
     QString exportToSVL(QString path, sv::Layer *layer);
@@ -253,6 +260,8 @@ protected:
     virtual void closeEvent(QCloseEvent *e);
     bool checkSaveModified();
     bool waitForInitialAnalysis();
+
+    virtual void recordDurationChanged(sv::sv_frame_t, sv::sv_samplerate_t);
 
     virtual void updateVisibleRangeDisplay(sv::Pane *p) const;
     virtual void updatePositionStatusDisplays() const;
